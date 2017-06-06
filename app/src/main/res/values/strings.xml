@@ -41,6 +41,11 @@
 	
 	<string name="name">Name</string>
 
+	<string name="bitrate">Bitrate</string>
+	<string name="sample_rate">Sample rate</string>
+	<string name="channels">Channels</string>
+	<string name="length">Length</string>
+
 	<!-- Title -->
 
 	<string name="playlists">Playlists</string>

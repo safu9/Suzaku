@@ -19,6 +19,11 @@
 	<string name="compilation">コンピレーション</string>
 
 	<string name="name">名前</string>
+
+	<string name="bitrate">ビットレート</string>
+	<string name="sample_rate">サンプルレート</string>
+	<string name="channels">チャンネル</string>
+	<string name="length">再生時間</string>
 	
 	<!-- Title -->
 

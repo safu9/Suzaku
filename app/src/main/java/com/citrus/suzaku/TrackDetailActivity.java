@@ -330,7 +330,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		private EditText[] mEditTexts = new EditText[ITEM_NUM];
 		private CheckBox compilationCheckBox;
 
-		private boolean isEditting;
+		private boolean isEditing;
 		
 		private static InfoFragment newInstance(Track track)
 		{
@@ -364,11 +364,11 @@ public class TrackDetailActivity extends AppCompatActivity
 		{
 			ContentValues values = mTrack.getContentValues();
 			
-			isEditting = true;
+			isEditing = true;
 			for(int i = 0; i < ITEM_NUM; i++){
 				mEditTexts[i].setText(values.getAsString(keys[i]));
 			}
-			isEditting = false;
+			isEditing = false;
 			
 			compilationCheckBox.setChecked(values.getAsBoolean(Tracks.COMPILATION));
 		}
@@ -392,7 +392,7 @@ public class TrackDetailActivity extends AppCompatActivity
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count)
 			{
-				if(isEditting || s.toString().equals(mText)){
+				if(isEditing || s.toString().equals(mText)){
 					return;
 				}
 				
@@ -400,8 +400,6 @@ public class TrackDetailActivity extends AppCompatActivity
 				values.put(keys[mNumber], mEditTexts[mNumber].getText().toString());
 				
 				((TrackDetailActivity)getActivity()).saveContentValues(values);
-				
-				App.logd("TDA TEXT CHANGED " + mText + "->" + s);
 			}
 
 			@Override
@@ -495,6 +493,11 @@ public class TrackDetailActivity extends AppCompatActivity
 
 		private TextView pathTextView;
 
+		private TextView lengthTextView;
+		private TextView bitrateTextView;
+		private TextView sampleRateTextView;
+		private TextView channelsTextView;
+
 
 		private static FileFragment newInstance(Track track)
 		{
@@ -512,7 +515,13 @@ public class TrackDetailActivity extends AppCompatActivity
 			mTrack = (Track)getArguments().getSerializable("TRACK");
 
 			View view = inflater.inflate(R.layout.fragment_track_detail_file, container, false);
+
 			pathTextView = (TextView)view.findViewById(R.id.path);
+
+			lengthTextView = (TextView)view.findViewById(R.id.length);
+			bitrateTextView = (TextView)view.findViewById(R.id.bitrate);
+			sampleRateTextView = (TextView)view.findViewById(R.id.sample_rate);
+			channelsTextView = (TextView)view.findViewById(R.id.channels);
 
 			updateView();
 
@@ -522,6 +531,18 @@ public class TrackDetailActivity extends AppCompatActivity
 		private void updateView()
 		{
 			pathTextView.setText(mTrack.path);
+
+			//! EXPERIMENTAL
+			TagLibHelper tagHelper = new TagLibHelper();
+			tagHelper.setFile(mTrack.path);
+
+			int length = tagHelper.getLength();
+			lengthTextView.setText((length / 60) + ":" + (length % 60));
+			bitrateTextView.setText(tagHelper.getBitrate() + "kbps");
+			sampleRateTextView.setText((tagHelper.getSampleRate() / 1000.0) + "kHz");
+			channelsTextView.setText(Integer.toString(tagHelper.getChannels()));
+
+			tagHelper.release();
 		}
 	}
 	
