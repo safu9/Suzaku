@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	
+	<item
+        android:id="@+id/menu_lyrics"
+        android:title="@string/lyrics"
+		android:enabled="false"/>
+	
+	<item
+        android:id="@+id/menu_playing_list"
+        android:title="@string/playing_list"
+		android:enabled="false"/>
+	
+    <item
+        android:id="@+id/menu_detail"
+        android:title="@string/detail"/>
+	
+	<item
+		android:id="@+id/menu_settings"
+		android:title="@string/settings"/>
+	
+</menu>

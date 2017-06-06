@@ -1,0 +1,30 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/myListItem"
+	android:layout_width="match_parent"
+	android:gravity="center_vertical"
+	android:orientation="vertical">
+
+	<TextView
+		style="@style/myListText"
+		android:id="@+id/title"
+		android:layout_height="@dimen/view_tiny"
+		android:layout_width="match_parent"/>
+
+	<TextView
+		style="@style/myListDetailText"
+		android:id="@+id/songs"
+		android:layout_height="@dimen/view_tiny"
+		android:layout_width="match_parent"
+		android:layout_below="@id/title"
+		android:layout_toLeftOf="@+id/popupButton"/>
+	
+	<ImageButton
+		android:id="@+id/popupButton"
+		android:src="@drawable/ic_popup"
+		android:layout_height="@dimen/small_icon_size"
+		android:layout_width="@dimen/small_icon_size"
+		android:layout_below="@id/title"
+		android:layout_alignParentRight="true"
+		android:background="@android:color/transparent"/>
+	
+</RelativeLayout>

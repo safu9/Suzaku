@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.citrus.suzaku" >
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:name=".App"
+        android:theme="@style/AppTheme"
+        android:allowBackup="false" >
+
+        <activity
+            android:label="@string/app_name"
+            android:name=".MainActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:label="@string/app_name"
+            android:name=".TrackActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
+
+        <activity
+            android:label="@string/app_name"
+            android:name=".TrackDetailActivity">
+        </activity>
+
+        <activity
+            android:label="@string/app_name"
+            android:name=".SettingActivity"
+            android:configChanges="locale">
+        </activity>
+
+        <service
+            android:label="@string/player_service_name"
+            android:name=".PlayerService"
+            android:process=":player"
+            android:exported="false">
+
+            <intent-filter >
+                <action android:name="Citrus.suzaku.action.ACTION_PLAY" />
+                <action android:name="Citrus.suzaku.action.ACTION_PLAY_PAUSE" />
+                <action android:name="Citrus.suzaku.action.ACTION_NEXT" />
+                <action android:name="Citrus.suzaku.action.ACTION_PREV" />
+                <action android:name="Citrus.suzaku.action.ACTION_STOP" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:label="@string/music_db_service_name"
+            android:name=".MusicDBService"
+            android:exported="false">
+
+            <intent-filter >
+                <action android:name="Citrus.suzaku.action.ACTION_UPDATE_DATABASE" />
+                <action android:name="Citrus.suzaku.action.ACTION_UPDATE_TRACK"/>
+                <action android:name="Citrus.suzaku.action.ACTION_CREATE_PLAYLIST" />
+                <action android:name="Citrus.suzaku.action.ACTION_EDIT_PLAYLIST" />
+                <action android:name="Citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST" />
+                <action android:name="Citrus.suzaku.action.ACTION_DELETE_PLAYLISTTRACKS" />
+                <action android:name="Citrus.suzaku.action.ACTION_DELETE_PLAYLIST" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".MediaButtonReceiver">
+
+            <intent-filter >
+                <action android:name="android.intent.action.ACTION_MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".PlayerWidgetProvider"
+            android:process=":player">
+
+            <intent-filter >
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+
+                <action android:name="Citrus.suzaku.action.ACTION_UPDATE_WIDGET" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info">
+            </meta-data>
+        </receiver>
+
+    </application>
+
+</manifest>

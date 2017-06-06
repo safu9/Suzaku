@@ -1,0 +1,14 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/myListItem"
+	android:layout_width="match_parent"
+	android:gravity="center_vertical">
+	
+	<!-- For Header or Footer -->
+
+	<TextView
+		style="@style/myListText"
+		android:id="@+id/title"
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"/>
+    
+</LinearLayout>

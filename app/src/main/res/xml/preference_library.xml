@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	android:title="@string/library">
+
+	<PreferenceCategory
+		android:title="@string/library">
+		
+		<CheckBoxPreference
+			android:key="@string/key_group_compilations"
+			android:title="@string/group_compilations"
+			android:defaultValue="false"/>
+	
+		<CheckBoxPreference
+			android:key="@string/key_hidden_files"
+			android:title="@string/show_hidden_files"
+			android:defaultValue="false"
+			android:enabled="false"/>
+		
+	</PreferenceCategory>
+	
+	<PreferenceCategory
+		android:title="@string/scan">
+		
+		<CheckBoxPreference
+			android:key="@string/key_auto_scan"
+			android:title="@string/auto_scan"
+			android:defaultValue="false"
+			android:enabled="false"/>
+<!--
+		<com.citrus.suzaku.FolderSelectPreference
+			android:key="@string/key_music_folder"
+			android:title="@string/select_folder"
+			android:enabled="false"/>
+-->
+	</PreferenceCategory>
+	
+</PreferenceScreen>

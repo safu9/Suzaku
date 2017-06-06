@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<!-- Basics -->
+
+	<string name="title">曲名</string>
+	<string name="artist">アーティスト</string>
+	<string name="album">アルバム</string>
+	<string name="album_artist">アルバムアーティスト</string>
+	<string name="artwork">アートワーク</string>
+	<string name="composer">作曲者</string>
+	<string name="genre">ジャンル</string>
+	<string name="track_no">トラック</string>
+	<string name="disc_no">ディスク</string>
+	<string name="year">年</string>
+	<string name="lyrics">歌詞</string>
+	<string name="playlist">プレイリスト</string>
+	<string name="path">パス</string>
+	<string name="compilation">コンピレーション</string>
+
+	<string name="name">名前</string>
+	
+	<!-- Title -->
+
+	<string name="playlists">プレイリスト</string>
+	<string name="artists">アーティスト</string>
+	<string name="albums">アルバム</string>
+	<string name="songs">曲</string>
+	<string name="genres">ジャンル</string>
+
+	<string name="select">選択</string>
+	<string name="select_playlist">プレイリストを選択</string>
+
+	<!-- Menu -->
+
+	<string name="shuffle">シャッフル</string>
+	<string name="order_by">並び替え</string>
+	<string name="settings">設定</string>
+	<string name="scan">スキャン</string>
+	<string name="detail">詳細</string>
+	<string name="file">ファイル</string>
+	<string name="add_to_playlist">プレイリストに追加</string>
+	<string name="add_to_queue">キューに追加</string>
+	<string name="edit">編集</string>
+	<string name="delete">削除</string>
+	<string name="create_new_playlist">新規プレイリスト</string>
+	<string name="save">保存</string>
+	<string name="update">更新</string>
+
+	<!-- Views -->
+
+	<string name="no_data">データ無し</string>
+	<string name="sd_unmounted">SDカードがマウントされていません</string>
+
+	<string name="unknown_artist">不明なアーティスト</string>
+	<string name="unknown_album">不明なアルバム</string>
+	<string name="unknown_genre">不明なジャンル</string>
+	<string name="compilations">コンピレーション</string>
+	<string name="various_artists">V.A.</string>
+	
+	<string name="playing_list">再生中リスト</string>
+	
+	<string name="choose_from_gallery">ギャラリーから選択</string>
+	
+	<string name="ok">OK</string>
+	<string name="cancel">キャンセル</string>
+
+	<plurals name="num_songs">
+		<item quantity="other">%1$d 曲</item>
+	</plurals>
+
+	<plurals name="num_albums">
+		<item quantity="other">%1$d アルバム</item>
+	</plurals>
+
+	<!-- Errors -->
+
+	<string name="notify_added_to_playlist">プレイリストに追加しました。</string>
+	<string name="warn_input_playlist_title">プレイリスト名を入力してください。</string>
+	<string name="warn_title_already_exists">その名前は既に存在します。</string>
+
+	<string name="notify_saved_changes">変更を保存しました。</string>
+	
+	<string name="notify_scanning">スキャンしています…</string>
+	<string name="notify_scan_finished">スキャンが終わりました。</string>
+	
+	<string name="err_cant_play">\"%1$s\" を再生できません。</string>
+
+	<!-- Preference -->
+
+	<string name="ui">UI</string>
+	<string name="library">ライブラリ</string>
+
+	<string name="show_player_screen">再生画面を表示</string>
+	<string name="summary_player_screen">再生開始時に画面を変更します。</string>
+	<string name="show_status_bar">ステータスバーを表示</string>
+	<string name="select_tabs">タブを選択</string>
+	<string name="language">言語 (Language)</string>
+
+	<string name="group_compilations">コンピレーションをまとめる</string>
+	<string name="show_hidden_files">隠しファイルを表示</string>
+	<string name="auto_scan">自動スキャン</string>
+	<string name="select_folder">フォルダを選択</string>
+
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	android:title="@string/ui">
+
+	<PreferenceCategory
+		android:title="@string/ui">
+
+		<!-- TENTATIVE -->
+		<CheckBoxPreference
+			android:key="light_theme"
+			android:title="Light Theme"
+			android:defaultValue="true"
+			android:enabled="false"/>
+
+		<CheckBoxPreference
+			android:key="@string/key_player_screen"
+			android:title="@string/show_player_screen"
+			android:summary="@string/summary_player_screen"
+			android:defaultValue="true"/>
+
+		<CheckBoxPreference
+			android:key="@string/key_status_bar"
+			android:title="@string/show_status_bar"
+			android:defaultValue="true"
+			android:enabled="false"/>
+		
+		<MultiSelectListPreference
+			android:key="@string/key_tabs"
+			android:title="@string/select_tabs"
+			android:entries="@array/tabs"
+			android:entryValues="@array/tabValues"
+			android:defaultValue="@array/tabValues"/>
+		
+		<ListPreference
+			android:key="@string/key_language"
+			android:title="@string/language"
+			android:entries="@array/languages"
+			android:entryValues="@array/languageValues"/>
+		
+	</PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="mySeekBar" parent="@style/Widget.AppCompat.SeekBar">
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:splitTrack">false</item>
+        <item name="android:progressDrawable">@drawable/seekbar_progress_layer</item>
+        <item name="android:indeterminateDrawable">@drawable/seekbar_progress_layer</item>
+        <item name="android:minHeight">12dp</item>
+        <item name="android:maxHeight">12dp</item>
+        <item name="android:thumb">@drawable/seekbar_thumb</item>
+        <item name="android:thumbOffset">16dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+    </style>
+
+</resources>
