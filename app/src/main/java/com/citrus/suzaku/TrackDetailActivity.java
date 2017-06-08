@@ -1,11 +1,9 @@
 package com.citrus.suzaku;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -16,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,8 +27,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.citrus.suzaku.MusicDB.Tracks;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +35,10 @@ public class TrackDetailActivity extends AppCompatActivity
 {
 	private List<Track> mTracks;
 	private Track mTrack;
-	private ContentValues mValues = new ContentValues();
-	
+
+	private SparseArray<String> mTag = new SparseArray<>();
+	private SparseArray<String> mChangedTag = new SparseArray<>();
+
 	private DatabaseBroadcastReceiver receiver;
 
 	private TabLayout mTabs;
@@ -75,9 +74,13 @@ public class TrackDetailActivity extends AppCompatActivity
 		//! EXPERIMENTAL
 		TagLibHelper tagHelper = new TagLibHelper();
 		tagHelper.setFile(mTrack.path);
-		tagHelper.dumpTags();
-		tagHelper.release();
 
+		tagHelper.dumpTags();
+		for(int i = 0; i < TagLibHelper.NUMBER_OF_KEY; i++){
+			mTag.put(i, tagHelper.getTag(i));
+		}
+
+		tagHelper.release();
 
 		// UI
 
@@ -156,39 +159,50 @@ public class TrackDetailActivity extends AppCompatActivity
 				saveTrackInfo();
 				finish();
 				return true;
-				
-			case R.id.menu_update:
-				Intent intent = new Intent(MusicDBService.ACTION_UPDATE_TRACK);
-				intent.putExtra(MusicDBService.INTENT_KEY_TRACK, mTrack);
-				intent.setPackage(App.PACKAGE);
-				startService(intent);
-				return true;
 
 			default:
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
-	private void saveContentValues(ContentValues values)
+
+	private SparseArray<String> getTag()
 	{
-		mValues.putAll(values);
+		return mTag;
+	}
+	
+	private void saveTagChanges(int key, String value)
+	{
+		mChangedTag.put(key, value);
 	}
 	
 	private void saveTrackInfo()
 	{
-		if(mValues.size() == 0){
+		int size = mChangedTag.size();
+		if(size == 0){
 			return;
 		}
-		
-		SQLiteDatabase db = MusicDBHelper.getInstanceForWriting().getWritableDatabase();
-		try{
-			MusicDB mdb = new MusicDB(db);
-			mdb.updateTrack(mTrack.id, mValues);
-		}finally{
-		//	db.close();
+
+		// ファイルに書き込み
+		TagLibHelper tagHelper = new TagLibHelper();
+		tagHelper.setFile(mTrack.path);
+
+		for(int i = 0; i < size; i++){
+			tagHelper.setTag(mChangedTag.keyAt(i), mChangedTag.valueAt(i));
 		}
-		
-		Toast.makeText(this, R.string.notify_saved_changes, Toast.LENGTH_SHORT).show();
+		boolean ret = tagHelper.saveTag();
+		tagHelper.release();
+
+		if(ret){
+			// データベースを更新
+			Intent intent = new Intent(MusicDBService.ACTION_UPDATE_TRACK);
+			intent.putExtra(MusicDBService.INTENT_KEY_PATH, mTrack.path);
+			intent.setPackage(App.PACKAGE);
+			startService(intent);
+
+			Toast.makeText(this, R.string.notify_saved_changes, Toast.LENGTH_SHORT).show();
+		}else{
+			Toast.makeText(this, R.string.cant_save_changes, Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 	private class MyPagerAdapter extends FragmentStatePagerAdapter
@@ -299,21 +313,22 @@ public class TrackDetailActivity extends AppCompatActivity
 	
 	public static class InfoFragment extends Fragment
 	{
-		private static final int ITEM_NUM = 9;
+		private static final int ITEM_NUM = 10;
 		
-		private static final String[] keys = {
-			Tracks.TITLE,
-			Tracks.ALBUM,
-			Tracks.ARTIST,
-			Tracks.ALBUMARTIST,
-			Tracks.COMPOSER,
-			Tracks.GENRE,
-			Tracks.TRACK_NO,
-			Tracks.DISC_NO,
-			Tracks.YEAR
+		private static final int[] KEYS = {
+			TagLibHelper.KEY_TITLE,
+			TagLibHelper.KEY_ALBUM,
+			TagLibHelper.KEY_ARTIST,
+			TagLibHelper.KEY_ALBUMARTIST,
+			TagLibHelper.KEY_COMPOSER,
+			TagLibHelper.KEY_GENRE,
+			TagLibHelper.KEY_TRACKNUMBER,
+			TagLibHelper.KEY_DISCNUMBER,
+			TagLibHelper.KEY_YEAR,
+			TagLibHelper.KEY_COMMENT
 		};
 		
-		private static final int[] ids = {
+		private static final int[] IDS = {
 			R.id.title,
 			R.id.album,
 			R.id.artist,
@@ -322,7 +337,8 @@ public class TrackDetailActivity extends AppCompatActivity
 			R.id.genre,
 			R.id.track_no,
 			R.id.disc_no,
-			R.id.year
+			R.id.year,
+			R.id.comment
 		};
 		
 		private Track mTrack;
@@ -350,7 +366,7 @@ public class TrackDetailActivity extends AppCompatActivity
 			View view = inflater.inflate(R.layout.fragment_track_detail_info, container, false);
 			
 			for(int i = 0; i < ITEM_NUM; i++){
-				mEditTexts[i] = (EditText)view.findViewById(ids[i]);
+				mEditTexts[i] = (EditText)view.findViewById(IDS[i]);
 				mEditTexts[i].addTextChangedListener(new MyTextWatcher(i));
 			}
 			compilationCheckBox = (CheckBox)view.findViewById(R.id.compilation);
@@ -362,15 +378,21 @@ public class TrackDetailActivity extends AppCompatActivity
 
 		private void updateView()
 		{
-			ContentValues values = mTrack.getContentValues();
-			
+			SparseArray<String> tag = ((TrackDetailActivity)getActivity()).getTag();
+
 			isEditing = true;
 			for(int i = 0; i < ITEM_NUM; i++){
-				mEditTexts[i].setText(values.getAsString(keys[i]));
+				mEditTexts[i].setText(tag.get(KEYS[i]));
 			}
 			isEditing = false;
-			
-			compilationCheckBox.setChecked(values.getAsBoolean(Tracks.COMPILATION));
+
+			boolean isCompilation = false;
+			try{
+				isCompilation = (Integer.parseInt(tag.get(TagLibHelper.KEY_COMPILATION)) > 0);
+			}catch(NumberFormatException e){
+				// e.printStackTrace();
+			}
+			compilationCheckBox.setChecked(isCompilation);
 		}
 		
 		private class MyTextWatcher implements TextWatcher
@@ -396,10 +418,8 @@ public class TrackDetailActivity extends AppCompatActivity
 					return;
 				}
 				
-				ContentValues values = new ContentValues();
-				values.put(keys[mNumber], mEditTexts[mNumber].getText().toString());
-				
-				((TrackDetailActivity)getActivity()).saveContentValues(values);
+				String values = mEditTexts[mNumber].getText().toString();
+				((TrackDetailActivity)getActivity()).saveTagChanges(KEYS[mNumber], values);
 			}
 
 			@Override
@@ -477,13 +497,8 @@ public class TrackDetailActivity extends AppCompatActivity
 		
 		private void updateView()
 		{
-			//! EXPERIMENTAL
-			TagLibHelper tagHelper = new TagLibHelper();
-			tagHelper.setFile(mTrack.path);
-			String lyrics = tagHelper.getLyrics();
-			tagHelper.release();
-
-			lyricsEditText.setText(lyrics);
+			SparseArray<String> tag = ((TrackDetailActivity)getActivity()).getTag();
+			lyricsEditText.setText(tag.get(TagLibHelper.KEY_LYRICS));
 		}
 	}
 
@@ -537,7 +552,7 @@ public class TrackDetailActivity extends AppCompatActivity
 			tagHelper.setFile(mTrack.path);
 
 			int length = tagHelper.getLength();
-			lengthTextView.setText((length / 60) + ":" + (length % 60));
+			lengthTextView.setText(String.format("%d:%02d", length / 60, length % 60));
 			bitrateTextView.setText(tagHelper.getBitrate() + "kbps");
 			sampleRateTextView.setText((tagHelper.getSampleRate() / 1000.0) + "kHz");
 			channelsTextView.setText(Integer.toString(tagHelper.getChannels()));

@@ -18,6 +18,26 @@
 // static jclass myClass;
 // static jfieldID fieldID;
 
+const char* KEYS[] = {
+        "TITLE",
+        "TITLESORT",
+        "ARTIST",
+        "ARTISTSORT",
+        "ALBUM",
+        "ALBUMSORT",
+        "ALBUMARTIST",
+        "ALBUMARTISTSORT",
+        "GENRE",
+        "COMPOSER",
+        "YEAR",
+        "LYRICS",
+        "COMMENT",
+        "CONTENTGROUP",
+        "TRACKNUMBER",
+        "DISCNUMBER",
+        "COMPILATION"
+};
+
 // Handle Utils
 
 jfieldID getHandleField(JNIEnv *env, jobject obj, const char* name)
@@ -60,15 +80,9 @@ void releaseFile(JNIEnv *env, jobject instance)
     setHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle", 0);
 }
 
-TagLib::String getTag(JNIEnv *env, jobject instance, const char* key)
-{
-    TagLib::PropertyMap* tags = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
-    if(!tags){
-        TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
-        tags = new TagLib::PropertyMap(file->file()->properties());
-        setHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle", tags);
-    }
 
+TagLib::String findTagFromMap(TagLib::PropertyMap* tags, const char* key)
+{
     TagLib::PropertyMap::ConstIterator i = tags->find(key);
     if(i == tags->end()){
         return TagLib::String::null;
@@ -82,11 +96,22 @@ TagLib::String getTag(JNIEnv *env, jobject instance, const char* key)
     return str;
 }
 
+TagLib::String getTag(JNIEnv *env, jobject instance, const char* key)
+{
+    TagLib::PropertyMap* tags = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
+    if(!tags){
+        TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
+        tags = new TagLib::PropertyMap(file->file()->properties());
+        setHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle", tags);
+    }
+
+    return findTagFromMap(tags, key);
+}
+
 void setTag(JNIEnv *env, jobject instance, const char* key, const char* value)
 {
     TagLib::PropertyMap* tags = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
     if(!tags){
-        //!! いけるか！？
         TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
         tags = new TagLib::PropertyMap(file->file()->properties());
         setHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle", tags);
@@ -196,6 +221,15 @@ Java_com_citrus_suzaku_TagLibHelper_dumpTags(JNIEnv *env, jobject instance, jcla
 }
 
 // Read
+
+
+
+JNIEXPORT jstring JNICALL
+Java_com_citrus_suzaku_TagLibHelper_getTag(JNIEnv *env, jobject instance, jint key)
+{
+    return env->NewStringUTF(getTag(env, instance, KEYS[key]).toCString(true));
+}
+
 
 JNIEXPORT jstring JNICALL
 Java_com_citrus_suzaku_TagLibHelper_getTitle(JNIEnv *env, jobject instance)
@@ -333,7 +367,7 @@ JNIEXPORT jboolean JNICALL
 Java_com_citrus_suzaku_TagLibHelper_getCompilation(JNIEnv *env, jobject instance)
 {
     TagLib::String comp = getTag(env, instance, "COMPILATION");
-    return (comp.toInt() > 0)? JNI_TRUE : JNI_FALSE;
+    return (jboolean)(comp.toInt() > 0);
 }
 
 JNIEXPORT jbyteArray JNICALL
@@ -417,6 +451,32 @@ Java_com_citrus_suzaku_TagLibHelper_getChannels(JNIEnv *env, jobject instance)
 
 
 // Write
+
+
+JNIEXPORT void JNICALL
+Java_com_citrus_suzaku_TagLibHelper_setTag(JNIEnv *env, jobject instance, jint key, jstring value_)
+{
+    const char *value = env->GetStringUTFChars(value_, 0);
+    setTag(env, instance, KEYS[key], value);
+    env->ReleaseStringUTFChars(value_, value);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_citrus_suzaku_TagLibHelper_saveTag(JNIEnv *env, jobject instance)
+{
+    TagLib::PropertyMap* tags = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
+    if(!tags){
+        return 0;
+    }
+
+    TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
+    TagLib::File* f = file->file();
+    TagLib::PropertyMap rejected = f->setProperties(*tags);
+    bool ret = f->save();
+
+    return (jboolean)((rejected.size() == 0) && ret);
+}
+
 
 JNIEXPORT void JNICALL
 Java_com_citrus_suzaku_TagLibHelper_setTitle(JNIEnv *env, jobject instance, jstring title_)

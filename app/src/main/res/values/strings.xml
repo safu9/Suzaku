@@ -36,11 +36,12 @@
 	<string name="year">Year</string>
 	<string name="lyrics">Lyrics</string>
 	<string name="playlist">Playlist</string>
-	<string name="path">Path</string>
 	<string name="compilation">Compilation</string>
+	<string name="comment">Comment</string>
 	
 	<string name="name">Name</string>
 
+	<string name="path">Path</string>
 	<string name="bitrate">Bitrate</string>
 	<string name="sample_rate">Sample rate</string>
 	<string name="channels">Channels</string>
@@ -111,6 +112,7 @@
 	<string name="warn_title_already_exists">The title already exists.</string>
 	
 	<string name="notify_saved_changes">Saved changes.</string>
+	<string name="cant_save_changes">Can\'t save changes.</string>
 	
 	<string name="notify_scanning">Scanning…</string>
 	<string name="notify_scan_finished">Scan finished.</string>

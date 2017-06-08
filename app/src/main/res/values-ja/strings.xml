@@ -15,11 +15,12 @@
 	<string name="year">年</string>
 	<string name="lyrics">歌詞</string>
 	<string name="playlist">プレイリスト</string>
-	<string name="path">パス</string>
 	<string name="compilation">コンピレーション</string>
+	<string name="comment">コメント</string>
 
 	<string name="name">名前</string>
 
+	<string name="path">パス</string>
 	<string name="bitrate">ビットレート</string>
 	<string name="sample_rate">サンプルレート</string>
 	<string name="channels">チャンネル</string>
@@ -85,6 +86,7 @@
 	<string name="warn_title_already_exists">その名前は既に存在します。</string>
 
 	<string name="notify_saved_changes">変更を保存しました。</string>
+	<string name="cant_save_changes">変更を保存できません。</string>
 	
 	<string name="notify_scanning">スキャンしています…</string>
 	<string name="notify_scan_finished">スキャンが終わりました。</string>

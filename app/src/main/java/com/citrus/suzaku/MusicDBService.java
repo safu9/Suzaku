@@ -47,7 +47,7 @@ public class MusicDBService extends IntentService
 	public static final String ACTION_PLAYLIST_CHANGED = "Citrus.suzaku.action.ACTION_PLAYLIST_CHANGED";
 	
 	// Intent Extra Key
-	public static final String INTENT_KEY_TRACK = "TRACK";
+	public static final String INTENT_KEY_PATH = "PATH";
 	public static final String INTENT_KEY_PLAYLIST = "PLAYLIST";
 	public static final String INTENT_KEY_PLAYLIST_ID = "PLAYLIST_ID";
 	public static final String INTENT_KEY_TRACKS = "TRACKS";
@@ -80,8 +80,8 @@ public class MusicDBService extends IntentService
 				break;
 		
 			case ACTION_UPDATE_TRACK:
-				Track track = (Track)intent.getSerializableExtra(INTENT_KEY_TRACK);
-				updateTrack(track);
+				String path = (String)intent.getSerializableExtra(INTENT_KEY_PATH);
+				updateTrack(path);
 			
 				notifyAction(ACTION_DATABASE_CHANGED);
 				break;
@@ -324,16 +324,16 @@ public class MusicDBService extends IntentService
 	}
 	
 	// ACTION_UPDATE_TRACK
-	private void updateTrack(Track track)
+	private void updateTrack(String path)
 	{
-		String[] whereArgs = { track.path };
+		String[] whereArgs = { path };
 		List<Track> tracks = MyMediaStoreManager.getTracks(MediaStore.Audio.Media.DATA + " = ?", whereArgs);
 
 		if(tracks.size() == 0){
 			return;
 		}
 
-		track = tracks.get(0);
+		Track track = tracks.get(0);
 		
 		File file = new File(track.path);
 		if(!file.exists()){

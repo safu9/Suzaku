@@ -1,6 +1,6 @@
 package com.citrus.suzaku;
 //
-// Created by $USER_NAME on 2017/05/17
+// Created by safu on 2017/05/17
 
 public class TagLibHelper
 {
@@ -13,10 +13,33 @@ public class TagLibHelper
     private long tagHandle;
     private long tagMapHandle;
 
-    public native void setFile(String path_);
+    public native void setFile(String path);
     public native void dumpTags();
 
     // Read
+
+    public static final int NUMBER_OF_KEY = 17;
+
+    public static final int KEY_TITLE = 0;
+    public static final int KEY_TITLESORT = 1;
+    public static final int KEY_ARTIST = 2;
+    public static final int KEY_ARTISTSORT = 3;
+    public static final int KEY_ALBUM = 4;
+    public static final int KEY_ALBUMSORT = 5;
+    public static final int KEY_ALBUMARTIST = 6;
+    public static final int KEY_ALBUMARTISTSORT = 7;
+    public static final int KEY_GENRE = 8;
+    public static final int KEY_COMPOSER = 9;
+    public static final int KEY_YEAR = 10;
+    public static final int KEY_LYRICS = 11;
+    public static final int KEY_COMMENT = 12;
+    public static final int KEY_GROUP = 13;
+    public static final int KEY_TRACKNUMBER = 14;
+    public static final int KEY_DISCNUMBER = 15;
+    public static final int KEY_COMPILATION = 16;
+
+
+    public native String getTag(int key);           // ちょっとだけ遅い
 
     public native String getTitle();
     public native String getTitleSort();
@@ -44,6 +67,9 @@ public class TagLibHelper
     public native int getChannels();
 
     // Write
+
+    public native void setTag(int key, String value);
+    public native boolean saveTag();
 
     public native void setTitle(String title);
     public native void setTitleSort(String titleSort);
