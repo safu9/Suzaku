@@ -73,6 +73,7 @@
 	<string name="create_new_playlist">Create New Playlist</string>
 	<string name="save">Save</string>
 	<string name="update">Update</string>
+	<string name="add_folder">Add Folder</string>
 	
 	<!-- Views -->
 
@@ -104,6 +105,9 @@
 		<item quantity="one">%1$d album</item>
 		<item quantity="other">%1$d albums</item>
 	</plurals>
+
+	<string name="inner_storage">Inner storage</string>
+	<string name="sd_card">SD card</string>
 
 	<!-- Errors -->
 

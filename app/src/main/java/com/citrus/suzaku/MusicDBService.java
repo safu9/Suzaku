@@ -159,11 +159,11 @@ public class MusicDBService extends IntentService
 
 		//! DEBUG
 		am.getMemoryInfo(info);
-		double newlinuxFreeHeap = info.availMem * 100 / 1024 / 1024 / 100.0;
+		double newLinuxFreeHeap = info.availMem * 100 / 1024 / 1024 / 100.0;
 
 		showToast(R.string.notify_scan_finished);
 		
-		Log.d("Suzaku", "MDBS Updated DB  time:" + (System.currentTimeMillis() - startTime) / 1000.0 + "s memory:" + (newlinuxFreeHeap - linuxFreeHeap) + "MB");
+		Log.d("Suzaku", "MDBS Updated DB  time:" + (System.currentTimeMillis() - startTime) / 1000.0 + "s memory:" + (newLinuxFreeHeap - linuxFreeHeap) + "MB");
 	}
 	
 	//!! MEMORY LEAK
@@ -171,10 +171,31 @@ public class MusicDBService extends IntentService
 	{
 		long time = System.currentTimeMillis();
 
-		// ArrayList<String> rootPaths = MyPreference.getStringList(MyPreference.MUSIC_FOLDER);
-		// Environment.getExternalStorageDirectory().getAbsolutePath();
+		ArrayList<String> rootPaths = MyPreference.getStringList(MyPreference.MUSIC_FOLDER);
 
-		ArrayList<String> rootPaths = (ArrayList<String>)App.getSdCardFilesDirPathList();
+		//! TENTATIVE
+		if(rootPaths.size() == 0){
+			rootPaths.add(Environment.getExternalStorageDirectory().getAbsolutePath());
+			rootPaths.addAll(App.getSdCardFilesDirPathList());
+		}
+
+		String[] whereArgs = rootPaths.toArray(new String[rootPaths.size()]);
+		String where = "";
+		for(int i = 0; i < rootPaths.size(); i++){
+			if(i != 0){
+				where += "AND ";
+			}
+			where += Tracks.PATH + " NOT LIKE ? || '/%' ";
+		}
+
+		db.beginTransactionNonExclusive();
+		try{
+			MusicDB mdb = new MusicDB(db);
+			mdb.deleteTracks(where, whereArgs);
+			db.setTransactionSuccessful();
+		}finally{
+			db.endTransaction();
+		}
 
 		for(String path : rootPaths){
 			App.logd("MDBS UT : " + path);
@@ -198,7 +219,6 @@ public class MusicDBService extends IntentService
 		db.beginTransactionNonExclusive();
 		try{
 			MusicDB mdb = new MusicDB(db);
-			mdb.deleteTracks(Tracks.PATH + " NOT LIKE ? || '%'", whereArgs);
 			
 			for(Track track : tracks){
 

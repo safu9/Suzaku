@@ -92,20 +92,33 @@ public class MyPreference
 	// 設定値 ArrayList<String> を保存
 	public static void putStringList(String key, ArrayList<String> list)
 	{
+		PreferenceManager.getDefaultSharedPreferences(App.getContext()).edit().putString(key, toJsonString(list)).apply();
+	}
+
+	public static String toJsonString(List<String> list)
+	{
+		if(list == null){
+			return null;
+		}
+
 		JSONArray jsonAry = new JSONArray();
 		for(String str : list) {
 			jsonAry.put(str);
 		}
-		PreferenceManager.getDefaultSharedPreferences(App.getContext()).edit().putString(key, jsonAry.toString()).apply();
+		return jsonAry.toString();
 	}
 
 	// 設定値 ArrayList<String> を取得
 	public static ArrayList<String> getStringList(String key)
 	{
-		ArrayList<String> list = new ArrayList();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(App.getContext());
-		String strJson = prefs.getString(key, "");
-		if(!strJson.equals("")) {
+		return toStringList(prefs.getString(key, ""));
+	}
+
+	public static ArrayList<String> toStringList(String strJson)
+	{
+		ArrayList<String> list = new ArrayList<>();
+		if(strJson != null && !strJson.equals("")) {
 			try {
 				JSONArray jsonAry = new JSONArray(strJson);
 				for(int i=0; i<jsonAry.length(); i++) {

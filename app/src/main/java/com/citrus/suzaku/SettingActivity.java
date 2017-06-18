@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -176,6 +177,25 @@ public class SettingActivity extends AppCompatActivity
 		{
 			if(key.equals(MyPreference.GROUP_COMPILATION) || key.equals(MyPreference.MUSIC_FOLDER)){
 				mUpdateFlag = true;
+			}
+		}
+
+		@Override
+		public void onDisplayPreferenceDialog(Preference preference)
+		{
+			DialogFragment dialogFragment = null;
+			if (preference instanceof LibraryFolderPreference){
+				dialogFragment = new LibraryFolderDialog();
+				Bundle bundle = new Bundle(1);
+				bundle.putString("key", preference.getKey());
+				dialogFragment.setArguments(bundle);
+			}
+
+			if (dialogFragment != null){
+				dialogFragment.setTargetFragment(this, 0);
+				dialogFragment.show(this.getFragmentManager(), "android.support.v7.preference.PreferenceFragment.DIALOG");
+			}else{
+				super.onDisplayPreferenceDialog(preference);
 			}
 		}
 	}
