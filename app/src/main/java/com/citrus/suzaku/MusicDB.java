@@ -22,13 +22,14 @@ public class MusicDB
 		public static final String PATH = "path";
 		public static final String TITLE = "title";
 		public static final String TITLE_SORT = "titleSort";
-		public static final String ALBUM = "album";
-		public static final String ALBUM_ID = "albumId";
-	//	public static final String ALBUM_SORT = "albumSort";
-		public static final String ALBUMARTIST = "albumArtist";
 		public static final String ARTIST = "artist";
 		public static final String ARTIST_ID = "artistId";
-	//	public static final String ARTIST_SORT = "artistSort";
+		public static final String ARTIST_SORT = "artistSort";
+		public static final String ALBUM = "album";
+		public static final String ALBUM_ID = "albumId";
+		public static final String ALBUM_SORT = "albumSort";
+		public static final String ALBUMARTIST = "albumArtist";
+		public static final String ALBUMARTIST_SORT = "albumArtistSort";
 		public static final String ARTWORK_HASH = "artworkHash";
 		public static final String COMPOSER = "composer";
 		public static final String GENRE = "genre";
@@ -53,7 +54,7 @@ public class MusicDB
 		public static final String ALBUM_SORT = "albumSort";
 		public static final String ARTIST = "artist";
 		public static final String ARTIST_ID = "artistId";
-	//	public static final String ARTIST_SORT = "artistSort";
+		public static final String ARTIST_SORT = "artistSort";
 		public static final String ARTWORK_HASH = "artworkHash";
 		public static final String YEAR = "year";
 		public static final String COMPILATION = "compilation";
@@ -402,8 +403,8 @@ public class MusicDB
 
 	public void deletePlaylist(long playlistId)
 	{
-		String[] selectonArgs = { String.valueOf(playlistId) };
-		db.delete(Playlists.TABLE, Playlists._ID + " = ?", selectonArgs);
+		String[] selectionArgs = { String.valueOf(playlistId) };
+		db.delete(Playlists.TABLE, Playlists._ID + " = ?", selectionArgs);
 
 		db.execSQL("DROP TABLE IF EXISTS " +  PlaylistTracks.TABLE + String.valueOf(playlistId) + ";");
 	}

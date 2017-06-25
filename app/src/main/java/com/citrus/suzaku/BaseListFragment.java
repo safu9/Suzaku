@@ -19,7 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -38,7 +38,7 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 	private DatabaseBroadcastReceiver receiver;
 
 	private ListView mListView;
-	private ListAdapter mAdapter;
+	private BaseAdapter mAdapter;
 	private TextView mEmptyView;
 
 	@Override
@@ -158,13 +158,13 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 		return mListView;
 	}
 
-	public void setListAdapter(ListAdapter adapter)
+	public void setListAdapter(BaseAdapter adapter)
 	{
 		mAdapter = adapter;
 		mListView.setAdapter(adapter);
 	}
 
-	public ListAdapter getListAdapter()
+	public BaseAdapter getListAdapter()
 	{
 		return mAdapter;
 	}
@@ -255,6 +255,8 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 
 		mListView.clearChoices();
 		mListView.setChoiceMode(ListView.CHOICE_MODE_NONE);
+
+		mAdapter.notifyDataSetChanged();
 	}
 	
 	public void resetChoiceMode()

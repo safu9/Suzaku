@@ -381,7 +381,6 @@ public class MusicDBService extends IntentService
 	//	db.close();
 	}
 
-	//!! MEMORY LEAK : MediaMetadataRetriever
 	private static void getMediaMetadata(Track t)
 	{
         TagLibHelper tag = new TagLibHelper();
@@ -390,25 +389,20 @@ public class MusicDBService extends IntentService
         t.title = ifEmpty(tag.getTitle(), t.title);
         t.titleSort = ifEmpty(tag.getTitleSort(), t.title);
 
+		t.artist = ifEmpty(tag.getArtist(), MusicDB._NULL);
+		t.artistSort = ifEmpty(tag.getArtistSort(), t.artist);
         t.album = ifEmpty(tag.getAlbum(), MusicDB._NULL);
-        t.artist = ifEmpty(tag.getArtist(), MusicDB._NULL);
+		t.albumSort = ifEmpty(tag.getAlbumSort(), t.album);
         t.albumArtist = ifEmpty(tag.getAlbumArtist(), t.artist);
+		t.albumArtistSort = ifEmpty(tag.getAlbumArtistSort(), t.albumArtist.equals(t.artist)? t.artistSort : t.albumArtist);
 
         t.composer = ifEmpty(tag.getComposer(), MusicDB._NULL);
         t.genre = ifEmpty(tag.getGenre(), MusicDB._NULL);
 
-        // String[] discNum = ifEmpty(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER), "0").split("/", 2);
-        // String[] trackNum = ifEmpty(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER), "0").split("/", 2);
-
         t.discNo = tag.getDiscNumber();
         t.trackNo = tag.getTrackNumber();
 
-        // t.discCount = (discNo.length == 2)? Integer.valueOf(discNo[1]) : 0;
-        // t.trackCount = (trackNo.length == 2)? Integer.valueOf(trackNo[1]) : 0;
-
         t.compilation = tag.getCompilation();
-
-        // t.artworkHash = ArtworkCache.getHash(retriever.getEmbeddedPicture());
 
         t.artworkHash = ArtworkCache.getHash(tag.getArtwork());
 
@@ -428,11 +422,11 @@ public class MusicDBService extends IntentService
 			// 各アルバムで DISC_NO, TRACK_NO が最小のデータを INSERT
 			stmt =
 				"INSERT INTO " + Albums.TABLE + " (" +
-					Albums.ALBUM + "," + Albums.ALBUM_SORT + "," + Albums.ARTIST + "," + Albums.ARTWORK_HASH + "," + Albums.YEAR + "," + Albums.NUMBER_OF_SONGS +
+					Albums.ALBUM + "," + Albums.ALBUM_SORT + "," + Albums.ARTIST + "," + Albums.ARTIST_SORT + "," + Albums.ARTWORK_HASH + "," + Albums.YEAR + "," + Albums.NUMBER_OF_SONGS +
 				") " +
-				"SELECT t3." + Tracks.ALBUM + ",t3." + Tracks.ALBUM + ",t3." + Tracks.ALBUMARTIST + ",t3." + Tracks.ARTWORK_HASH + ",t4." + Tracks.YEAR + ",t4." + Albums.NUMBER_OF_SONGS +
+				"SELECT t3." + Tracks.ALBUM + ",t3." + Tracks.ALBUM_SORT + ",t3." + Tracks.ALBUMARTIST + ",t3." + Tracks.ALBUMARTIST_SORT + ",t3." + Tracks.ARTWORK_HASH + ",t4." + Tracks.YEAR + ",t4." + Albums.NUMBER_OF_SONGS +
 				" FROM (" +
-					"SELECT " + Tracks.ALBUM + "," + Tracks.ALBUM + "," + Tracks.ALBUMARTIST + "," + Tracks.ARTWORK_HASH +
+					"SELECT " + Tracks.ALBUM + "," + Tracks.ALBUM_SORT + "," + Tracks.ALBUMARTIST + "," + Tracks.ALBUMARTIST_SORT + "," + Tracks.ARTWORK_HASH +
 					" FROM " + Tracks.TABLE + " t1 " +
 					"WHERE t1." + Tracks._ID + " = (" +
 						"SELECT " + Tracks._ID +
@@ -520,9 +514,9 @@ public class MusicDBService extends IntentService
 					"INSERT INTO " + Artists.TABLE + "(" +
 						Artists.ARTIST + "," + Artists.ARTIST_SORT + "," + Artists.NUMBER_OF_SONGS + "," + Artists.NUMBER_OF_ALBUMS +
 					") SELECT " + 
-					"t." + Tracks.ARTIST + ",t." + Tracks.ARTIST + ",t." + Artists.NUMBER_OF_SONGS + ",t." + Artists.NUMBER_OF_ALBUMS +
+					"t." + Tracks.ARTIST + ",t." + Artists.ARTIST_SORT + ",t." + Artists.NUMBER_OF_SONGS + ",t." + Artists.NUMBER_OF_ALBUMS +
 					" FROM (" +
-						"SELECT " + Tracks.ARTIST + ", COUNT(*) AS " + Artists.NUMBER_OF_SONGS + ", COUNT(DISTINCT " + Tracks.ALBUM + ") AS " + Artists.NUMBER_OF_ALBUMS +
+						"SELECT " + Tracks.ARTIST + ", MAX(" + Tracks.ARTIST_SORT + ") AS " + Artists.ARTIST_SORT + ", COUNT(*) AS " + Artists.NUMBER_OF_SONGS + ", COUNT(DISTINCT " + Tracks.ALBUM + ") AS " + Artists.NUMBER_OF_ALBUMS +
 						" FROM " + Tracks.TABLE + " GROUP BY " + Tracks.ARTIST +
 					") t";
 					
@@ -550,9 +544,9 @@ public class MusicDBService extends IntentService
 					"INSERT INTO " + Artists.TABLE + "(" +
 						Artists.ARTIST + "," + Artists.ARTIST_SORT + "," + Artists.NUMBER_OF_SONGS + "," + Artists.NUMBER_OF_ALBUMS +
 					") SELECT " + 
-					Albums.ARTIST + "," + Albums.ARTIST + "," + Artists.NUMBER_OF_SONGS + "," + Artists.NUMBER_OF_ALBUMS +
+					Albums.ARTIST + "," + Artists.ARTIST_SORT + "," + Artists.NUMBER_OF_SONGS + "," + Artists.NUMBER_OF_ALBUMS +
 					" FROM (" +
-						"SELECT " + Albums.ARTIST + ", SUM(" + Albums.NUMBER_OF_SONGS + ") AS " + Artists.NUMBER_OF_SONGS + ", COUNT(*) AS " + Artists.NUMBER_OF_ALBUMS +
+						"SELECT " + Albums.ARTIST + ", MAX(" + Albums.ARTIST_SORT + ") AS " + Artists.ARTIST_SORT + ", SUM(" + Albums.NUMBER_OF_SONGS + ") AS " + Artists.NUMBER_OF_SONGS + ", COUNT(*) AS " + Artists.NUMBER_OF_ALBUMS +
 						" FROM " + Albums.TABLE + " WHERE " + Albums.COMPILATION + " = 0 GROUP BY " + Albums.ARTIST +
 					");";
 

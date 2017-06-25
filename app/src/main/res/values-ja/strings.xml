@@ -20,6 +20,8 @@
 
 	<string name="name">名前</string>
 
+	<string name="sort">読みがな</string>
+
 	<string name="path">パス</string>
 	<string name="bitrate">ビットレート</string>
 	<string name="sample_rate">サンプルレート</string>

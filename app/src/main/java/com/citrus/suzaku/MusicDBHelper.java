@@ -11,7 +11,7 @@ import com.citrus.suzaku.MusicDB.*;
 public class MusicDBHelper extends SQLiteOpenHelper
 {
 	private static final String DATABASE_NAME = "music.db";
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 6;
 
 	// Singleton ...
 
@@ -82,12 +82,15 @@ public class MusicDBHelper extends SQLiteOpenHelper
 				   Tracks.PATH + " TEXT UNIQUE NOT NULL," +
 				   Tracks.TITLE + " TEXT NOT NULL," +
 				   Tracks.TITLE_SORT + " TEXT," +
-				   Tracks.ALBUM + " TEXT," +
-				   Tracks.ALBUM_ID + " INTEGER," +
-				   Tracks.ALBUMARTIST + " TEXT," +
-				   Tracks.ARTWORK_HASH + " TEXT," +
 				   Tracks.ARTIST + " TEXT," +
 				   Tracks.ARTIST_ID + " INTEGER," +
+				   Tracks.ARTIST_SORT + " TEXT," +
+				   Tracks.ALBUM + " TEXT," +
+				   Tracks.ALBUM_ID + " INTEGER," +
+				   Tracks.ALBUM_SORT + " TEXT," +
+				   Tracks.ALBUMARTIST + " TEXT," +
+				   Tracks.ALBUMARTIST_SORT + " TEXT," +
+				   Tracks.ARTWORK_HASH + " TEXT," +
 				   Tracks.COMPOSER + " TEXT," +
 				   Tracks.GENRE + " TEXT," +
 				   Tracks.TRACK_NO + " INTEGER," +
@@ -108,6 +111,7 @@ public class MusicDBHelper extends SQLiteOpenHelper
 				   Albums.ARTWORK_HASH + " TEXT," +
 				   Albums.ARTIST + " TEXT," +
 				   Albums.ARTIST_ID + " INTEGER," +
+				   Albums.ARTIST_SORT + " TEXT," +
 				   Albums.NUMBER_OF_SONGS + " INTEGER," +
 				   Albums.YEAR + " INTEGER," +
 				   Albums.COMPILATION + " INTEGER NOT NULL DEFAULT 0);");
@@ -147,12 +151,15 @@ public class MusicDBHelper extends SQLiteOpenHelper
 				   PlaylistTracks.PATH + " TEXT NOT NULL," +
 				   PlaylistTracks.TITLE + " TEXT NOT NULL," +
 				   PlaylistTracks.TITLE_SORT + " TEXT," +
-				   PlaylistTracks.ALBUM + " TEXT," +
-				   PlaylistTracks.ALBUM_ID + " INTEGER," +
-				   PlaylistTracks.ALBUMARTIST + " TEXT," +
-				   PlaylistTracks.ARTWORK_HASH + " TEXT," +
 				   PlaylistTracks.ARTIST + " TEXT," +
 				   PlaylistTracks.ARTIST_ID + " INTEGER," +
+				   PlaylistTracks.ARTIST_SORT + " TEXT," +
+				   PlaylistTracks.ALBUM + " TEXT," +
+				   PlaylistTracks.ALBUM_ID + " INTEGER," +
+				   PlaylistTracks.ALBUM_SORT + " TEXT," +
+				   PlaylistTracks.ALBUMARTIST + " TEXT," +
+				   PlaylistTracks.ALBUMARTIST_SORT + " TEXT," +
+				   PlaylistTracks.ARTWORK_HASH + " TEXT," +
 				   PlaylistTracks.COMPOSER + " TEXT," +
 				   PlaylistTracks.GENRE + " TEXT," +
 				   PlaylistTracks.TRACK_NO + " INTEGER," +

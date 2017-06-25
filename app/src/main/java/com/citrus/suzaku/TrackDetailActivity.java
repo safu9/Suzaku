@@ -207,7 +207,7 @@ public class TrackDetailActivity extends AppCompatActivity
 	
 	private class MyPagerAdapter extends FragmentStatePagerAdapter
 	{
-		private static final int NUM_PAGES = 4;
+		private static final int NUM_PAGES = 5;
 
 		public MyPagerAdapter(FragmentManager fm)
 		{
@@ -230,6 +230,9 @@ public class TrackDetailActivity extends AppCompatActivity
 					fragment = LyricsFragment.newInstance(mTrack);
 					break;
 				case 3:
+					fragment = SortFragment.newInstance(mTrack);
+					break;
+				case 4:
 					fragment = FileFragment.newInstance(mTrack);
 					break;
 				default:
@@ -254,6 +257,8 @@ public class TrackDetailActivity extends AppCompatActivity
 				case 2:
 					return getString(R.string.lyrics);
 				case 3:
+					return getString(R.string.sort);
+				case 4:
 					return getString(R.string.file);
 			}
 			return null;
@@ -313,16 +318,18 @@ public class TrackDetailActivity extends AppCompatActivity
 	
 	public static class InfoFragment extends Fragment
 	{
-		private static final int ITEM_NUM = 10;
+		private static final int ITEM_NUM = 12;
 		
 		private static final int[] KEYS = {
 			TagLibHelper.KEY_TITLE,
-			TagLibHelper.KEY_ALBUM,
 			TagLibHelper.KEY_ARTIST,
+			TagLibHelper.KEY_ALBUM,
 			TagLibHelper.KEY_ALBUMARTIST,
 			TagLibHelper.KEY_COMPOSER,
 			TagLibHelper.KEY_GENRE,
 			TagLibHelper.KEY_TRACKNUMBER,
+			TagLibHelper.KEY_TRACKNUMBER,
+			TagLibHelper.KEY_DISCNUMBER,
 			TagLibHelper.KEY_DISCNUMBER,
 			TagLibHelper.KEY_YEAR,
 			TagLibHelper.KEY_COMMENT
@@ -330,18 +337,18 @@ public class TrackDetailActivity extends AppCompatActivity
 		
 		private static final int[] IDS = {
 			R.id.title,
-			R.id.album,
 			R.id.artist,
+			R.id.album,
 			R.id.album_artist,
 			R.id.composer,
 			R.id.genre,
 			R.id.track_no,
+			R.id.track_count,
 			R.id.disc_no,
+			R.id.disc_count,
 			R.id.year,
 			R.id.comment
 		};
-		
-		private Track mTrack;
 	
 		private EditText[] mEditTexts = new EditText[ITEM_NUM];
 		private CheckBox compilationCheckBox;
@@ -351,9 +358,9 @@ public class TrackDetailActivity extends AppCompatActivity
 		private static InfoFragment newInstance(Track track)
 		{
 			InfoFragment fragment = new InfoFragment();
-			Bundle bundle = new Bundle();
-			bundle.putSerializable("TRACK", track);
-			fragment.setArguments(bundle);
+		//	Bundle bundle = new Bundle();
+		//	bundle.putSerializable("TRACK", track);
+		//	fragment.setArguments(bundle);
 			
 			return fragment;
 		}
@@ -361,7 +368,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
-			mTrack = (Track)getArguments().getSerializable("TRACK");
+			// mTrack = (Track)getArguments().getSerializable("TRACK");
 			
 			View view = inflater.inflate(R.layout.fragment_track_detail_info, container, false);
 			
@@ -369,7 +376,17 @@ public class TrackDetailActivity extends AppCompatActivity
 				mEditTexts[i] = (EditText)view.findViewById(IDS[i]);
 				mEditTexts[i].addTextChangedListener(new MyTextWatcher(i));
 			}
+
 			compilationCheckBox = (CheckBox)view.findViewById(R.id.compilation);
+			compilationCheckBox.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					String values = (compilationCheckBox.isChecked())? "1" : "0";
+					((TrackDetailActivity)getActivity()).saveTagChanges(TagLibHelper.KEY_COMPILATION, values);
+				}
+			});
 		
 			updateView();
 			
@@ -382,7 +399,25 @@ public class TrackDetailActivity extends AppCompatActivity
 
 			isEditing = true;
 			for(int i = 0; i < ITEM_NUM; i++){
-				mEditTexts[i].setText(tag.get(KEYS[i]));
+				String value = tag.get(KEYS[i]);
+
+				// 複数フィールドの値でタグ1つのとき
+				switch(IDS[i]){
+					case R.id.track_no:
+					case R.id.disc_no: {
+						String[] values = value.split("/", 2);
+						value = (values.length >= 1) ? values[0] : "";
+						break;
+					}
+					case R.id.track_count:
+					case R.id.disc_count: {
+						String[] values = value.split("/", 2);
+						value = (values.length >= 2) ? values[1] : "";
+						break;
+					}
+				}
+
+				mEditTexts[i].setText(value);
 			}
 			isEditing = false;
 
@@ -419,6 +454,19 @@ public class TrackDetailActivity extends AppCompatActivity
 				}
 				
 				String values = mEditTexts[mNumber].getText().toString();
+
+				// 複数フィールドの値でタグ1つのとき
+				switch(IDS[mNumber]){
+					case R.id.track_no:
+					case R.id.disc_no:
+						values = values + "/" + mEditTexts[mNumber+1].getText().toString();
+						break;
+					case R.id.track_count:
+					case R.id.disc_count:
+						values = mEditTexts[mNumber-1].getText().toString() + "/" + values;
+						break;
+				}
+
 				((TrackDetailActivity)getActivity()).saveTagChanges(KEYS[mNumber], values);
 			}
 
@@ -467,17 +515,15 @@ public class TrackDetailActivity extends AppCompatActivity
 	
 	public static class LyricsFragment extends Fragment
 	{
-		private Track mTrack;
-		
 		private EditText lyricsEditText;
 		
 		
 		private static LyricsFragment newInstance(Track track)
 		{
 			LyricsFragment fragment = new LyricsFragment();
-			Bundle bundle = new Bundle();
-			bundle.putSerializable("TRACK", track);
-			fragment.setArguments(bundle);
+		//	Bundle bundle = new Bundle();
+		//	bundle.putSerializable("TRACK", track);
+		//	fragment.setArguments(bundle);
 			
 			return fragment;
 		}
@@ -485,7 +531,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
-			mTrack = (Track)getArguments().getSerializable("TRACK");
+			// mTrack = (Track)getArguments().getSerializable("TRACK");
 			
 			View view = inflater.inflate(R.layout.fragment_track_detail_lyrics, container, false);
 			lyricsEditText = (EditText)view.findViewById(R.id.lyrics);
@@ -499,6 +545,108 @@ public class TrackDetailActivity extends AppCompatActivity
 		{
 			SparseArray<String> tag = ((TrackDetailActivity)getActivity()).getTag();
 			lyricsEditText.setText(tag.get(TagLibHelper.KEY_LYRICS));
+		}
+	}
+
+	public static class SortFragment extends Fragment
+	{
+		private static final int ITEM_NUM = 8;
+
+		private static final int[] KEYS = {
+				TagLibHelper.KEY_TITLE,
+				TagLibHelper.KEY_TITLESORT,
+				TagLibHelper.KEY_ARTIST,
+				TagLibHelper.KEY_ARTISTSORT,
+				TagLibHelper.KEY_ALBUM,
+				TagLibHelper.KEY_ALBUMSORT,
+				TagLibHelper.KEY_ALBUMARTIST,
+				TagLibHelper.KEY_ALBUMARTISTSORT
+		};
+
+		private static final int[] IDS = {
+				R.id.title,
+				R.id.title_sort,
+				R.id.artist,
+				R.id.artist_sort,
+				R.id.album,
+				R.id.album_sort,
+				R.id.album_artist,
+				R.id.album_artist_sort
+		};
+
+		private EditText[] mEditTexts = new EditText[ITEM_NUM];
+
+		private boolean isEditing;
+
+		private static SortFragment newInstance(Track track)
+		{
+			SortFragment fragment = new SortFragment();
+		//	Bundle bundle = new Bundle();
+		//	bundle.putSerializable("TRACK", track);
+		//	fragment.setArguments(bundle);
+
+			return fragment;
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		{
+			// mTrack = (Track)getArguments().getSerializable("TRACK");
+
+			View view = inflater.inflate(R.layout.fragment_track_detail_sort, container, false);
+
+			for(int i = 0; i < ITEM_NUM; i++){
+				mEditTexts[i] = (EditText)view.findViewById(IDS[i]);
+				mEditTexts[i].addTextChangedListener(new MyTextWatcher(i));
+			}
+
+			updateView();
+
+			return view;
+		}
+
+		private void updateView()
+		{
+			SparseArray<String> tag = ((TrackDetailActivity)getActivity()).getTag();
+
+			isEditing = true;
+			for(int i = 0; i < ITEM_NUM; i++){
+				mEditTexts[i].setText(tag.get(KEYS[i]));
+			}
+			isEditing = false;
+		}
+
+		private class MyTextWatcher implements TextWatcher
+		{
+			private int mNumber;
+			private String mText;
+
+			private MyTextWatcher(int number)
+			{
+				mNumber = number;
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after)
+			{
+				mText = s.toString();
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count)
+			{
+				if(isEditing || s.toString().equals(mText)){
+					return;
+				}
+
+				String values = mEditTexts[mNumber].getText().toString();
+				((TrackDetailActivity)getActivity()).saveTagChanges(KEYS[mNumber], values);
+			}
+
+			@Override
+			public void afterTextChanged(Editable s)
+			{
+			}
 		}
 	}
 

@@ -29,21 +29,6 @@
 				android:inputType="text"/>
 
 			<TextView
-				android:text="@string/album"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textSize="@dimen/text_small"
-				android:textColor="@color/black"/>
-
-			<EditText
-				android:id="@+id/album"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:textSize="@dimen/text_small"
-				android:textColor="@color/black"
-				android:inputType="text"/>
-
-			<TextView
 				android:text="@string/artist"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -52,6 +37,21 @@
 
 			<EditText
 				android:id="@+id/artist"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:inputType="text"/>
+
+			<TextView
+				android:text="@string/album"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"/>
+
+			<EditText
+				android:id="@+id/album"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"

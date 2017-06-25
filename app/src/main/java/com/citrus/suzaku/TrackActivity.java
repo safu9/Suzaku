@@ -226,7 +226,8 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 	protected void onStart()
 	{
 		super.onStart();
-		
+
+		// TODO: Error : Activity has leaked ServiceConnection that was originally bound here
 		Intent intent = new Intent(this, PlayerService.class);
 		bindService(intent, this, Context.BIND_AUTO_CREATE);
 	}

@@ -16,11 +16,14 @@ public class Track implements Serializable
 	public String path;
 	public String title;
 	public String titleSort;
-	public String album;
-	public long albumId;
-	public String albumArtist;
 	public String artist;
 	public long artistId;
+	public String artistSort;
+	public String album;
+	public long albumId;
+	public String albumSort;
+	public String albumArtist;
+	public String albumArtistSort;
 	public String composer;
 	public String genre;
 	public int trackNo;
@@ -43,11 +46,14 @@ public class Track implements Serializable
 		path = cursor.getString(cursor.getColumnIndex(Tracks.PATH));
 		title = cursor.getString(cursor.getColumnIndex(Tracks.TITLE));
 		titleSort = cursor.getString(cursor.getColumnIndex(Tracks.TITLE_SORT));
-		album = cursor.getString(cursor.getColumnIndex(Tracks.ALBUM));
-		albumId = cursor.getLong(cursor.getColumnIndex(Tracks.ALBUM_ID));
-		albumArtist = cursor.getString(cursor.getColumnIndex(Tracks.ALBUMARTIST));
 		artist = cursor.getString(cursor.getColumnIndex(Tracks.ARTIST));
 		artistId = cursor.getLong(cursor.getColumnIndex(Tracks.ARTIST_ID));
+		artistSort = cursor.getString(cursor.getColumnIndex(Tracks.ARTIST_SORT));
+		album = cursor.getString(cursor.getColumnIndex(Tracks.ALBUM));
+		albumId = cursor.getLong(cursor.getColumnIndex(Tracks.ALBUM_ID));
+		albumSort = cursor.getString(cursor.getColumnIndex(Tracks.ALBUM_SORT));
+		albumArtist = cursor.getString(cursor.getColumnIndex(Tracks.ALBUMARTIST));
+		albumArtistSort = cursor.getString(cursor.getColumnIndex(Tracks.ALBUMARTIST_SORT));
 		composer = cursor.getString(cursor.getColumnIndex(Tracks.COMPOSER));
 		genre = cursor.getString(cursor.getColumnIndex(Tracks.GENRE));
 		trackNo = cursor.getInt(cursor.getColumnIndex(Tracks.TRACK_NO));
@@ -63,17 +69,20 @@ public class Track implements Serializable
 
 	public ContentValues getContentValues()
 	{
-		ContentValues values = new ContentValues(18);
+		ContentValues values = new ContentValues(21);
 
 		values.put(Tracks._ID, id);
 		values.put(Tracks.PATH, path);
 		values.put(Tracks.TITLE, title);
 		values.put(Tracks.TITLE_SORT, titleSort);
-		values.put(Tracks.ALBUM, album);
-		values.put(Tracks.ALBUM_ID, albumId);
-		values.put(Tracks.ALBUMARTIST, albumArtist);
 		values.put(Tracks.ARTIST, artist);
 		values.put(Tracks.ARTIST_ID, artistId);
+		values.put(Tracks.ARTIST_SORT, artistSort);
+		values.put(Tracks.ALBUM, album);
+		values.put(Tracks.ALBUM_ID, albumId);
+		values.put(Tracks.ALBUM_SORT, albumSort);
+		values.put(Tracks.ALBUMARTIST, albumArtist);
+		values.put(Tracks.ALBUMARTIST_SORT, albumArtistSort);
 		values.put(Tracks.COMPOSER, composer);
 		values.put(Tracks.GENRE, genre);
 		values.put(Tracks.TRACK_NO, trackNo);
@@ -91,12 +100,12 @@ public class Track implements Serializable
 
 	// For Displaying String
 
-	public String getAlbumString(){
-		return (!album.equals(MusicDB._NULL))? album : App.getContext().getString(R.string.unknown_album);
-	}
-
 	public String getArtistString(){
 		return (!artist.equals(MusicDB._NULL))? artist : App.getContext().getString(R.string.unknown_artist);
+	}
+
+	public String getAlbumString(){
+		return (!album.equals(MusicDB._NULL))? album : App.getContext().getString(R.string.unknown_album);
 	}
 	
 	public String getDurationString()

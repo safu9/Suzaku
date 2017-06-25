@@ -41,6 +41,8 @@
 	
 	<string name="name">Name</string>
 
+	<string name="sort">Sort</string>
+
 	<string name="path">Path</string>
 	<string name="bitrate">Bitrate</string>
 	<string name="sample_rate">Sample rate</string>
