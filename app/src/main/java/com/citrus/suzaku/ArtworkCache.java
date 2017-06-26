@@ -375,6 +375,8 @@ public class ArtworkCache
 		public static void release()
 		{
 			if(largeCache != null && !largeCache.isRecycled()){
+				largeHash = null;
+
 				largeCache.recycle();
 				largeCache = null;
 			}
@@ -492,13 +494,13 @@ public class ArtworkCache
 			@Override
 			protected void onPostExecute(Bitmap result)
 			{
-					if(result == null){
-						return;
-					}
+				if(result == null){
+					return;
+				}
 
-					if(image != null && track.artworkHash.equals(image.getTag())){
-						image.setImageBitmap(result);
-					}
+				if(image != null && track.artworkHash.equals(image.getTag())){
+					image.setImageBitmap(result);
+				}
 
 				super.onPostExecute(result);
 			}

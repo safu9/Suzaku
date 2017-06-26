@@ -71,8 +71,8 @@ public class PlayerWidgetProvider extends AppWidgetProvider
 			views.setTextViewText(R.id.artist, track.getArtistString());
 
 			Bitmap artwork = ArtworkCache.Large.getArtworkCache(track);
-			if(artwork != null){
-				views.setImageViewBitmap(R.id.artwork, artwork);		// null genkin
+			if(artwork != null && !artwork.isRecycled()){
+				views.setImageViewBitmap(R.id.artwork, artwork);				// NPE 回避
 			}else{
 				views.setImageViewResource(R.id.artwork, R.drawable.big_blank);
 			}
@@ -82,7 +82,7 @@ public class PlayerWidgetProvider extends AppWidgetProvider
 			views.setTextViewText(R.id.album, "");
 			views.setTextViewText(R.id.artist, "");
 
-			views.setImageViewResource(R.id.artwork, R.drawable.big_blank);		// null genkin
+			views.setImageViewResource(R.id.artwork, R.drawable.big_blank);		// NPE 回避
 		}
 		
 		if(isPlaying){
