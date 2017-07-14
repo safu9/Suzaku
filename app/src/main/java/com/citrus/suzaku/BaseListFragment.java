@@ -1,6 +1,5 @@
 package com.citrus.suzaku;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -41,13 +40,14 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 	private BaseAdapter mAdapter;
 	private TextView mEmptyView;
 
+
 	@Override
-	public void onAttach(Activity activity)
+	public void onAttach(Context context)
 	{
-		super.onAttach(activity);
+		super.onAttach(context);
 		mLoaderId = getArguments().getInt(LOADER_ID, 0);
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -103,6 +103,7 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 			}
 		});
 
+		mListView.setAdapter(mAdapter);
 		mListView.setEmptyView(mEmptyView);
 
 		receiver = new DatabaseBroadcastReceiver();
@@ -129,25 +130,6 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 		super.onStop();
 		getActivity().unregisterReceiver(receiver);
 	}
-/*
-	@Override
-	public void onDestroyView()
-	{
-		super.onDestroyView();
-	}
-	
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-	}
-
-	@Override
-	public void onDetach()
-	{
-		super.onDetach();
-	}
-*/
 
 	public void onListItemClick(ListView l, View v, int position, long id)
 	{
@@ -161,7 +143,9 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 	public void setListAdapter(BaseAdapter adapter)
 	{
 		mAdapter = adapter;
-		mListView.setAdapter(adapter);
+		if(mListView != null){
+			mListView.setAdapter(adapter);
+		}
 	}
 
 	public BaseAdapter getListAdapter()

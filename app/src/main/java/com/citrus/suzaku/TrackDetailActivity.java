@@ -516,7 +516,8 @@ public class TrackDetailActivity extends AppCompatActivity
 	public static class LyricsFragment extends Fragment
 	{
 		private EditText lyricsEditText;
-		
+
+		private boolean isEditing;
 		
 		private static LyricsFragment newInstance(Track track)
 		{
@@ -535,6 +536,7 @@ public class TrackDetailActivity extends AppCompatActivity
 			
 			View view = inflater.inflate(R.layout.fragment_track_detail_lyrics, container, false);
 			lyricsEditText = (EditText)view.findViewById(R.id.lyrics);
+			lyricsEditText.addTextChangedListener(new MyTextWatcher());
 			
 			updateView();
 			
@@ -543,8 +545,41 @@ public class TrackDetailActivity extends AppCompatActivity
 		
 		private void updateView()
 		{
+			isEditing = true;
 			SparseArray<String> tag = ((TrackDetailActivity)getActivity()).getTag();
 			lyricsEditText.setText(tag.get(TagLibHelper.KEY_LYRICS));
+			isEditing = false;
+		}
+
+		private class MyTextWatcher implements TextWatcher
+		{
+			private String mText;
+
+			private MyTextWatcher()
+			{
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after)
+			{
+				mText = s.toString();
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count)
+			{
+				if(isEditing || s.toString().equals(mText)){
+					return;
+				}
+
+				String values = lyricsEditText.getText().toString();
+				((TrackDetailActivity)getActivity()).saveTagChanges(TagLibHelper.KEY_LYRICS, values);
+			}
+
+			@Override
+			public void afterTextChanged(Editable s)
+			{
+			}
 		}
 	}
 
