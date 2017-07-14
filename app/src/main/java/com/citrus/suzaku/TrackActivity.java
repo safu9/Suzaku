@@ -463,7 +463,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		//! EXPERIMENTAL
 		TagLibHelper tagHelper = new TagLibHelper();
 		tagHelper.setFile(trackItem.path);
-		lyrics = tagHelper.getLyrics();
+		lyrics = convertNewlineCode(tagHelper.getLyrics());
 		tagHelper.release();
 
 		lyricsTextView.setText(lyrics);
@@ -506,6 +506,12 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		}catch(RemoteException e){
 			e.printStackTrace();
 		}
+	}
+
+	private static String convertNewlineCode(String org)
+	{
+		String code = System.getProperty("line.separator");
+		return (org != null)? org.replaceAll("\r\n|[\n\r\u2028\u2029\u0085]", code) : null;
 	}
 	
 	private class MyHandler extends Handler
