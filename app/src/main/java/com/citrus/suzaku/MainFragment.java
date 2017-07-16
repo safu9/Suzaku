@@ -27,7 +27,7 @@ public class MainFragment extends Fragment
 		((MainActivity)getActivity()).showDrawerIndicator(true);
 		((MainActivity)getActivity()).getSupportActionBar().setTitle(R.string.app_name);
 		
-		mPosition = MyPreference.getInt(MyPreference.TAB_POSITION);
+		mPosition = PreferenceUtils.getInt(PreferenceUtils.TAB_POSITION);
 		if(getArguments() != null){
 			mPosition = getArguments().getInt("POSITION", mPosition);
 			setArguments(null);
@@ -60,7 +60,7 @@ public class MainFragment extends Fragment
 	public void onPause()
 	{
 		super.onPause();
-		MyPreference.putInt(MyPreference.TAB_POSITION, mPosition);
+		PreferenceUtils.putInt(PreferenceUtils.TAB_POSITION, mPosition);
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class MainFragment extends Fragment
 				Intent intent = PlayerService.newPlayIntent(PlaylistManager.PLAY_RANGE_ALL, null, 0, true);
 				getActivity().startService(intent);
 
-				boolean ps = MyPreference.getBoolean(MyPreference.PLAYER_SCREEN);
+				boolean ps = PreferenceUtils.getBoolean(PreferenceUtils.PLAYER_SCREEN);
 				if(ps){
 					startActivity(new Intent(getActivity(), TrackActivity.class));
 				}

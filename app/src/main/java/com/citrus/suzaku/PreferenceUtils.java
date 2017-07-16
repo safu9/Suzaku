@@ -1,14 +1,18 @@
 package com.citrus.suzaku;
 
-import android.content.*;
-import android.preference.*;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import org.json.JSONArray;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 
-public class MyPreference
+public class PreferenceUtils
 {
 	// Used in Xml
 	public static final String PLAYER_SCREEN = "playerScreen";
@@ -19,6 +23,7 @@ public class MyPreference
 	// Used in Code only
 	public static final String TAB_POSITION = "tabPosition";
 	public static final String DB_LAST_UPDATED = "dbLastUpdated";
+	public static final String SD_TREE_URI = "sdTreeUri";
 	
 	
 	public static void initPreference()
@@ -76,6 +81,11 @@ public class MyPreference
 	{
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(App.getContext());
 		return pref.getLong(key, 0);
+	}
+
+	public static void putString(String key, String value)
+	{
+		PreferenceManager.getDefaultSharedPreferences(App.getContext()).edit().putString(key, value).apply();
 	}
 	
 	public static String getString(String key)

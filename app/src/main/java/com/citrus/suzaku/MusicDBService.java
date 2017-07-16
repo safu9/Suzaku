@@ -171,7 +171,7 @@ public class MusicDBService extends IntentService
 	{
 		long time = System.currentTimeMillis();
 
-		ArrayList<String> rootPaths = MyPreference.getStringList(MyPreference.MUSIC_FOLDER);
+		ArrayList<String> rootPaths = PreferenceUtils.getStringList(PreferenceUtils.MUSIC_FOLDER);
 
 		//! TENTATIVE
 		if(rootPaths.size() == 0){
@@ -255,7 +255,7 @@ public class MusicDBService extends IntentService
 			}
 		
 			db.setTransactionSuccessful();
-			MyPreference.putLong(MyPreference.DB_LAST_UPDATED, System.currentTimeMillis());
+			PreferenceUtils.putLong(PreferenceUtils.DB_LAST_UPDATED, System.currentTimeMillis());
 		}finally{
 			db.endTransaction();
 		}
@@ -264,8 +264,8 @@ public class MusicDBService extends IntentService
 	//! UNUSED
 	private void updateTracks(SQLiteDatabase db)
 	{
-		String rootPath = MyPreference.getString(MyPreference.MUSIC_FOLDER, Environment.getExternalStorageDirectory().getAbsolutePath());
-		long lastUpdated = MyPreference.getLong(MyPreference.DB_LAST_UPDATED);
+		String rootPath = PreferenceUtils.getString(PreferenceUtils.MUSIC_FOLDER, Environment.getExternalStorageDirectory().getAbsolutePath());
+		long lastUpdated = PreferenceUtils.getLong(PreferenceUtils.DB_LAST_UPDATED);
 
 		File rootDir = new File(rootPath);
 		if(!rootDir.exists()){
@@ -281,7 +281,7 @@ public class MusicDBService extends IntentService
 			updateTracksInDirectory(db, rootDir, lastUpdated);
 			
 			db.setTransactionSuccessful();
-			MyPreference.putLong(MyPreference.DB_LAST_UPDATED, System.currentTimeMillis());
+			PreferenceUtils.putLong(PreferenceUtils.DB_LAST_UPDATED, System.currentTimeMillis());
 		}finally{
 			db.endTransaction();
 		}
@@ -503,7 +503,7 @@ public class MusicDBService extends IntentService
 		
 		String stmt;
 		
-		boolean gc = MyPreference.getBoolean(MyPreference.GROUP_COMPILATION);
+		boolean gc = PreferenceUtils.getBoolean(PreferenceUtils.GROUP_COMPILATION);
 		
 		db.beginTransactionNonExclusive();
 		try{

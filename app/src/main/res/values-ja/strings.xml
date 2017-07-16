@@ -73,6 +73,9 @@
 	
 	<string name="ok">OK</string>
 	<string name="cancel">キャンセル</string>
+	<string name="yes">はい</string>
+	<string name="no">いいえ</string>
+	<string name="later">後で</string>
 
 	<plurals name="num_songs">
 		<item quantity="other">%1$d 曲</item>
@@ -85,12 +88,15 @@
 	<string name="inner_storage">内部ストレージ</string>
 	<string name="sd_card">SDカード</string>
 
+	<string name="sd_card_access">SDカードアクセス</string>
+
 	<!-- Errors -->
 
 	<string name="notify_added_to_playlist">プレイリストに追加しました。</string>
 	<string name="warn_input_playlist_title">プレイリスト名を入力してください。</string>
 	<string name="warn_title_already_exists">その名前は既に存在します。</string>
 
+	<string name="msg_confirm_saving">変更を保存しますか？</string>
 	<string name="notify_saved_changes">変更を保存しました。</string>
 	<string name="cant_save_changes">変更を保存できません。</string>
 	
@@ -98,6 +104,8 @@
 	<string name="notify_scan_finished">スキャンが終わりました。</string>
 	
 	<string name="err_cant_play">\"%1$s\" を再生できません。</string>
+
+	<string name="msg_get_sd_permission">SDカードへの操作を許可するために、SDカードのルートディレクトリを選択してください。</string>
 
 	<!-- Preference -->
 

@@ -39,12 +39,12 @@ public class LibraryFolderPreference extends DialogPreference
             value = defaultValue.toString();
         }
 
-        paths = MyPreference.toStringList(value);
+        paths = PreferenceUtils.toStringList(value);
     }
 
     public void persistStringListValue(List<String> paths)
     {
-        persistString(MyPreference.toJsonString(paths));
+        persistString(PreferenceUtils.toJsonString(paths));
     }
 
     public List<String> getStringListValue()

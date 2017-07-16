@@ -118,9 +118,9 @@ void setTag(JNIEnv *env, jobject instance, const char* key, const char* value)
     }
 
     if(tags->contains(key)){
-        tags->replace(key, TagLib::String(value));
+        tags->replace(key, TagLib::String(value, TagLib::String::UTF8));
     }else{
-        tags->insert(key, TagLib::String(value));
+        tags->insert(key, TagLib::String(value, TagLib::String::UTF8));
     }
 }
 

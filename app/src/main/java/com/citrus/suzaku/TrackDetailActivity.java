@@ -1,15 +1,23 @@
 package com.citrus.suzaku;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.provider.DocumentFile;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -27,17 +35,31 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.citrus.suzaku.R.string.file;
 
 
 public class TrackDetailActivity extends AppCompatActivity
 {
 	private List<Track> mTracks;
 	private Track mTrack;
+	private File mRoot;			// For Storage Access Framework
 
 	private SparseArray<String> mTag = new SparseArray<>();
 	private SparseArray<String> mChangedTag = new SparseArray<>();
+
+	private boolean isWaitingFinish = false;
 
 	private DatabaseBroadcastReceiver receiver;
 
@@ -45,8 +67,6 @@ public class TrackDetailActivity extends AppCompatActivity
 	private ViewPager mViewPager;
 
 	private MyPagerAdapter mPagerAdapter;
-
-	private int mPosition = 0;
 	
 	
 	@Override
@@ -97,9 +117,6 @@ public class TrackDetailActivity extends AppCompatActivity
 		mPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 		mViewPager.setAdapter(mPagerAdapter);
 
-		mViewPager.setCurrentItem(mPosition);
-		mViewPager.addOnPageChangeListener(new PageChangeListener());
-
 		mTabs.setupWithViewPager(mViewPager);
 
 		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -145,16 +162,21 @@ public class TrackDetailActivity extends AppCompatActivity
 		getMenuInflater().inflate(R.menu.menu_activity_track_detail, menu);
 		return true;
 	}
-	
+
+	@Override
+	public void onBackPressed()
+	{
+		confirmAndFinish();
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch(item.getItemId()){
 			case android.R.id.home:				// up button
-				//! TENTATIVE
-				finish();
+				confirmAndFinish();
 				return true;
-				
+
 			case R.id.menu_save:
 				saveTrackInfo();
 				finish();
@@ -162,6 +184,34 @@ public class TrackDetailActivity extends AppCompatActivity
 
 			default:
 				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	private void confirmAndFinish()
+	{
+		if(mChangedTag.size() > 0){
+			new AlertDialog.Builder(this)
+					.setTitle(R.string.save)
+					.setMessage(R.string.msg_confirm_saving)
+					.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							isWaitingFinish = true;
+							saveTrackInfo();
+						}
+					})
+					.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							finish();
+						}
+					})
+					.setNeutralButton(R.string.cancel, null)
+					.show();
+		}else{
+			finish();
 		}
 	}
 
@@ -174,37 +224,253 @@ public class TrackDetailActivity extends AppCompatActivity
 	{
 		mChangedTag.put(key, value);
 	}
-	
+
 	private void saveTrackInfo()
 	{
 		int size = mChangedTag.size();
-		if(size == 0){
-			return;
+
+		String path = mTrack.path;
+		boolean isTmp = false;
+
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+			// どのSDカードにあるのか決定
+			List<String> rootPaths = App.getSdCardFilesDirPathList();
+			for(String rootPath : rootPaths){
+				if(path.indexOf(rootPath) == 0){
+					mRoot = new File(rootPath);
+				}
+			}
+			if(mRoot != null){		// SDカードの時
+				if(!checkSdcardAccessPermission()){
+					return;
+				}
+				isTmp = true;
+			}
 		}
 
-		// ファイルに書き込み
-		TagLibHelper tagHelper = new TagLibHelper();
-		tagHelper.setFile(mTrack.path);
+		SaveTagAsyncTask task = new SaveTagAsyncTask(isTmp);
+		task.execute(mTrack.path);
+	}
 
-		for(int i = 0; i < size; i++){
-			tagHelper.setTag(mChangedTag.keyAt(i), mChangedTag.valueAt(i));
+
+	// SD Card Access (内部ストレージに一時ファイルを作成)
+
+	public String makeTempFile(String path)
+	{
+		File src = new File(path);
+		File tmp = new File(App.getContext().getExternalCacheDir().getAbsolutePath() + "/" + src.getName());
+		boolean result = copy(src, tmp);
+		return (result)? tmp.getAbsolutePath() : null;
+	}
+
+	public boolean applyTempFile(String path)
+	{
+		if(mRoot == null){
+			return false;
 		}
-		boolean ret = tagHelper.saveTag();
-		tagHelper.release();
 
-		if(ret){
-			// データベースを更新
-			Intent intent = new Intent(MusicDBService.ACTION_UPDATE_TRACK);
-			intent.putExtra(MusicDBService.INTENT_KEY_PATH, mTrack.path);
-			intent.setPackage(App.PACKAGE);
-			startService(intent);
+		File src = new File(path);
+		File tmp = new File(App.getContext().getExternalCacheDir().getAbsolutePath() + "/" + src.getName());
 
-			Toast.makeText(this, R.string.notify_saved_changes, Toast.LENGTH_SHORT).show();
-		}else{
-			Toast.makeText(this, R.string.cant_save_changes, Toast.LENGTH_SHORT).show();
+		// Tree Uri を取得　(Storage Access Framework)
+		Uri treeUri = Uri.parse(PreferenceUtils.getString(PreferenceUtils.SD_TREE_URI + "_" + mRoot.getName()));
+
+		// Document File を取得
+		DocumentFile file = DocumentFile.fromTreeUri(this, treeUri);
+		String[] names = path.substring(mRoot.getAbsolutePath().length() + 1).split("/");
+		for(String name : names){
+			file = file.findFile(name);
+		}
+
+		// Copy
+		boolean result = false;
+		try{
+			InputStream in = new FileInputStream(tmp);
+			OutputStream out = getContentResolver().openOutputStream(file.getUri());
+			result = copy2(in, out);
+		}catch(FileNotFoundException e){
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	private static boolean copy(File src, File dst)
+	{
+		boolean result = false;
+
+		FileInputStream inStream = null;
+		FileOutputStream outStream = null;
+		try {
+			inStream = new FileInputStream(src);
+			outStream = new FileOutputStream(dst);
+			FileChannel inChannel = inStream.getChannel();
+			FileChannel outChannel = outStream.getChannel();
+			long pos = 0;
+			while (pos < inChannel.size()) {
+				pos += inChannel.transferTo(pos, inChannel.size(), outChannel);
+			}
+			result = true;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (inStream != null) inStream.close();
+				if (outStream != null) outStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if ((! result) && dst.exists()){
+			dst.delete();
+		}
+
+		return result;
+	}
+
+	private static boolean copy2(InputStream src, OutputStream dst)
+	{
+		boolean result = false;
+
+		InputStream inStream = src;
+		OutputStream outStream = dst;
+		try {
+			outStream = new BufferedOutputStream(dst);
+
+			int data = -1;
+			byte[] buf = new byte[4096];
+			while ((data = inStream.read(buf)) != -1) {
+				outStream.write(buf, 0, data);
+			}
+
+			result = true;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (inStream != null) inStream.close();
+				if (outStream != null) outStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return result;
+	}
+
+	// SD Card へのアクセス許可
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public boolean checkSdcardAccessPermission()
+	{
+		if(mRoot == null){
+			return false;
+		}
+
+		// Tree Uri を取得　(Storage Access Framework)
+		String uriString = PreferenceUtils.getString(PreferenceUtils.SD_TREE_URI + "_" + mRoot.getName());
+		if(uriString == null){
+			new AlertDialog.Builder(this)
+					.setTitle(R.string.sd_card_access)
+					.setMessage(R.string.msg_get_sd_permission)
+					.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+							startActivityForResult(intent, 1);
+						}
+					})
+					.setNegativeButton(R.string.later, null)
+					.show();
+			return false;
+		}
+
+		return true;
+	}
+
+	public void onActivityResult(int requestCode, int resultCode, Intent resultData)
+	{
+		if(requestCode == 1 && resultCode == Activity.RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+			// IntentからtreeのURIを取得します。
+			Uri treeUri = resultData.getData();
+			DocumentFile file = DocumentFile.fromTreeUri(this, treeUri);
+
+			if(!file.getName().equals(mRoot.getName())){
+				checkSdcardAccessPermission();
+				return;
+			}
+
+			PreferenceUtils.putString(PreferenceUtils.SD_TREE_URI + "_" + mRoot.getName(), treeUri.toString());
+			App.logd("URI : " + treeUri.toString());
+
+			getContentResolver().takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+			if(isWaitingFinish){
+				saveTrackInfo();
+			}
 		}
 	}
-	
+
+	private class SaveTagAsyncTask extends AsyncTask<String, Void, Boolean>
+	{
+		boolean isTmp;
+
+		public SaveTagAsyncTask(boolean isTmp)
+		{
+			this.isTmp = isTmp;
+		}
+
+		@Override
+		protected Boolean doInBackground(String... params)
+		{
+			String path = params[0];
+
+			if(isTmp){
+				path = makeTempFile(params[0]);			// 内部ストレージに退避
+			}
+
+			// ファイルに書き込み
+			TagLibHelper tagHelper = new TagLibHelper();
+			tagHelper.setFile(path);
+
+			int size = mChangedTag.size();
+			for(int i = 0; i < size; i++){
+				tagHelper.setTag(mChangedTag.keyAt(i), mChangedTag.valueAt(i));
+			}
+			boolean ret = tagHelper.saveTag();
+			tagHelper.release();
+
+			if(isTmp){
+				ret = applyTempFile(params[0]);			// 復帰
+			}
+			return ret;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result)
+		{
+			super.onPostExecute(result);
+
+			if(result){
+				// データベースを更新
+				Intent intent = new Intent(MusicDBService.ACTION_UPDATE_TRACK);
+				intent.putExtra(MusicDBService.INTENT_KEY_PATH, mTrack.path);
+				intent.setPackage(App.PACKAGE);
+				startService(intent);
+
+				Toast.makeText(TrackDetailActivity.this, R.string.notify_saved_changes, Toast.LENGTH_SHORT).show();
+
+				if(isWaitingFinish){
+					finish();
+				}
+			}else{
+				Toast.makeText(TrackDetailActivity.this, R.string.cant_save_changes, Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+
 	private class MyPagerAdapter extends FragmentStatePagerAdapter
 	{
 		private static final int NUM_PAGES = 5;
@@ -259,7 +525,7 @@ public class TrackDetailActivity extends AppCompatActivity
 				case 3:
 					return getString(R.string.sort);
 				case 4:
-					return getString(R.string.file);
+					return getString(file);
 			}
 			return null;
 		}
@@ -267,25 +533,6 @@ public class TrackDetailActivity extends AppCompatActivity
 		public Fragment getFragmentAtPosition(int position)
 		{
 			return (Fragment)instantiateItem(mViewPager, position);
-		}
-	}
-	
-	private class PageChangeListener implements ViewPager.OnPageChangeListener
-	{
-		@Override
-		public void onPageSelected(int position)
-		{
-			mPosition = position;
-		}
-
-		@Override
-		public void onPageScrollStateChanged(int state)
-		{
-		}
-
-		@Override
-		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-		{
 		}
 	}
 	

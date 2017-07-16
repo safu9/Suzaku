@@ -99,7 +99,7 @@ public class AlbumFragment extends Fragment
 				Intent intent = PlayerService.newPlayIntent(PlaylistManager.PLAY_RANGE_TRACKS, albumItem, 0, true);
 				getActivity().startService(intent);
 
-				boolean ps = MyPreference.getBoolean(MyPreference.PLAYER_SCREEN);
+				boolean ps = PreferenceUtils.getBoolean(PreferenceUtils.PLAYER_SCREEN);
 				if(ps){
 					startActivity(new Intent(getActivity(), TrackActivity.class));
 				}

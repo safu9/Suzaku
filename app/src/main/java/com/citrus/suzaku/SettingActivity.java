@@ -125,8 +125,8 @@ public class SettingActivity extends AppCompatActivity
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences pref, String key)
 		{
-			if(key.equals(MyPreference.LANGUAGE)){
-				MyPreference.updateLocale();
+			if(key.equals(PreferenceUtils.LANGUAGE)){
+				PreferenceUtils.updateLocale();
 			}
 		}
 	}
@@ -175,7 +175,7 @@ public class SettingActivity extends AppCompatActivity
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences pref, String key)
 		{
-			if(key.equals(MyPreference.GROUP_COMPILATION) || key.equals(MyPreference.MUSIC_FOLDER)){
+			if(key.equals(PreferenceUtils.GROUP_COMPILATION) || key.equals(PreferenceUtils.MUSIC_FOLDER)){
 				mUpdateFlag = true;
 			}
 		}

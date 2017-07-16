@@ -1,22 +1,32 @@
 package com.citrus.suzaku;
 
-import android.*;
-import android.content.*;
-import android.content.pm.*;
-import android.content.res.*;
-import android.net.*;
-import android.os.*;
-import android.provider.*;
-import android.support.v4.app.*;
-import android.support.v4.content.*;
-import android.support.v4.widget.*;
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.content.PermissionChecker;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.*;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.*;
-import android.widget.*;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
-import java.util.*;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements ListView.OnItemClickListener
@@ -141,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 			Intent serviceIntent = PlayerService.newPlayIntent(PlaylistManager.PLAY_RANGE_QUEUE, null, 0, false);
 			startService(serviceIntent);
 
-			boolean ps = MyPreference.getBoolean(MyPreference.PLAYER_SCREEN);
+			boolean ps = PreferenceUtils.getBoolean(PreferenceUtils.PLAYER_SCREEN);
 			if(ps){
 				startActivity(new Intent(this, TrackActivity.class));
 			}
@@ -287,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     }
 
 	@Override
-	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
 
 		if (requestCode == REQUEST_CODE_EXTERNAL_STORAGE){
 			if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED){

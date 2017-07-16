@@ -37,7 +37,7 @@ public class Artist extends TrackGroup
 		MusicDB mdb = new MusicDB();
 		String[] selectionArgs = { String.valueOf(id) };
 		
-		boolean gc = MyPreference.getBoolean(MyPreference.GROUP_COMPILATION);
+		boolean gc = PreferenceUtils.getBoolean(PreferenceUtils.GROUP_COMPILATION);
 		if(!gc){
 			return mdb.getTracks(Tracks.ARTIST_ID + "= ?", selectionArgs, Tracks.TITLE_SORT + MusicDB.COLLATE_LOCALIZED);
 		}else{
@@ -49,7 +49,7 @@ public class Artist extends TrackGroup
 	{
 		MusicDB mdb = new MusicDB();
 		
-		boolean gc = MyPreference.getBoolean(MyPreference.GROUP_COMPILATION);
+		boolean gc = PreferenceUtils.getBoolean(PreferenceUtils.GROUP_COMPILATION);
 		if(!gc){
 			return mdb.getAlbumsByArtistFromTracks(id);
 		}else{

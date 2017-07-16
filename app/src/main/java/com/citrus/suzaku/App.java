@@ -34,7 +34,7 @@ public class App extends Application
 		appContext = getApplicationContext();
 		
 		// Init
-		MyPreference.initPreference();
+		PreferenceUtils.initPreference();
 	}
 
 	@Override

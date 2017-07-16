@@ -36,7 +36,7 @@ public class TrackListFragment extends BaseListFragment<Track>
 		Intent intent = PlayerService.newPlayIntent(PlaylistManager.PLAY_RANGE_ALL, null, position, false);
 		getActivity().startService(intent);
 
-		boolean ps = MyPreference.getBoolean(MyPreference.PLAYER_SCREEN);
+		boolean ps = PreferenceUtils.getBoolean(PreferenceUtils.PLAYER_SCREEN);
 		if(ps){
 			getActivity().startActivity(new Intent(getActivity(), TrackActivity.class));
 		}

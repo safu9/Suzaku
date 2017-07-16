@@ -68,7 +68,7 @@ public class ArtistListFragment extends TrackGroupListFragment<Artist>
 
 	private void updateArtistCompilation()
 	{
-		boolean gc = MyPreference.getBoolean(MyPreference.GROUP_COMPILATION);
+		boolean gc = PreferenceUtils.getBoolean(PreferenceUtils.GROUP_COMPILATION);
 		
 		if(!gc){
 			compilation = null;
