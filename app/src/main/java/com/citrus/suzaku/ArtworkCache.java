@@ -445,6 +445,11 @@ public class ArtworkCache
 
 				return null;
 			}
+
+			if(largeCache.isRecycled()){
+				return null;
+			}
+
 			return largeCache;
 		}
 

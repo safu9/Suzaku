@@ -71,7 +71,7 @@ public class PlayerWidgetProvider extends AppWidgetProvider
 			views.setTextViewText(R.id.artist, track.getArtistString());
 
 			Bitmap artwork = ArtworkCache.Large.getArtworkCache(track);
-			if(artwork != null && !artwork.isRecycled()){
+			if(artwork != null){
 				views.setImageViewBitmap(R.id.artwork, artwork);				// NPE 回避
 			}else{
 				views.setImageViewResource(R.id.artwork, R.drawable.big_blank);
