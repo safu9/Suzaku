@@ -1,13 +1,16 @@
 package com.citrus.suzaku;
 
 import android.annotation.TargetApi;
-import android.app.*;
-import android.content.*;
+import android.app.Application;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Environment;
 import android.os.storage.StorageManager;
-import android.util.*;
-import android.content.res.*;
+import android.util.DisplayMetrics;
+import android.util.Log;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,6 +28,8 @@ public class App extends Application
 	public static final String PACKAGE = "com.citrus.suzaku";				// for explicit service intent
 
 	private static Context appContext;
+
+	private static FirebaseAnalytics mFirebaseAnalytics;
 	
 	@Override
 	public void onCreate()
@@ -32,7 +37,10 @@ public class App extends Application
 		super.onCreate();
 		
 		appContext = getApplicationContext();
-		
+
+		// Obtain the FirebaseAnalytics instance.
+		mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
 		// Init
 		PreferenceUtils.initPreference();
 	}
