@@ -76,7 +76,7 @@
 
             <intent-filter >
                 <action android:name="Citrus.suzaku.action.ACTION_UPDATE_DATABASE" />
-                <action android:name="Citrus.suzaku.action.ACTION_UPDATE_TRACK"/>
+                <action android:name="Citrus.suzaku.action.ACTION_UPDATE_TRACKS"/>
                 <action android:name="Citrus.suzaku.action.ACTION_CREATE_PLAYLIST" />
                 <action android:name="Citrus.suzaku.action.ACTION_EDIT_PLAYLIST" />
                 <action android:name="Citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST" />

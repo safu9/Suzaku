@@ -6,16 +6,16 @@ public abstract class TrackGroupListFragment<T extends TrackGroup> extends BaseL
 {
 
 	@Override
-	protected List<Track> getCheckedTracks()
+	protected List<Long> getCheckedTrackIds()
 	{
 		List<T> items = getCheckedItems();
-		List<Track> tracks = new ArrayList<>();
+		List<Long> ids = new ArrayList<>();
 
-		for(T trackGroup : items){
-			tracks.addAll(trackGroup.getTracks());
+		for(T item : items){
+			ids.addAll(item.getTrackIds());
 		}
 		
-		return tracks;
+		return ids;
 	}
 	
 }

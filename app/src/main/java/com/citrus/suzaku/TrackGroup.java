@@ -6,4 +6,5 @@ import java.io.*;
 public abstract class TrackGroup implements Serializable
 {
 	public abstract List<Track> getTracks();
+	public abstract List<Long> getTrackIds();
 }

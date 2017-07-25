@@ -1,12 +1,16 @@
 package com.citrus.suzaku;
 
-import android.content.*;
-import android.database.*;
-import android.database.sqlite.*;
-import java.io.*;
-import java.util.*;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
-import com.citrus.suzaku.MusicDB.*;
+import com.citrus.suzaku.MusicDB.Albums;
+import com.citrus.suzaku.MusicDB.Genres;
+import com.citrus.suzaku.MusicDB.Tracks;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Genre extends TrackGroup implements Serializable
@@ -33,6 +37,15 @@ public class Genre extends TrackGroup implements Serializable
 		String[] selectionArgs = { genre };
 
 		return mdb.getTracks(Tracks.GENRE + "= ?", selectionArgs, Tracks.TITLE_SORT + MusicDB.COLLATE_LOCALIZED);
+	}
+
+	@Override
+	public List<Long> getTrackIds()
+	{
+		MusicDB mdb = new MusicDB();
+		String[] selectionArgs = { genre };
+
+		return mdb.getTrackIds(Tracks.GENRE + "= ?", selectionArgs, Tracks.TITLE_SORT + MusicDB.COLLATE_LOCALIZED);
 	}
 
 	public List<Album> getAlbums()

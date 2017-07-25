@@ -44,7 +44,21 @@ public class Artist extends TrackGroup
 			return mdb.getTracks(Tracks.ARTIST_ID + "= ? AND " + Tracks.COMPILATION + "= 0", selectionArgs, Tracks.TITLE_SORT + MusicDB.COLLATE_LOCALIZED);
 		}
 	}
-	
+
+	@Override
+	public List<Long> getTrackIds()
+	{
+		MusicDB mdb = new MusicDB();
+		String[] selectionArgs = { String.valueOf(id) };
+
+		boolean gc = PreferenceUtils.getBoolean(PreferenceUtils.GROUP_COMPILATION);
+		if(!gc){
+			return mdb.getTrackIds(Tracks.ARTIST_ID + "= ?", selectionArgs, Tracks.TITLE_SORT + MusicDB.COLLATE_LOCALIZED);
+		}else{
+			return mdb.getTrackIds(Tracks.ARTIST_ID + "= ? AND " + Tracks.COMPILATION + "= 0", selectionArgs, Tracks.TITLE_SORT + MusicDB.COLLATE_LOCALIZED);
+		}
+	}
+
 	public List<Album> getAlbums()
 	{
 		MusicDB mdb = new MusicDB();

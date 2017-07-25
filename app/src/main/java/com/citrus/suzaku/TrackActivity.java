@@ -190,11 +190,11 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			@Override
 			public void onClick(View v)
 			{
-				List<Track> tracks = new ArrayList<>();
-				tracks.add(trackItem);
+				List<Long> trackIds = new ArrayList<>();
+				trackIds.add(trackItem.id);
 
 				Intent intent = new Intent(TrackActivity.this, TrackDetailActivity.class);
-				intent.putExtra("TRACKS", (Serializable)tracks);
+				intent.putExtra("IDS", (Serializable)trackIds);
 				startActivity(intent);
 
 				fadePanel();
@@ -297,11 +297,11 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 
 		switch(item.getItemId()){
 			case R.id.menu_detail:
-				List<Track> tracks = new ArrayList<>();
-				tracks.add(trackItem);
+				List<Long> trackIds = new ArrayList<>();
+				trackIds.add(trackItem.id);
 				
 				intent = new Intent(this, TrackDetailActivity.class);
-				intent.putExtra("TRACKS", (Serializable)tracks);
+				intent.putExtra("IDS", (Serializable)trackIds);
 				startActivity(intent);
 				return true;
 

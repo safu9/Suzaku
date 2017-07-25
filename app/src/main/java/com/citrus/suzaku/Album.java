@@ -1,11 +1,13 @@
 package com.citrus.suzaku;
 
-import android.content.*;
-import android.database.*;
-import java.io.*;
-import java.util.*;
+import android.content.ContentValues;
+import android.database.Cursor;
 
-import com.citrus.suzaku.MusicDB.*;
+import com.citrus.suzaku.MusicDB.Albums;
+import com.citrus.suzaku.MusicDB.Tracks;
+
+import java.io.Serializable;
+import java.util.List;
 
 public class Album extends TrackGroup implements Serializable
 {
@@ -45,7 +47,16 @@ public class Album extends TrackGroup implements Serializable
 		
 		return mdb.getTracks(Tracks.ALBUM_ID + "= ?", selectionArgs, Tracks.DISC_NO + "," + Tracks.TRACK_NO);
 	}
-	
+
+	@Override
+	public List<Long> getTrackIds()
+	{
+		MusicDB mdb = new MusicDB();
+		String[] selectionArgs = { String.valueOf(id) };
+
+		return mdb.getTrackIds(Tracks.ALBUM_ID + "= ?", selectionArgs, Tracks.DISC_NO + "," + Tracks.TRACK_NO);
+	}
+
 	public ContentValues getContentValues()
 	{
 		ContentValues values = new ContentValues(8);

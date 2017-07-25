@@ -8,13 +8,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.provider.DocumentFile;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -38,35 +42,49 @@ import android.widget.Toast;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.citrus.suzaku.R.string.file;
-
 
 public class TrackDetailActivity extends AppCompatActivity
 {
-	private List<Track> mTracks;
-	private Track mTrack;
-	private File mRoot;			// For Storage Access Framework
+	private static final int READ_TAG_LOADER_ID = 1;
+	private static final int SAVE_TAG_LOADER_ID = 2;
 
-	private SparseArray<String> mTag = new SparseArray<>();
+	private static final String READ_DIALOG_TAG = "ReadProgressDialog";
+	private static final String SAVE_DIALOG_TAG = "SaveProgressDialog";
+
+	private static final int MSG_UPDATE_DIALOG = 1;
+	private static final int MSG_DISMISS_DIALOG = 2;
+	
+
+	private List<Track> mTracks;
+	private boolean isMultiple = false;
+	private Track mTrack;
+
+	private String[] mTag = new String[TagLibHelper.NUMBER_OF_KEY];
+	private boolean[] mMultipleValue = new boolean[TagLibHelper.NUMBER_OF_KEY];
 	private SparseArray<String> mChangedTag = new SparseArray<>();
 
-	private boolean isWaitingFinish = false;
+	private File mRoot;			// Storage Access Framework のURIを取得中のルートディレクトリ
+	private boolean isWaitingFinish = false;			// SAF の許可待ち
 
 	private DatabaseBroadcastReceiver receiver;
 
+	private Toolbar mToolbar;
 	private TabLayout mTabs;
 	private ViewPager mViewPager;
 
 	private MyPagerAdapter mPagerAdapter;
+
+	private static DialogHandler handler;
 	
 	
 	@Override
@@ -78,41 +96,46 @@ public class TrackDetailActivity extends AppCompatActivity
 		setContentView(R.layout.activity_track_detail);
 
 		receiver = new DatabaseBroadcastReceiver();
-		
-		// Data
 
-		//! TENTATIVE
-		mTracks = (ArrayList<Track>)getIntent().getSerializableExtra("TRACKS");
-		if(mTracks.size() == 0){
-			finish();
-			return;
-		}
-		mTrack = mTracks.get(0);
-		
-		App.logd("TDA TID" + mTrack.id);
-
-		//! EXPERIMENTAL
-		TagLibHelper tagHelper = new TagLibHelper();
-		tagHelper.setFile(mTrack.path);
-
-		tagHelper.dumpTags();
-		for(int i = 0; i < TagLibHelper.NUMBER_OF_KEY; i++){
-			mTag.put(i, tagHelper.getTag(i));
-		}
-
-		tagHelper.release();
+		handler = new DialogHandler(this);
 
 		// UI
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(mTrack.title);
-        setSupportActionBar(toolbar);
+		mToolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(mToolbar);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
+
 		// Tab
 
 		mTabs = (TabLayout)findViewById(R.id.tabs);
 		mViewPager = (ViewPager)findViewById(R.id.pager);
+		
+		// Data
+
+		if(savedInstanceState != null){										// 再生成時
+			for(int i = 0; i < TagLibHelper.NUMBER_OF_KEY; i++){
+				String tag = savedInstanceState.getString("CHANGED_TAG_" + i);
+				if(tag != null){
+					saveTagChanges(i, tag);
+				}
+			}
+
+			getSupportLoaderManager().initLoader(SAVE_TAG_LOADER_ID, null, new SaveTagLoaderCallbacks());	// 再度 Callbacks への紐づけのみを行う
+		}
+
+		getSupportLoaderManager().initLoader(READ_TAG_LOADER_ID, null, new ReadTagLoaderCallbacks());
+	}
+
+	private void setupView()
+	{
+		if(!isMultiple){
+			mToolbar.setTitle(mTrack.title);
+		}else{
+			int size = mTracks.size();
+			mToolbar.setTitle(getResources().getQuantityString(R.plurals.num_songs, size, size));
+		}
+
+		// Tabs
 
 		mPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 		mViewPager.setAdapter(mPagerAdapter);
@@ -155,18 +178,22 @@ public class TrackDetailActivity extends AppCompatActivity
 		mViewPager = null;
 		mPagerAdapter = null;
 	}
-	
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+
+		for(int i = 0; i < TagLibHelper.NUMBER_OF_KEY; i++){
+			outState.putString("CHANGED_TAG_" + i, mChangedTag.get(i));
+		}
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.menu_activity_track_detail, menu);
 		return true;
-	}
-
-	@Override
-	public void onBackPressed()
-	{
-		confirmAndFinish();
 	}
 
 	@Override
@@ -178,13 +205,19 @@ public class TrackDetailActivity extends AppCompatActivity
 				return true;
 
 			case R.id.menu_save:
+				isWaitingFinish = true;
 				saveTrackInfo();
-				finish();
 				return true;
 
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	public void onBackPressed()
+	{
+		confirmAndFinish();
 	}
 
 	private void confirmAndFinish()
@@ -215,9 +248,14 @@ public class TrackDetailActivity extends AppCompatActivity
 		}
 	}
 
-	private SparseArray<String> getTag()
+	private String[] getTag()
 	{
 		return mTag;
+	}
+
+	private boolean[] getMultipleValue()
+	{
+		return mMultipleValue;
 	}
 	
 	private void saveTagChanges(int key, String value)
@@ -227,150 +265,54 @@ public class TrackDetailActivity extends AppCompatActivity
 
 	private void saveTrackInfo()
 	{
-		int size = mChangedTag.size();
+		List<Bundle> pathInfoList = new ArrayList<>();
 
-		String path = mTrack.path;
-		boolean isTmp = false;
+		for(int i = 0; i < mTracks.size(); i++){
+			String path = mTracks.get(i).path;
+			boolean isTmp = false;
+			File root = null;
 
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-			// どのSDカードにあるのか決定
-			List<String> rootPaths = App.getSdCardFilesDirPathList();
-			for(String rootPath : rootPaths){
-				if(path.indexOf(rootPath) == 0){
-					mRoot = new File(rootPath);
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				// どのSDカードにあるのか決定
+				List<String> rootPaths = App.getSdCardFilesDirPathList();
+				for(String rootPath : rootPaths){
+					if(path.indexOf(rootPath) == 0){
+						root = new File(rootPath);
+					}
+				}
+				if(root != null){		// SDカードの時
+					if(!checkSdcardAccessPermission(root)){
+						return;
+					}
+					isTmp = true;
 				}
 			}
-			if(mRoot != null){		// SDカードの時
-				if(!checkSdcardAccessPermission()){
-					return;
-				}
-				isTmp = true;
-			}
+
+			Bundle pathInfo = new Bundle();
+			pathInfo.putString("PATH", path);
+			pathInfo.putBoolean("NEED_TMP", isTmp);
+			pathInfo.putSerializable("ROOT", root);
+			pathInfoList.add(pathInfo);
 		}
 
-		SaveTagAsyncTask task = new SaveTagAsyncTask(isTmp);
-		task.execute(mTrack.path);
-	}
-
-
-	// SD Card Access (内部ストレージに一時ファイルを作成)
-
-	public String makeTempFile(String path)
-	{
-		File src = new File(path);
-		File tmp = new File(App.getContext().getExternalCacheDir().getAbsolutePath() + "/" + src.getName());
-		boolean result = copy(src, tmp);
-		return (result)? tmp.getAbsolutePath() : null;
-	}
-
-	public boolean applyTempFile(String path)
-	{
-		if(mRoot == null){
-			return false;
-		}
-
-		File src = new File(path);
-		File tmp = new File(App.getContext().getExternalCacheDir().getAbsolutePath() + "/" + src.getName());
-
-		// Tree Uri を取得　(Storage Access Framework)
-		Uri treeUri = Uri.parse(PreferenceUtils.getString(PreferenceUtils.SD_TREE_URI + "_" + mRoot.getName()));
-
-		// Document File を取得
-		DocumentFile file = DocumentFile.fromTreeUri(this, treeUri);
-		String[] names = path.substring(mRoot.getAbsolutePath().length() + 1).split("/");
-		for(String name : names){
-			file = file.findFile(name);
-		}
-
-		// Copy
-		boolean result = false;
-		try{
-			InputStream in = new FileInputStream(tmp);
-			OutputStream out = getContentResolver().openOutputStream(file.getUri());
-			result = copy2(in, out);
-		}catch(FileNotFoundException e){
-			e.printStackTrace();
-		}
-		return result;
-	}
-
-	private static boolean copy(File src, File dst)
-	{
-		boolean result = false;
-
-		FileInputStream inStream = null;
-		FileOutputStream outStream = null;
-		try {
-			inStream = new FileInputStream(src);
-			outStream = new FileOutputStream(dst);
-			FileChannel inChannel = inStream.getChannel();
-			FileChannel outChannel = outStream.getChannel();
-			long pos = 0;
-			while (pos < inChannel.size()) {
-				pos += inChannel.transferTo(pos, inChannel.size(), outChannel);
-			}
-			result = true;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inStream != null) inStream.close();
-				if (outStream != null) outStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		if ((! result) && dst.exists()){
-			dst.delete();
-		}
-
-		return result;
-	}
-
-	private static boolean copy2(InputStream src, OutputStream dst)
-	{
-		boolean result = false;
-
-		InputStream inStream = src;
-		OutputStream outStream = dst;
-		try {
-			outStream = new BufferedOutputStream(dst);
-
-			int data = -1;
-			byte[] buf = new byte[4096];
-			while ((data = inStream.read(buf)) != -1) {
-				outStream.write(buf, 0, data);
-			}
-
-			result = true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (inStream != null) inStream.close();
-				if (outStream != null) outStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return result;
+		Bundle arg = new Bundle();
+		arg.putSerializable("PATH_INFO_LIST", (Serializable)pathInfoList);
+		getSupportLoaderManager().initLoader(SAVE_TAG_LOADER_ID, arg, new SaveTagLoaderCallbacks());
 	}
 
 	// SD Card へのアクセス許可
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public boolean checkSdcardAccessPermission()
+	public boolean checkSdcardAccessPermission(File root)
 	{
-		if(mRoot == null){
+		if(root == null){
 			return false;
 		}
 
 		// Tree Uri を取得　(Storage Access Framework)
-		String uriString = PreferenceUtils.getString(PreferenceUtils.SD_TREE_URI + "_" + mRoot.getName());
+		String uriString = PreferenceUtils.getString(PreferenceUtils.SD_TREE_URI + "_" + root.getName());
 		if(uriString == null){
+			mRoot = root;
+
 			new AlertDialog.Builder(this)
 					.setTitle(R.string.sd_card_access)
 					.setMessage(R.string.msg_get_sd_permission)
@@ -398,7 +340,7 @@ public class TrackDetailActivity extends AppCompatActivity
 			DocumentFile file = DocumentFile.fromTreeUri(this, treeUri);
 
 			if(!file.getName().equals(mRoot.getName())){
-				checkSdcardAccessPermission();
+				checkSdcardAccessPermission(mRoot);
 				return;
 			}
 
@@ -407,56 +349,352 @@ public class TrackDetailActivity extends AppCompatActivity
 
 			getContentResolver().takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
-			if(isWaitingFinish){
-				saveTrackInfo();
+			// 保存処理を再開
+			saveTrackInfo();
+		}
+	}
+
+	// AsyncTaskLoader
+
+	private static class ReadTagLoader extends BaseAsyncTaskLoader<Bundle>
+	{
+		private List<Long> ids;
+
+		public ReadTagLoader(Context context, List<Long> ids)
+		{
+			super(context);
+			this.ids = ids;
+		}
+
+		@Override
+		public Bundle loadInBackground()
+		{
+			List<Track> tracks = new ArrayList<>();
+			boolean isMultiple = false;
+			String[] tags = new String[TagLibHelper.NUMBER_OF_KEY];
+			boolean[] multipleValue = new boolean[TagLibHelper.NUMBER_OF_KEY];
+
+			if(ids.size() == 0){
+				return null;
+			}
+
+			MusicDB mdb = new MusicDB();
+			for(long id : ids){
+				tracks.add(mdb.getTrack(id));
+			}
+
+			int size = tracks.size();
+			if(size > 1){
+				isMultiple = true;
+			}
+
+			TagLibHelper tagHelper = new TagLibHelper();
+			for(int i = 0; i < size; i++){
+				Track track = tracks.get(i);
+
+				updateDialog(track.path + " (" + (i + 1) + "/" + size + ")");
+				App.logd("TDA TrackID : " + track.id);
+
+				tagHelper.setFile(track.path);
+			//	tagHelper.dumpTags();
+
+				if(i == 0){
+					for(int j = 0; j < TagLibHelper.NUMBER_OF_KEY; j++){
+						tags[j] = tagHelper.getTag(j);
+					}
+				}else{
+					for(int j = 0; j < TagLibHelper.NUMBER_OF_KEY; j++){
+						if(multipleValue[j]){
+							continue;
+						}
+
+						String tag = tagHelper.getTag(j);
+						if((tag != null && !tag.equals(tags[j])) || (tag == null && tags[j] != null)){
+							multipleValue[j] = true;
+						}
+					}
+				}
+
+				tagHelper.release();
+			}
+
+			Bundle result = new Bundle();
+			result.putSerializable("TRACKS", (Serializable)tracks);
+			result.putBoolean("MULTIPLE", isMultiple);
+			result.putStringArray("TAG", tags);
+			result.putBooleanArray("MULTIPLE_VALUE", multipleValue);
+
+			setResult(result);
+			return result;
+		}
+
+		private void updateDialog(String text)
+		{
+			Message msg = new Message();
+			msg.obj = READ_DIALOG_TAG;
+			msg.what = MSG_UPDATE_DIALOG;
+			Bundle arg = new Bundle();
+			arg.putString("TEXT", text);
+			msg.setData(arg);
+			TrackDetailActivity.handler.sendMessage(msg);
+		}
+	}
+
+	private class ReadTagLoaderCallbacks implements LoaderManager.LoaderCallbacks<Bundle>
+	{
+		@Override
+		public Loader<Bundle> onCreateLoader(int id, Bundle args)
+		{
+			App.logd("TDA RTLC onCreateLoader");
+
+			List<Long> ids = (List<Long>)getIntent().getSerializableExtra("IDS");
+			if(ids == null || ids.size() == 0){
+				finish();
+				return null;
+			}
+
+			ProgressDialog dialog = ProgressDialog.newInstance(getString(R.string.msg_now_loading));
+			dialog.setCancelable(false);
+			dialog.show(getSupportFragmentManager(), READ_DIALOG_TAG);
+
+			return new ReadTagLoader(TrackDetailActivity.this, ids);
+		}
+
+		@Override
+		public void onLoadFinished(Loader<Bundle> loader, Bundle result)
+		{
+			App.logd("TDA RTLC onLoadFinished");
+
+			// Using FragmentTransaction
+			Message msg = new Message();
+			msg.obj = READ_DIALOG_TAG;
+			msg.what = MSG_DISMISS_DIALOG;
+			TrackDetailActivity.handler.sendMessage(msg);
+
+			if(result != null){
+				mTracks = (List<Track>)result.getSerializable("TRACKS");
+				isMultiple = result.getBoolean("MULTIPLE");
+				mTag = result.getStringArray("TAG");
+				mMultipleValue = result.getBooleanArray("MULTIPLE_VALUE");
+
+				//! TENTATIVE
+				mTrack = mTracks.get(0);
+				setupView();
+			}else{
+				finish();
+			}
+		}
+
+		@Override
+		public void onLoaderReset(Loader<Bundle> loader)
+		{
+		}
+	}
+	
+	private static class SaveTagLoader extends BaseAsyncTaskLoader<Bundle>
+	{
+		private Context mContext;
+		private List<Bundle> mPathInfoList;
+		private SparseArray<String> mChangedTag;
+
+		public SaveTagLoader(Context context, List<Bundle> pathInfo, SparseArray<String> changedTag)
+		{
+			super(context);
+
+			mContext = context;
+			mPathInfoList = pathInfo;
+			mChangedTag = changedTag;
+		}
+
+		@Override
+		public Bundle loadInBackground()
+		{
+			List<String> succeededPaths = new ArrayList<>();
+			List<String> failedPaths = new ArrayList<>();
+
+			for(int i = 0; i < mPathInfoList.size(); i++){
+				Bundle pathInfo = mPathInfoList.get(i);
+				String orgPath = pathInfo.getString("PATH");
+				String path = orgPath;
+				boolean isTmp = pathInfo.getBoolean("NEED_TMP");
+
+				updateDialog(path + " (" + (i + 1) + "/" + mPathInfoList.size() + ")");
+
+				try{
+					if(isTmp){
+						path = makeTempFile(path);            // 内部ストレージに退避
+					}
+
+					// ファイルに書き込み
+					TagLibHelper tagHelper = new TagLibHelper();
+					tagHelper.setFile(path);
+
+					int size = mChangedTag.size();
+					for(int j = 0; j < size; j++){
+						tagHelper.setTag(mChangedTag.keyAt(j), mChangedTag.valueAt(j));
+					}
+					boolean result = tagHelper.saveTag();
+					tagHelper.release();
+
+					if(!result){
+						throw new IOException("Tags were Rejected.");
+					}
+
+					if(isTmp){
+						File root = (File)pathInfo.getSerializable("ROOT");
+						applyTempFile(orgPath, root);            // 復帰
+					}
+
+					succeededPaths.add(path);
+				}catch(IOException e){
+					e.printStackTrace();
+					failedPaths.add(path);
+				}finally{
+					if(isTmp){
+						deleteTempFile(path);
+					}
+				}
+			}
+
+			Bundle result = new Bundle();
+			result.putSerializable("SUCCEEDED_PATHS", (Serializable)succeededPaths);
+			result.putSerializable("FAILED_PATHS", (Serializable)failedPaths);
+
+			setResult(result);
+			return result;
+		}
+
+		private void updateDialog(String text)
+		{
+			Message msg = new Message();
+			msg.obj = SAVE_DIALOG_TAG;
+			msg.what = MSG_UPDATE_DIALOG;
+			Bundle arg = new Bundle();
+			arg.putString("TEXT", text);
+			msg.setData(arg);
+			TrackDetailActivity.handler.sendMessage(msg);
+		}
+
+		// SD Card Access (内部ストレージに一時ファイルを作成)
+
+		private String makeTempFile(String path) throws IOException
+		{
+			File src = new File(path);
+			File tmp = new File(App.getContext().getExternalCacheDir().getAbsolutePath() + "/" + src.getName());
+			copy(src, tmp);
+			return tmp.getAbsolutePath();
+		}
+
+		private void applyTempFile(String path, File root) throws IOException, IllegalArgumentException
+		{
+			File src = new File(path);
+			File tmp = new File(App.getContext().getExternalCacheDir().getAbsolutePath() + "/" + src.getName());
+
+			// Tree Uri を取得　(Storage Access Framework)
+			Uri treeUri = Uri.parse(PreferenceUtils.getString(PreferenceUtils.SD_TREE_URI + "_" + root.getName()));
+
+			// Document File を取得
+			DocumentFile file = DocumentFile.fromTreeUri(mContext, treeUri);
+			String[] names = path.substring(root.getAbsolutePath().length() + 1).split("/");
+			for(String name : names){
+				file = file.findFile(name);
+			}
+
+			// Copy
+			InputStream in = new FileInputStream(tmp);
+			OutputStream out = mContext.getContentResolver().openOutputStream(file.getUri());
+			copy2(in, out);
+		}
+
+		private static void deleteTempFile(String path)
+		{
+			File tmp = new File(path);
+			if(tmp.exists()){
+				tmp.delete();
+			}
+		}
+
+		private static void copy(File src, File dst) throws IOException
+		{
+			FileInputStream inStream = null;
+			FileOutputStream outStream = null;
+			try {
+				inStream = new FileInputStream(src);
+				outStream = new FileOutputStream(dst);
+				FileChannel inChannel = inStream.getChannel();
+				FileChannel outChannel = outStream.getChannel();
+
+				long pos = 0;
+				while (pos < inChannel.size()) {
+					pos += inChannel.transferTo(pos, inChannel.size(), outChannel);
+				}
+			} finally {
+				try {
+					if (inStream != null) inStream.close();
+					if (outStream != null) outStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		private static void copy2(InputStream src, OutputStream dst) throws IOException
+		{
+			InputStream inStream = src;
+			OutputStream outStream = null;
+			try {
+				outStream = new BufferedOutputStream(dst);
+
+				int data = -1;
+				byte[] buf = new byte[4096];
+				while ((data = inStream.read(buf)) != -1) {
+					outStream.write(buf, 0, data);
+				}
+			} finally {
+				try {
+					if (inStream != null) inStream.close();
+					if (outStream != null) outStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
 
-	private class SaveTagAsyncTask extends AsyncTask<String, Void, Boolean>
+	private class SaveTagLoaderCallbacks implements LoaderManager.LoaderCallbacks<Bundle>
 	{
-		boolean isTmp;
-
-		public SaveTagAsyncTask(boolean isTmp)
+		@Override
+		public Loader<Bundle> onCreateLoader(int id, Bundle args)
 		{
-			this.isTmp = isTmp;
+			if(args == null){
+				return null;
+			}
+
+			ProgressDialog dialog = ProgressDialog.newInstance(getString(R.string.msg_now_saving));
+			dialog.setCancelable(false);
+			dialog.show(getSupportFragmentManager(), SAVE_DIALOG_TAG);
+
+			List<Bundle> pathInfoList = (List<Bundle>)args.getSerializable("PATH_INFO_LIST");
+
+			return new SaveTagLoader(TrackDetailActivity.this, pathInfoList, mChangedTag);
 		}
 
 		@Override
-		protected Boolean doInBackground(String... params)
+		public void onLoadFinished(Loader<Bundle> loader, Bundle result)
 		{
-			String path = params[0];
+			getSupportLoaderManager().destroyLoader(SAVE_TAG_LOADER_ID);
 
-			if(isTmp){
-				path = makeTempFile(params[0]);			// 内部ストレージに退避
-			}
+			// Using FragmentTransaction
+			Message msg = new Message();
+			msg.obj = SAVE_DIALOG_TAG;
+			msg.what = MSG_DISMISS_DIALOG;
+			TrackDetailActivity.handler.sendMessage(msg);
 
-			// ファイルに書き込み
-			TagLibHelper tagHelper = new TagLibHelper();
-			tagHelper.setFile(path);
-
-			int size = mChangedTag.size();
-			for(int i = 0; i < size; i++){
-				tagHelper.setTag(mChangedTag.keyAt(i), mChangedTag.valueAt(i));
-			}
-			boolean ret = tagHelper.saveTag();
-			tagHelper.release();
-
-			if(isTmp){
-				ret = applyTempFile(params[0]);			// 復帰
-			}
-			return ret;
-		}
-
-		@Override
-		protected void onPostExecute(Boolean result)
-		{
-			super.onPostExecute(result);
-
-			if(result){
+			List<String> failedPaths = (List<String>)result.getSerializable("FAILED_PATHS");
+			if(failedPaths != null && failedPaths.size() == 0){
 				// データベースを更新
-				Intent intent = new Intent(MusicDBService.ACTION_UPDATE_TRACK);
-				intent.putExtra(MusicDBService.INTENT_KEY_PATH, mTrack.path);
+				Intent intent = new Intent(MusicDBService.ACTION_UPDATE_TRACKS);
+				intent.putExtra(MusicDBService.INTENT_KEY_PATHS, result.getSerializable("SUCCEEDED_PATHS"));
 				intent.setPackage(App.PACKAGE);
 				startService(intent);
 
@@ -469,11 +707,58 @@ public class TrackDetailActivity extends AppCompatActivity
 				Toast.makeText(TrackDetailActivity.this, R.string.cant_save_changes, Toast.LENGTH_SHORT).show();
 			}
 		}
+
+		@Override
+		public void onLoaderReset(Loader<Bundle> loader)
+		{
+		}
 	}
 
+	// Handler for ProgressDialog
+	private static class DialogHandler extends Handler
+	{
+		private WeakReference<FragmentActivity> mActivityRef;
+
+		public DialogHandler(FragmentActivity activity)
+		{
+			mActivityRef = new WeakReference<>(activity);
+		}
+
+		@Override
+		public void handleMessage(Message msg)
+		{
+			String tag = msg.obj.toString();
+			FragmentActivity activity = mActivityRef.get();
+			if(activity == null){
+				return;
+			}
+
+			ProgressDialog dialog = (ProgressDialog)activity.getSupportFragmentManager().findFragmentByTag(tag);
+			if(dialog != null){
+				switch(msg.what){
+					case MSG_UPDATE_DIALOG:
+						String text = msg.getData().getString("TEXT");
+						dialog.updateMessage(text);
+						break;
+					case MSG_DISMISS_DIALOG:
+						dialog.dismiss();
+						break;
+				}
+			}
+		}
+	}
+
+	// ViewPager Adapter
 	private class MyPagerAdapter extends FragmentStatePagerAdapter
 	{
 		private static final int NUM_PAGES = 5;
+		private final int[] FRAGMENT_IDS = {
+				0, 1, 2, 3, 4
+		};
+		private static final int NUM_PAGES_MULTIPLE = 3;		// 複数曲モードのとき
+		private final int[] FRAGMENT_IDS_MULTIPLE = {
+				0, 1, 3
+		};
 
 		public MyPagerAdapter(FragmentManager fm)
 		{
@@ -485,18 +770,19 @@ public class TrackDetailActivity extends AppCompatActivity
 		{
 			Fragment fragment;
 
-			switch(position){
+			int id = (!isMultiple) ? FRAGMENT_IDS[position] : FRAGMENT_IDS_MULTIPLE[position];
+			switch(id){
 				case 0:
-					fragment = InfoFragment.newInstance(mTrack);
+					fragment = InfoFragment.newInstance(isMultiple);
 					break;
 				case 1:
 					fragment = ArtworkFragment.newInstance(mTrack);
 					break;
 				case 2:
-					fragment = LyricsFragment.newInstance(mTrack);
+					fragment = LyricsFragment.newInstance();
 					break;
 				case 3:
-					fragment = SortFragment.newInstance(mTrack);
+					fragment = SortFragment.newInstance(isMultiple);
 					break;
 				case 4:
 					fragment = FileFragment.newInstance(mTrack);
@@ -511,11 +797,13 @@ public class TrackDetailActivity extends AppCompatActivity
 		@Override
 		public int getCount()
 		{
-			return NUM_PAGES;
+			return (!isMultiple) ? NUM_PAGES : NUM_PAGES_MULTIPLE;
 		}
 
-		public String getPageTitle(int position){
-			switch(position){
+		public String getPageTitle(int position)
+		{
+			int id = (!isMultiple) ? FRAGMENT_IDS[position] : FRAGMENT_IDS_MULTIPLE[position];
+			switch(id){
 				case 0:
 					return getString(R.string.detail);
 				case 1:
@@ -525,7 +813,7 @@ public class TrackDetailActivity extends AppCompatActivity
 				case 3:
 					return getString(R.string.sort);
 				case 4:
-					return getString(file);
+					return getString(R.string.file);
 			}
 			return null;
 		}
@@ -535,34 +823,35 @@ public class TrackDetailActivity extends AppCompatActivity
 			return (Fragment)instantiateItem(mViewPager, position);
 		}
 	}
-	
+
 	// BroadcastReceiver
 	private class DatabaseBroadcastReceiver extends BroadcastReceiver
 	{
 		private IntentFilter filter;
-		
+
 		public DatabaseBroadcastReceiver()
 		{
 			filter = new IntentFilter();
 			filter.addAction(MusicDBService.ACTION_DATABASE_CHANGED);
 		}
-		
+
 		@Override
 		public void onReceive(Context context, Intent intent)
 		{
 			MusicDB mdb = new MusicDB();
 			mTrack = mdb.getTrack(mTrack.id);
-			
+
 			mPagerAdapter.notifyDataSetChanged();
 		}
-		
+
 		public IntentFilter getIntentFilter()
 		{
 			return filter;
 		}
 	}
-	
-	
+
+	// Fragments
+
 	public static class InfoFragment extends Fragment
 	{
 		private static final int ITEM_NUM = 12;
@@ -589,9 +878,9 @@ public class TrackDetailActivity extends AppCompatActivity
 			R.id.album_artist,
 			R.id.composer,
 			R.id.genre,
-			R.id.track_no,
+			R.id.track_num,
 			R.id.track_count,
-			R.id.disc_no,
+			R.id.disc_num,
 			R.id.disc_count,
 			R.id.year,
 			R.id.comment
@@ -602,21 +891,19 @@ public class TrackDetailActivity extends AppCompatActivity
 
 		private boolean isEditing;
 		
-		private static InfoFragment newInstance(Track track)
+		private static InfoFragment newInstance(boolean isMultiple)
 		{
 			InfoFragment fragment = new InfoFragment();
-		//	Bundle bundle = new Bundle();
-		//	bundle.putSerializable("TRACK", track);
-		//	fragment.setArguments(bundle);
-			
+			Bundle args = new Bundle();
+
+			args.putBoolean("MULTIPLE", isMultiple);
+			fragment.setArguments(args);
 			return fragment;
 		}
 		
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
-			// mTrack = (Track)getArguments().getSerializable("TRACK");
-			
 			View view = inflater.inflate(R.layout.fragment_track_detail_info, container, false);
 			
 			for(int i = 0; i < ITEM_NUM; i++){
@@ -634,6 +921,13 @@ public class TrackDetailActivity extends AppCompatActivity
 					((TrackDetailActivity)getActivity()).saveTagChanges(TagLibHelper.KEY_COMPILATION, values);
 				}
 			});
+
+			boolean isMultiple = getArguments().getBoolean("MULTIPLE");
+			if(isMultiple){														// 複数曲モードではタイトル非表示
+				TextView titleLabel = (TextView)view.findViewById(R.id.titleLabel);
+				titleLabel.setVisibility(View.GONE);
+				mEditTexts[0].setVisibility(View.GONE);
+			}
 		
 			updateView();
 			
@@ -642,35 +936,47 @@ public class TrackDetailActivity extends AppCompatActivity
 
 		private void updateView()
 		{
-			SparseArray<String> tag = ((TrackDetailActivity)getActivity()).getTag();
+			String[] tag = ((TrackDetailActivity)getActivity()).getTag();
+			boolean[] multipleValue = ((TrackDetailActivity)getActivity()).getMultipleValue();
 
 			isEditing = true;
 			for(int i = 0; i < ITEM_NUM; i++){
-				String value = tag.get(KEYS[i]);
+				String value = tag[KEYS[i]];
 
 				// 複数フィールドの値でタグ1つのとき
-				switch(IDS[i]){
-					case R.id.track_no:
-					case R.id.disc_no: {
-						String[] values = value.split("/", 2);
-						value = (values.length >= 1) ? values[0] : "";
-						break;
-					}
-					case R.id.track_count:
-					case R.id.disc_count: {
-						String[] values = value.split("/", 2);
-						value = (values.length >= 2) ? values[1] : "";
-						break;
+				if(value != null){
+					switch(IDS[i]){
+						case R.id.track_num:
+						case R.id.disc_num:{
+							String[] values = value.split("/", 2);
+							value = (values.length >= 1) ? values[0] : "";
+							break;
+						}
+						case R.id.track_count:
+						case R.id.disc_count:{
+							String[] values = value.split("/", 2);
+							value = (values.length >= 2) ? values[1] : "";
+							break;
+						}
 					}
 				}
 
-				mEditTexts[i].setText(value);
+				if(!multipleValue[KEYS[i]]){
+					mEditTexts[i].setText(value);
+				}else{
+					if(IDS[i] != R.id.track_num && IDS[i] != R.id.track_count
+							&& IDS[i] != R.id.disc_num && IDS[i] != R.id.disc_count){
+						mEditTexts[i].setHint(R.string.mix);
+					}else{
+						mEditTexts[i].setHint(" - ");
+					}
+				}
 			}
 			isEditing = false;
 
 			boolean isCompilation = false;
 			try{
-				isCompilation = (Integer.parseInt(tag.get(TagLibHelper.KEY_COMPILATION)) > 0);
+				isCompilation = (Integer.parseInt(tag[TagLibHelper.KEY_COMPILATION]) > 0);
 			}catch(NumberFormatException e){
 				// e.printStackTrace();
 			}
@@ -704,8 +1010,8 @@ public class TrackDetailActivity extends AppCompatActivity
 
 				// 複数フィールドの値でタグ1つのとき
 				switch(IDS[mNumber]){
-					case R.id.track_no:
-					case R.id.disc_no:
+					case R.id.track_num:
+					case R.id.disc_num:
 						values = values + "/" + mEditTexts[mNumber+1].getText().toString();
 						break;
 					case R.id.track_count:
@@ -715,6 +1021,8 @@ public class TrackDetailActivity extends AppCompatActivity
 				}
 
 				((TrackDetailActivity)getActivity()).saveTagChanges(KEYS[mNumber], values);
+
+				mEditTexts[mNumber].setHint(null);
 			}
 
 			@Override
@@ -756,7 +1064,9 @@ public class TrackDetailActivity extends AppCompatActivity
 		
 		private void updateView()
 		{
-			ArtworkCache.Large.setArtworkView(artworkImageView, mTrack);
+			if(mTrack != null){
+				ArtworkCache.Large.setArtworkView(artworkImageView, mTrack);
+			}
 		}
 	}
 	
@@ -766,21 +1076,15 @@ public class TrackDetailActivity extends AppCompatActivity
 
 		private boolean isEditing;
 		
-		private static LyricsFragment newInstance(Track track)
+		private static LyricsFragment newInstance()
 		{
 			LyricsFragment fragment = new LyricsFragment();
-		//	Bundle bundle = new Bundle();
-		//	bundle.putSerializable("TRACK", track);
-		//	fragment.setArguments(bundle);
-			
 			return fragment;
 		}
 		
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
-			// mTrack = (Track)getArguments().getSerializable("TRACK");
-			
 			View view = inflater.inflate(R.layout.fragment_track_detail_lyrics, container, false);
 			lyricsEditText = (EditText)view.findViewById(R.id.lyrics);
 			lyricsEditText.addTextChangedListener(new MyTextWatcher());
@@ -793,8 +1097,8 @@ public class TrackDetailActivity extends AppCompatActivity
 		private void updateView()
 		{
 			isEditing = true;
-			SparseArray<String> tag = ((TrackDetailActivity)getActivity()).getTag();
-			lyricsEditText.setText(tag.get(TagLibHelper.KEY_LYRICS));
+			String[] tag = ((TrackDetailActivity)getActivity()).getTag();
+			lyricsEditText.setText(tag[TagLibHelper.KEY_LYRICS]);
 			isEditing = false;
 		}
 
@@ -860,26 +1164,35 @@ public class TrackDetailActivity extends AppCompatActivity
 
 		private boolean isEditing;
 
-		private static SortFragment newInstance(Track track)
+		private static SortFragment newInstance(boolean isMultiple)
 		{
 			SortFragment fragment = new SortFragment();
-		//	Bundle bundle = new Bundle();
-		//	bundle.putSerializable("TRACK", track);
-		//	fragment.setArguments(bundle);
+			Bundle args = new Bundle();
 
+			args.putBoolean("MULTIPLE", isMultiple);
+			fragment.setArguments(args);
 			return fragment;
 		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
-			// mTrack = (Track)getArguments().getSerializable("TRACK");
-
 			View view = inflater.inflate(R.layout.fragment_track_detail_sort, container, false);
 
 			for(int i = 0; i < ITEM_NUM; i++){
 				mEditTexts[i] = (EditText)view.findViewById(IDS[i]);
 				mEditTexts[i].addTextChangedListener(new MyTextWatcher(i));
+			}
+
+			boolean isMultiple = getArguments().getBoolean("MULTIPLE");
+			if(isMultiple){														// 複数曲モードではタイトル非表示
+				TextView titleLabel = (TextView)view.findViewById(R.id.titleLabel);
+				titleLabel.setVisibility(View.GONE);
+				mEditTexts[0].setVisibility(View.GONE);
+
+				TextView titleSortLabel = (TextView)view.findViewById(R.id.titleSortLabel);
+				titleSortLabel.setVisibility(View.GONE);
+				mEditTexts[1].setVisibility(View.GONE);
 			}
 
 			updateView();
@@ -889,11 +1202,16 @@ public class TrackDetailActivity extends AppCompatActivity
 
 		private void updateView()
 		{
-			SparseArray<String> tag = ((TrackDetailActivity)getActivity()).getTag();
+			String[] tag = ((TrackDetailActivity)getActivity()).getTag();
+			boolean[] multipleValue = ((TrackDetailActivity)getActivity()).getMultipleValue();
 
 			isEditing = true;
 			for(int i = 0; i < ITEM_NUM; i++){
-				mEditTexts[i].setText(tag.get(KEYS[i]));
+				if(!multipleValue[KEYS[i]]){
+					mEditTexts[i].setText(tag[KEYS[i]]);
+				}else{
+					mEditTexts[i].setHint(R.string.mix);
+				}
 			}
 			isEditing = false;
 		}
@@ -923,6 +1241,8 @@ public class TrackDetailActivity extends AppCompatActivity
 
 				String values = mEditTexts[mNumber].getText().toString();
 				((TrackDetailActivity)getActivity()).saveTagChanges(KEYS[mNumber], values);
+
+				mEditTexts[mNumber].setHint(null);
 			}
 
 			@Override
@@ -975,6 +1295,10 @@ public class TrackDetailActivity extends AppCompatActivity
 
 		private void updateView()
 		{
+			if(mTrack == null){
+				return;
+			}
+
 			pathTextView.setText(mTrack.path);
 
 			//! EXPERIMENTAL

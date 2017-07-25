@@ -43,9 +43,14 @@ public class TrackListFragment extends BaseListFragment<Track>
 	}
 
 	@Override
-	protected List<Track> getCheckedTracks()
+	protected List<Long> getCheckedTrackIds()
 	{
-		return getCheckedItems();
+		List<Track> tracks = getCheckedItems();
+		List<Long> ids = new ArrayList<>();
+		for(Track track : tracks){
+			ids.add(track.id);
+		}
+		return ids;
 	}
 
 	@Override

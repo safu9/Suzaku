@@ -14,6 +14,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/titleLabel"
                 android:text="@string/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -29,6 +30,7 @@
                 android:inputType="text"/>
 
             <TextView
+                android:id="@+id/titleSortLabel"
                 android:text="@string/sort"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

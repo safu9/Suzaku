@@ -1,20 +1,27 @@
 package com.citrus.suzaku;
 
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
-import java.io.*;
-import java.util.*;
-
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import java.io.Serializable;
+import java.util.List;
 
 
 // Select Playlist and Add Tracks
 public class PlaylistSelectDialog extends DialogFragment implements ListView.OnItemClickListener
 {
-	private static final String TRACKS = "TRACKS";
+	private static final String TRACK_IDS = "TRACK_IDS";
 	
 	private List<Playlist> playlists;
 	private PlaylistListAdapter adapter;
@@ -23,12 +30,12 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 	private IntentFilter filter;
 	
 	
-	public static PlaylistSelectDialog newInstance(List<Track> tracks)
+	public static PlaylistSelectDialog newInstance(List<Long> trackIds)
 	{
 		PlaylistSelectDialog dialog = new PlaylistSelectDialog();
 		
 		Bundle bundle = new Bundle();
-		bundle.putSerializable(TRACKS, (Serializable)tracks);
+		bundle.putSerializable(TRACK_IDS, (Serializable)trackIds);
 		dialog.setArguments(bundle);
 		
 		return dialog;
@@ -88,11 +95,11 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 			return;
 		}
 		
-		List<Track> tracks = (List<Track>)getArguments().getSerializable(TRACKS);
+		List<Long> tracks = (List<Long>)getArguments().getSerializable(TRACK_IDS);
 
 		Intent intent = new Intent(MusicDBService.ACTION_ADD_TO_PLAYLIST);
 		intent.putExtra(MusicDBService.INTENT_KEY_PLAYLIST, playlists.get(position - 1));
-		intent.putExtra(MusicDBService.INTENT_KEY_TRACKS, (Serializable)tracks);
+		intent.putExtra(MusicDBService.INTENT_KEY_TRACK_IDS, (Serializable)tracks);
 		intent.setPackage(App.PACKAGE);
 		getActivity().startService(intent);
 		

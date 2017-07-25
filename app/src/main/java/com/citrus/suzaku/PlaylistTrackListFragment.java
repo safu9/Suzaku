@@ -98,7 +98,7 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 			case R.id.menu_delete:
 				Intent intent = new Intent(MusicDBService.ACTION_DELETE_PLAYLISTTRACKS);
 				intent.putExtra(MusicDBService.INTENT_KEY_PLAYLIST, playlist);
-				intent.putExtra(MusicDBService.INTENT_KEY_TRACKS, (Serializable)getCheckedItems());
+				intent.putExtra(MusicDBService.INTENT_KEY_TRACK_IDS, (Serializable)getCheckedTrackIds());
 				intent.setPackage(App.PACKAGE);
 				getActivity().startService(intent);
 				
@@ -112,15 +112,15 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 	
 
 	@Override
-	protected List<Track> getCheckedTracks()
+	protected List<Long> getCheckedTrackIds()
 	{
 		List<PlaylistTrack> ptracks = getCheckedItems();
-		List<Track> tracks = new ArrayList<>();
+		List<Long> trackIds = new ArrayList<>();
 		for(PlaylistTrack ptrack : ptracks){
-			tracks.add(ptrack.getTrack());
+			trackIds.add(ptrack.trackId);
 		}
 
-		return tracks;
+		return trackIds;
 	}
 
 	@Override

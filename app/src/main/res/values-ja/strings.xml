@@ -85,6 +85,9 @@
 		<item quantity="other">%1$d アルバム</item>
 	</plurals>
 
+
+	<string name="mix">ミックス</string>
+
 	<string name="inner_storage">内部ストレージ</string>
 	<string name="sd_card">SDカード</string>
 
@@ -106,6 +109,9 @@
 	<string name="err_cant_play">\"%1$s\" を再生できません。</string>
 
 	<string name="msg_get_sd_permission">SDカードへの操作を許可するために、SDカードのルートディレクトリを選択してください。</string>
+
+	<string name="msg_now_loading">読み込み中…</string>
+	<string name="msg_now_saving">保存中…</string>
 
 	<!-- Preference -->
 

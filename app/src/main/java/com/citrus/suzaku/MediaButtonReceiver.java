@@ -15,33 +15,46 @@ public class MediaButtonReceiver extends BroadcastReceiver
 		}
 		
 		App.logd("MBR Received Key Code : " + keyEvent.getKeyCode());
-			
+
+		Intent service;
 		switch(keyEvent.getKeyCode()){
 			case KeyEvent.KEYCODE_HEADSETHOOK:
 			case KeyEvent.KEYCODE_MEDIA_PLAY:
 			case KeyEvent.KEYCODE_MEDIA_PAUSE:
 			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-				context.startService(new Intent(PlayerService.ACTION_PLAY_PAUSE));
+				service = new Intent(PlayerService.ACTION_PLAY_PAUSE);
+				service.setPackage(App.PACKAGE);
+				context.startService(service);
 				break;
 				
 			case KeyEvent.KEYCODE_MEDIA_NEXT:
-				context.startService(new Intent(PlayerService.ACTION_NEXT));
+				service = new Intent(PlayerService.ACTION_NEXT);
+				service.setPackage(App.PACKAGE);
+				context.startService(service);
 				break;
 				
 			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-				context.startService(new Intent(PlayerService.ACTION_PREV));
+				service = new Intent(PlayerService.ACTION_PREV);
+				service.setPackage(App.PACKAGE);
+				context.startService(service);
 				break;
 				
 			case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-			//	context.startService(new Intent(SuzakuPlayerService.ACTION_FAST_FORWARD));
-				break;
+/*				service = new Intent(PlayerService.ACTION_FAST_FORWARD);
+				service.setPackage(App.PACKAGE);
+				context.startService(service);
+*/				break;
 				
 			case KeyEvent.KEYCODE_MEDIA_REWIND:
-			//	context.startService(new Intent(SuzakuPlayerService.ACTION_REWIND));
-				break;
+/*				service = new Intent(PlayerService.ACTION_REWIND);
+				service.setPackage(App.PACKAGE);
+				context.startService(service);
+*/				break;
 				
 			case KeyEvent.KEYCODE_MEDIA_STOP:
-				context.startService(new Intent(PlayerService.ACTION_STOP));
+				service = new Intent(PlayerService.ACTION_STOP);
+				service.setPackage(App.PACKAGE);
+				context.startService(service);
 				break;
 		}
 	}

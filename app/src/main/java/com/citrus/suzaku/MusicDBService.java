@@ -35,7 +35,7 @@ public class MusicDBService extends IntentService
 {
 	// Actions From App
 	public static final String ACTION_UPDATE_DATABASE = "Citrus.suzaku.action.ACTION_UPDATE_DATABASE";
-	public static final String ACTION_UPDATE_TRACK = "Citrus.suzaku.action.ACTION_UPDATE_TRACK";
+	public static final String ACTION_UPDATE_TRACKS = "Citrus.suzaku.action.ACTION_UPDATE_TRACKS";
 	public static final String ACTION_CREATE_PLAYLIST = "Citrus.suzaku.action.ACTION_CREATE_PLAYLIST";
 	public static final String ACTION_EDIT_PLAYLIST = "Citrus.suzaku.action.ACTION_EDIT_PLAYLIST";
 	public static final String ACTION_ADD_TO_PLAYLIST = "Citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST";
@@ -47,10 +47,10 @@ public class MusicDBService extends IntentService
 	public static final String ACTION_PLAYLIST_CHANGED = "Citrus.suzaku.action.ACTION_PLAYLIST_CHANGED";
 	
 	// Intent Extra Key
-	public static final String INTENT_KEY_PATH = "PATH";
+	public static final String INTENT_KEY_PATHS = "PATHS";
 	public static final String INTENT_KEY_PLAYLIST = "PLAYLIST";
 	public static final String INTENT_KEY_PLAYLIST_ID = "PLAYLIST_ID";
-	public static final String INTENT_KEY_TRACKS = "TRACKS";
+	public static final String INTENT_KEY_TRACK_IDS = "TRACK_IDS";
 	
 	
 /*	public MusicDBService(String name)
@@ -79,9 +79,9 @@ public class MusicDBService extends IntentService
 				notifyAction(ACTION_DATABASE_CHANGED);
 				break;
 		
-			case ACTION_UPDATE_TRACK:
-				String path = (String)intent.getSerializableExtra(INTENT_KEY_PATH);
-				updateTrack(path);
+			case ACTION_UPDATE_TRACKS:
+				List<String> paths = (List<String>)intent.getSerializableExtra(INTENT_KEY_PATHS);
+				updateTracks(paths);
 			
 				notifyAction(ACTION_DATABASE_CHANGED);
 				break;
@@ -102,16 +102,16 @@ public class MusicDBService extends IntentService
 			}
 			case ACTION_ADD_TO_PLAYLIST:{
 				Playlist playlist = (Playlist) intent.getSerializableExtra(INTENT_KEY_PLAYLIST);
-				List<Track> tracks = (List<Track>) intent.getSerializableExtra(INTENT_KEY_TRACKS);
-				addPlaylistTracks(playlist, tracks);
+				List<Long> trackIds = (List<Long>) intent.getSerializableExtra(INTENT_KEY_TRACK_IDS);
+				addPlaylistTracks(playlist, trackIds);
 
 				notifyAction(ACTION_PLAYLIST_CHANGED);
 				break;
 			}
 			case ACTION_DELETE_PLAYLISTTRACKS: {
 				Playlist playlist = (Playlist) intent.getSerializableExtra(INTENT_KEY_PLAYLIST);
-				List<PlaylistTrack> tracks = (List<PlaylistTrack>) intent.getSerializableExtra(INTENT_KEY_TRACKS);
-				deletePlaylistTracks(playlist, tracks);
+				List<Long> trackIds = (List<Long>) intent.getSerializableExtra(INTENT_KEY_TRACK_IDS);
+				deletePlaylistTracks(playlist, trackIds);
 
 				notifyAction(ACTION_PLAYLIST_CHANGED);
 				break;
@@ -214,7 +214,7 @@ public class MusicDBService extends IntentService
 	private void updateAllTracksInStorage(SQLiteDatabase db, String rootPath)
 	{
 		String[] whereArgs = { rootPath + "/" };
-		List<Track> tracks = MyMediaStoreManager.getTracks(MediaStore.Audio.Media.DATA + " LIKE ? || '%'", whereArgs);		
+		List<Track> tracks = MyMediaStoreManager.getTracks(MediaStore.Audio.Media.DATA + " LIKE ? || '%'", whereArgs);		// "||" は文字列連結
 		
 		db.beginTransactionNonExclusive();
 		try{
@@ -246,13 +246,13 @@ public class MusicDBService extends IntentService
 				track.fileLastModified = file.lastModified();
 
 				mdb.insertTrack(track);
-
+/*
 				ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
 				ActivityManager am = (ActivityManager)getSystemService(Activity.ACTIVITY_SERVICE);
 				am.getMemoryInfo(info);
 				double linuxFreeHeap = info.availMem * 100 / 1024 / 1024 / 100.0;
 				App.logd("MDBS Free LinuxHeap : " + linuxFreeHeap + "MB");
-			}
+*/			}
 		
 			db.setTransactionSuccessful();
 			PreferenceUtils.putLong(PreferenceUtils.DB_LAST_UPDATED, System.currentTimeMillis());
@@ -343,32 +343,40 @@ public class MusicDBService extends IntentService
 		}
 	}
 	
-	// ACTION_UPDATE_TRACK
-	private void updateTrack(String path)
+	// ACTION_UPDATE_TRACKS
+	private void updateTracks(List<String> paths)
 	{
-		String[] whereArgs = { path };
-		List<Track> tracks = MyMediaStoreManager.getTracks(MediaStore.Audio.Media.DATA + " = ?", whereArgs);
+		List<Track> tracks = new ArrayList<>();
 
-		if(tracks.size() == 0){
-			return;
+		for(String path : paths){
+			String[] whereArgs = { path };
+			List<Track> results = MyMediaStoreManager.getTracks(MediaStore.Audio.Media.DATA + " = ?", whereArgs);
+
+			if(results.size() == 0){
+				continue;
+			}
+
+			Track track = results.get(0);
+
+			File file = new File(track.path);
+			if(!file.exists()){
+				continue;
+			}
+
+			getMediaMetadata(track);
+			track.fileLastModified = file.lastModified();
+
+			tracks.add(track);
 		}
-
-		Track track = tracks.get(0);
-		
-		File file = new File(track.path);
-		if(!file.exists()){
-			return;
-		}
-
-		getMediaMetadata(track);
-		track.fileLastModified = file.lastModified();
 
 		SQLiteDatabase db = MusicDBHelper.getInstanceForWriting().getWritableDatabase();
 		MusicDB mdb = new MusicDB(db);
 		
 		db.beginTransactionNonExclusive();
 		try{
-			mdb.insertTrack(track);
+			for(Track track : tracks){
+				mdb.insertTrack(track);
+			}
 			db.setTransactionSuccessful();
 		}finally{
 			db.endTransaction();
@@ -377,7 +385,7 @@ public class MusicDBService extends IntentService
 		updateAlbums(db);
 		updateArtists(db);
 		updateGenres(db);
-		
+
 	//	db.close();
 	}
 
@@ -718,7 +726,7 @@ public class MusicDBService extends IntentService
 	// PlaylistTrack
 
 	// ACTION_ADD_TO_PLAYLIST
-	private void addPlaylistTracks(Playlist playlist, List<Track> tracks)
+	private void addPlaylistTracks(Playlist playlist, List<Long> trackIds)
 	{
 		SQLiteDatabase db = MusicDBHelper.getInstanceForWriting().getWritableDatabase();
 		db.beginTransactionNonExclusive();
@@ -726,7 +734,8 @@ public class MusicDBService extends IntentService
 			MusicDB mdb = new MusicDB(db);
 			
 			int i = mdb.getPlaylistTracks(playlist.id).size();
-			for(Track track : tracks){
+			for(Long id : trackIds){
+				Track track = mdb.getTrack(id);
 				PlaylistTrack playlistTrack = new PlaylistTrack(null);
 				playlistTrack.setTrackInfo(track);
 				playlistTrack.trackId = track.id;
@@ -737,7 +746,7 @@ public class MusicDBService extends IntentService
 				i++;
 			}
 
-			updateNumSongsInPlaylist(db, playlist.id, tracks.size());
+			updateNumSongsInPlaylist(db, playlist.id, trackIds.size());
 
 			db.setTransactionSuccessful();
 		}finally{
@@ -748,7 +757,7 @@ public class MusicDBService extends IntentService
 	}
 
 	// ACTION_DELETE_PLAYLISTTRACKS
-	private void deletePlaylistTracks(Playlist playlist, List<PlaylistTrack> tracks)
+	private void deletePlaylistTracks(Playlist playlist, List<Long> trackIds)
 	{
 		SQLiteDatabase db = MusicDBHelper.getInstanceForWriting().getWritableDatabase();
 		db.beginTransactionNonExclusive();
@@ -760,15 +769,15 @@ public class MusicDBService extends IntentService
 			SQLiteStatement deleteStmt = db.compileStatement(stmt);
 
 			try{
-				for(Track t : tracks){
-					deleteStmt.bindLong(1, t.id);
+				for(Long id : trackIds){
+					deleteStmt.bindLong(1, id);
 					deleteStmt.executeUpdateDelete();
 				}
 			}finally{
 				deleteStmt.close();
 			}
 
-			updateNumSongsInPlaylist(db, playlist.id, -tracks.size());
+			updateNumSongsInPlaylist(db, playlist.id, -trackIds.size());
 
 			// Playlist TrackNo を更新
 			List<PlaylistTrack> ptracks = playlist.getPlaylistTracks();

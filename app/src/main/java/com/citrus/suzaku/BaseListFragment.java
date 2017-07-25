@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.view.ActionMode;
 import android.util.SparseBooleanArray;
@@ -197,7 +196,7 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 				break;
 				
 			case R.id.menu_add_to_playlist:
-				PlaylistSelectDialog dialog = PlaylistSelectDialog.newInstance(getCheckedTracks());
+				PlaylistSelectDialog dialog = PlaylistSelectDialog.newInstance(getCheckedTrackIds());
 				dialog.setTargetFragment(this, 0);
 				dialog.show(getChildFragmentManager(), "PlaylistSelectDialog");
 				
@@ -209,7 +208,7 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 				
 			case R.id.menu_detail:
 				Intent intent = new Intent(getActivity(), TrackDetailActivity.class);
-				intent.putExtra("TRACKS", (Serializable)getCheckedTracks());
+				intent.putExtra("IDS", (Serializable)getCheckedTrackIds());
 				startActivity(intent);
 				break;
 				
@@ -267,8 +266,8 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 	}
 
 	
-	// Convert List<T> (Track or TrackGroup) to List<Track>
-	protected abstract List<Track> getCheckedTracks();
+	// Convert List<T> (Track or TrackGroup) to List<Long> (ID)
+	protected abstract List<Long> getCheckedTrackIds();
 
 	// Run in AsyncTaskLoader
 	protected abstract List<T> getDataList();
@@ -330,10 +329,9 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 	}
 	
 	// AsyncTaskLoader
-	private static class DataListLoader<T> extends AsyncTaskLoader<List<T>>
+	private static class DataListLoader<T> extends BaseAsyncTaskLoader<List<T>>
 	{
 		private BaseListFragment<T> fragment;
-		private List<T> list;
 		
 		public DataListLoader(Context context, BaseListFragment<T> fragment)
 		{
@@ -348,42 +346,17 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 			if(fragment == null){
 				return null;
 			}
-		
-			return fragment.getDataList();
-		}
 
-		@Override
-		protected void onStartLoading()
-		{
-			if(list != null){
-				deliverResult(list);
-			}else if(takeContentChanged() || list == null){
-				forceLoad();
-			}
-		}
+			List<T> list = fragment.getDataList();
 
-		@Override
-		protected void onStopLoading()
-		{
-			cancelLoad();
-		}
-
-		@Override
-		public void deliverResult(List<T> list)
-		{
-			this.list = list;
-			
-			if(isStarted()){
-				super.deliverResult(list);
-			}
+			setResult(list);
+			return list;
 		}
 		
 		@Override
 		protected void onReset()
 		{
 			super.onReset();
-			
-			cancelLoad();
 			fragment = null;
 		}
 	}

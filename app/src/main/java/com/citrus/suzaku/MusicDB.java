@@ -143,6 +143,22 @@ public class MusicDB
 
 		return tracks;
 	}
+
+	public List<Long> getTrackIds(String selection, String[] selectionArgs, String sortOrder)
+	{
+		Cursor cursor = db.query(Tracks.TABLE, null, selection, selectionArgs, null, null, sortOrder);
+
+		List<Long> trackIds = new ArrayList<>();
+
+		while(cursor.moveToNext()){
+			long id = cursor.getLong(cursor.getColumnIndex(Tracks._ID));
+			trackIds.add(id);
+		}
+
+		cursor.close();
+
+		return trackIds;
+	}
 	
 	public List<Track> getAllTracks()
 	{

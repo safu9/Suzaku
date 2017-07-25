@@ -128,8 +128,8 @@ public class PlaylistListFragment extends TrackGroupListFragment<Playlist>
 		{
 			switch(item.getItemId()){
 				case R.id.menu_add_to_playlist:
-					List<Track> tracks = getItem(menuPosition).getTracks();
-					PlaylistSelectDialog selectDialog = PlaylistSelectDialog.newInstance(tracks);
+					List<Long> trackIds = getItem(menuPosition).getTrackIds();
+					PlaylistSelectDialog selectDialog = PlaylistSelectDialog.newInstance(trackIds);
 					selectDialog.setTargetFragment(PlaylistListFragment.this, 0);
 					selectDialog.show(getChildFragmentManager(), "PlaylistSelectDialog");
 					return true;
