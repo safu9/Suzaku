@@ -205,7 +205,8 @@
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
-				android:textColor="@color/black"/>
+				android:textColor="@color/black"
+				android:inputType="textMultiLine"/>
 
 			<CheckBox
 				android:id="@+id/compilation"

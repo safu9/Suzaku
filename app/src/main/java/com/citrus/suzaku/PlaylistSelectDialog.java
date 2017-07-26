@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +42,7 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 		return dialog;
 	}
 
+	@NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState)
 	{
@@ -137,7 +139,7 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 		@Override
 		public View newView(ViewGroup parent)
 		{
-			View view = inflater.inflate(R.layout.dialog_listitem_playlist, null, false);
+			View view = inflater.inflate(R.layout.dialog_listitem_playlist, parent, false);
 
 			ViewHolder holder = new ViewHolder();
 

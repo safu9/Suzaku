@@ -25,6 +25,7 @@
 		android:layout_width="@dimen/small_icon_size"
 		android:layout_below="@id/title"
 		android:layout_alignParentRight="true"
-		android:background="@android:color/transparent"/>
+		android:background="@android:color/transparent"
+		android:contentDescription="@string/menu"/>
 	
 </RelativeLayout>

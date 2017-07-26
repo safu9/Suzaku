@@ -75,7 +75,7 @@ public class App extends Application
 	// SDカードのfilesディレクトリパスのリストを取得する
 	// Android5.0 (API 21) 以上対応
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static List<String> getSdCardFilesDirPathListForLollipop()
+	private static List<String> getSdCardFilesDirPathListForLollipop()
 	{
 		List<String> sdCardFilesDirPathList = new ArrayList<>();
 
@@ -106,7 +106,7 @@ public class App extends Application
 	}
 
 	// SDカードのfilesディレクトリパスのリストを取得する
-	public static List<String> getSdCardFilesDirPathListUnderLollippop()
+	private static List<String> getSdCardFilesDirPathListUnderLollippop()
 	{
 		List<String> sdCardFilesDirPathList = new ArrayList<>();
 		StorageManager sm = (StorageManager) appContext.getSystemService(Context.STORAGE_SERVICE);

@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceDialogFragmentCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ public class LibraryFolderDialog extends PreferenceDialogFragmentCompat implemen
     private List<String> paths;
     private FolderListAdapter adapter;
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
@@ -134,7 +136,7 @@ public class LibraryFolderDialog extends PreferenceDialogFragmentCompat implemen
         @Override
         public View newView(ViewGroup parent)
         {
-            View view = inflater.inflate(R.layout.dialog_listitem_lib_folder, null, false);
+            View view = inflater.inflate(R.layout.dialog_listitem_lib_folder, parent, false);
 
             ViewHolder holder = new ViewHolder();
 

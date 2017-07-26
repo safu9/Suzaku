@@ -15,9 +15,10 @@
 			android:id="@+id/lyrics"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
+			android:gravity="top"
 			android:textSize="@dimen/text_small"
 			android:textColor="@color/black"
-			android:gravity="top"/>
+			android:inputType="textMultiLine"/>
 
 	</ScrollView>
 

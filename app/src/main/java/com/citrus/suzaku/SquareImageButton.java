@@ -1,14 +1,13 @@
 package com.citrus.suzaku;
 
-import android.content.*;
-import android.content.res.*;
-import android.util.*;
-import android.widget.*;
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.util.AttributeSet;
 
 /*
  View を正方形に調整
  */
-public class SquareImageButton extends ImageButton
+public class SquareImageButton extends android.support.v7.widget.AppCompatImageButton
 {
 	public static final int ADJUST_WIDTH = 0;
 	public static final int ADJUST_HEIGHT = 1;

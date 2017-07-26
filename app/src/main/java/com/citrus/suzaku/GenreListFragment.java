@@ -70,7 +70,7 @@ public class GenreListFragment extends TrackGroupListFragment<Genre>
 		@Override
 		public View newView(ViewGroup parent)
 		{
-			View view = inflater.inflate(R.layout.listitem_genre, null, false);
+			View view = inflater.inflate(R.layout.listitem_genre, parent, false);
 
 			ViewHolder holder = new ViewHolder();
 			holder.genreTextView = (TextView)view.findViewById(R.id.genre);

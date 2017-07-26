@@ -171,7 +171,7 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 	}
 
 
-	public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked)
+	private void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked)
 	{
 		if(mode != null){
 			mode.setTitle(getListView().getCheckedItemCount() + " / " + getListView().getCount());

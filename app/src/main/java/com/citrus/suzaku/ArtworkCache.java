@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.Display;
@@ -341,7 +342,7 @@ public class ArtworkCache
 			private static final ThreadFactory sThreadFactory = new ThreadFactory(){
 				private final AtomicInteger mCount = new AtomicInteger(1);
 				@Override
-				public Thread newThread(Runnable r){
+				public Thread newThread(@NonNull Runnable r){
 					return new Thread(r, "AsyncTask #" + mCount.getAndIncrement());
 				}
 			};

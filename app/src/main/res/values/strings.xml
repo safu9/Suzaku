@@ -57,7 +57,6 @@
 	<string name="songs">Songs</string>
 	<string name="genres">Genres</string>
 
-	<string name="select">Select</string>
 	<string name="select_playlist">Select Playlist</string>
 
 	<!-- Menu -->
@@ -74,13 +73,9 @@
 	<string name="delete">Delete</string>
 	<string name="create_new_playlist">Create New Playlist</string>
 	<string name="save">Save</string>
-	<string name="update">Update</string>
 	<string name="add_folder">Add Folder</string>
 	
 	<!-- Views -->
-
-	<string name="drawer_open" translatable="false">open</string>
-	<string name="drawer_close" translatable="false">close</string>
 	
 	<string name="no_data">No Data</string>
 	<string name="sd_unmounted">SD card is not mounted</string>
@@ -117,6 +112,21 @@
 	<string name="sd_card">SD card</string>
 
 	<string name="sd_card_access">SD Card Access</string>
+
+	<!-- Accessibility -->
+
+	<string name="open_drawer">Open Drawer</string>
+	<string name="close_drawer">Close Drawer</string>
+
+	<string name="play">Play</string>
+	<string name="next">Next</string>
+	<string name="previous">Previous</string>
+	<string name="loop_mode">Loop Mode</string>
+	<string name="shuffle_mode">Shuffle Mode</string>
+
+	<string name="menu">Menu</string>
+	<string name="clear">Clear</string>
+	<string name="close">Close</string>
 
 	<!-- Errors -->
 

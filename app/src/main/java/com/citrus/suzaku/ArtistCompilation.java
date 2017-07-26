@@ -20,6 +20,7 @@ public class ArtistCompilation extends Artist
 
 	}
 	
+	@Override
 	public List<Album> getAlbums()
 	{
 		MusicDB mdb = new MusicDB();

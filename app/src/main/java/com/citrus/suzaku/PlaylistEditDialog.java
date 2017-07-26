@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +34,7 @@ public class PlaylistEditDialog extends DialogFragment implements View.OnClickLi
 		return dialog;
 	}
 	
+	@NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState)
 	{
@@ -74,7 +76,7 @@ public class PlaylistEditDialog extends DialogFragment implements View.OnClickLi
 				Playlist playlist = (Playlist)getArguments().getSerializable(PLAYLIST);
 				playlist.title = editText.getText().toString();
 
-				if(playlist.title == null || playlist.title.isEmpty()){
+				if(playlist.title.isEmpty()){
 					Toast.makeText(App.getContext(), R.string.warn_input_playlist_title, Toast.LENGTH_SHORT).show();
 					return;
 				}

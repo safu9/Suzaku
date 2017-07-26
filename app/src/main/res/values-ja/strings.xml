@@ -36,7 +36,6 @@
 	<string name="songs">曲</string>
 	<string name="genres">ジャンル</string>
 
-	<string name="select">選択</string>
 	<string name="select_playlist">プレイリストを選択</string>
 
 	<!-- Menu -->
@@ -53,7 +52,6 @@
 	<string name="delete">削除</string>
 	<string name="create_new_playlist">新規プレイリスト</string>
 	<string name="save">保存</string>
-	<string name="update">更新</string>
 	<string name="add_folder">フォルダを追加</string>
 
 	<!-- Views -->
@@ -92,6 +90,21 @@
 	<string name="sd_card">SDカード</string>
 
 	<string name="sd_card_access">SDカードアクセス</string>
+
+	<!-- Accessibility -->
+
+	<string name="open_drawer">ドロワーを開く</string>
+	<string name="close_drawer">ドロワーを閉じる</string>
+
+	<string name="play">再生</string>
+	<string name="next">次へ</string>
+	<string name="previous">前へ</string>
+	<string name="loop_mode">ループモード</string>
+	<string name="shuffle_mode">シャッフルモード</string>
+
+	<string name="menu">メニュー</string>
+	<string name="clear">消す</string>
+	<string name="close">閉じる</string>
 
 	<!-- Errors -->
 

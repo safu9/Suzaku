@@ -78,7 +78,7 @@ public class AlbumListFragment extends TrackGroupListFragment<Album>
 		@Override
 		public View newView(ViewGroup parent)
 		{
-			View view = inflater.inflate(R.layout.listitem_album, null, false);
+			View view = inflater.inflate(R.layout.listitem_album, parent, false);
 
 			ViewHolder holder = new ViewHolder();
 

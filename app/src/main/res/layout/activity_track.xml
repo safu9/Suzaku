@@ -180,7 +180,8 @@
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
 				android:paddingTop="@dimen/margin_small"
-				android:paddingBottom="@dimen/margin_small"/>
+				android:paddingBottom="@dimen/margin_small"
+				android:contentDescription="@string/loop_mode"/>
 
 			<ImageButton
 				style="@style/myButton"
@@ -190,7 +191,8 @@
 				android:layout_weight="1"
 				android:paddingTop="@dimen/margin_small"
 				android:paddingBottom="@dimen/margin_small"
-				android:src="@drawable/ic_skip_prev"/>
+				android:src="@drawable/ic_skip_prev"
+				android:contentDescription="@string/previous"/>
 
 			<ImageButton
 				style="@style/myButton"
@@ -199,7 +201,8 @@
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
 				android:paddingTop="@dimen/margin_small"
-				android:paddingBottom="@dimen/margin_small"/>
+				android:paddingBottom="@dimen/margin_small"
+				android:contentDescription="@string/play"/>
 
 			<ImageButton
 				style="@style/myButton"
@@ -209,7 +212,8 @@
 				android:layout_weight="1"
 				android:paddingTop="@dimen/margin_small"
 				android:paddingBottom="@dimen/margin_small"
-				android:src="@drawable/ic_skip_next"/>
+				android:src="@drawable/ic_skip_next"
+				android:contentDescription="@string/next"/>
 
 			<ImageButton
 				style="@style/myButton"
@@ -219,7 +223,8 @@
 				android:layout_weight="1"
 				android:paddingTop="@dimen/margin_small"
 				android:paddingBottom="@dimen/margin_small"
-				android:src="@drawable/ic_shuffle"/>
+				android:src="@drawable/ic_shuffle"
+				android:contentDescription="@string/shuffle_mode"/>
 
 		</LinearLayout>
 

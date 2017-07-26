@@ -92,7 +92,7 @@ public class TrackListFragment extends BaseListFragment<Track>
 		@Override
 		public View newView(ViewGroup parent)
 		{
-			View view = inflater.inflate(R.layout.listitem_track, null, false);
+			View view = inflater.inflate(R.layout.listitem_track, parent, false);
 
 			ViewHolder holder = new ViewHolder();
 

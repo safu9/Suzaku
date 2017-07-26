@@ -1,10 +1,11 @@
 package com.citrus.suzaku;
 
-import android.content.*;
-import android.database.*;
-import java.io.*;
+import android.content.ContentValues;
+import android.database.Cursor;
 
-import com.citrus.suzaku.MusicDB.*;
+import com.citrus.suzaku.MusicDB.PlaylistTracks;
+
+import java.io.Serializable;
 
 
 public class PlaylistTrack extends Track implements Serializable, Cloneable
@@ -51,12 +52,17 @@ public class PlaylistTrack extends Track implements Serializable, Cloneable
 	
 	public Track getTrack()
 	{
-		Track track = clone();
-		track.id = trackId;
-		
+		Track track = null;
+		try{
+			track = clone();
+			track.id = trackId;
+		}catch(CloneNotSupportedException e){
+			e.printStackTrace();
+		}
 		return track;
 	}
 
+	@Override
 	public ContentValues getContentValues()
 	{
 		ContentValues values = new ContentValues(20);
@@ -87,15 +93,9 @@ public class PlaylistTrack extends Track implements Serializable, Cloneable
 	}
 	
 	@Override
-	protected PlaylistTrack clone()
+	protected PlaylistTrack clone() throws CloneNotSupportedException
 	{
-		PlaylistTrack ptrack = null;
-		try{
-			ptrack = (PlaylistTrack)super.clone();
-		}catch(CloneNotSupportedException e){
-			e.printStackTrace();
-		}
-		return ptrack;
+		return (PlaylistTrack)super.clone();
 	}
 	
 }

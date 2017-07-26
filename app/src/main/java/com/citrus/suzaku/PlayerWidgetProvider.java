@@ -17,7 +17,7 @@ public class PlayerWidgetProvider extends AppWidgetProvider
 		updateWidget(context, null, false);
 	}
 	
-	public void updateWidget(Context context, Track track, boolean isPlaying)
+	private void updateWidget(Context context, Track track, boolean isPlaying)
 	{
 		RemoteViews views = createView(track, isPlaying);
 		AppWidgetManager manager = AppWidgetManager.getInstance(context);

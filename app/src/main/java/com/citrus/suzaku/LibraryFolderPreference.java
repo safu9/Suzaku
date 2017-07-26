@@ -12,7 +12,7 @@ import java.util.List;
 
 public class LibraryFolderPreference extends DialogPreference
 {
-    List<String> paths = new ArrayList<>();
+    private List<String> paths = new ArrayList<>();
 
     public LibraryFolderPreference(Context context, AttributeSet attrs)
     {

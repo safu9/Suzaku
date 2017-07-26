@@ -7,13 +7,15 @@ import android.view.*;
 import android.view.View.*;
 import android.widget.*;
 
+import java.lang.ref.WeakReference;
+
 
 public class DockFragment extends Fragment implements ServiceConnection
 {
 	private Messenger mService;
 	private boolean isBound;
 	
-	private final Messenger mMessenger = new Messenger(new MyHandler());
+	private final Messenger mMessenger = new Messenger(new MyHandler(this));
 
 	private boolean isPlaying = false;
 	private boolean isStopped = true;
@@ -61,6 +63,7 @@ public class DockFragment extends Fragment implements ServiceConnection
 
 		playButton.setImageResource(R.drawable.ic_play);
 		playButton.setOnClickListener(new ImageButton.OnClickListener(){
+			@Override
 			public void onClick(View v){
 				if(isReady){
 					if(isStopped){
@@ -75,6 +78,7 @@ public class DockFragment extends Fragment implements ServiceConnection
 		});
 
 		nextButton.setOnClickListener(new ImageButton.OnClickListener(){
+			@Override
 			public void onClick(View v){
 				if(isReady){
 					sendMessege(PlayerService.MSG_NEXT);
@@ -83,6 +87,7 @@ public class DockFragment extends Fragment implements ServiceConnection
 		});
 
 		prevButton.setOnClickListener(new ImageButton.OnClickListener(){
+			@Override
 			public void onClick(View v){
 				if(isReady){
 					sendMessege(PlayerService.MSG_PREV);
@@ -185,35 +190,48 @@ public class DockFragment extends Fragment implements ServiceConnection
 			e.printStackTrace();
 		}
 	}
-	
-	
-	private class MyHandler extends Handler
+
+	private void handleMessage(Message msg)
 	{
+		if(!isBound){
+			return;
+		}
+
+		Bundle bundle = msg.getData();
+
+		switch(msg.what){
+			case PlayerService.MSG_NOTIFY_TRACK:
+				Track track = (Track)bundle.getSerializable(PlayerService.KEY_TRACK);
+				updateView(track);
+				break;
+			case PlayerService.MSG_NOTIFY_STATE:
+				isPlaying = bundle.getBoolean(PlayerService.KEY_PLAYING, false);
+				isStopped = bundle.getBoolean(PlayerService.KEY_STOPPED, true);
+				updateState();
+				break;
+			case PlayerService.MSG_STOPPED:
+				isPlaying = false;
+				updateState();
+				break;
+		}
+	}
+	
+	
+	private static class MyHandler extends Handler
+	{
+		private WeakReference<DockFragment> mFragmentRef;
+
+		public MyHandler(DockFragment fragment)
+		{
+			mFragmentRef = new WeakReference<>(fragment);
+		}
+
 		@Override
 		public void handleMessage(Message msg)
 		{
-			if(!isBound){
-				return;
-			}
-
-			Bundle bundle = msg.getData();
-
-			switch(msg.what){
-				case PlayerService.MSG_NOTIFY_TRACK:
-					Track track = (Track)bundle.getSerializable(PlayerService.KEY_TRACK);
-					updateView(track);
-					break;
-				case PlayerService.MSG_NOTIFY_STATE:
-					isPlaying = bundle.getBoolean(PlayerService.KEY_PLAYING, false);
-					isStopped = bundle.getBoolean(PlayerService.KEY_STOPPED, true);
-					updateState();
-					break;
-				case PlayerService.MSG_STOPPED:
-					isPlaying = false;
-					updateState();
-					break;
-				default:
-					super.handleMessage(msg);
+			DockFragment fragment = mFragmentRef.get();
+			if(fragment != null){
+				fragment.handleMessage(msg);
 			}
 		}
 	}

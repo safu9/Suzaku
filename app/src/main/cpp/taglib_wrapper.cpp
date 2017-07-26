@@ -163,7 +163,7 @@ Java_com_citrus_suzaku_TagLibHelper_setFile(JNIEnv *env, jobject instance, jstri
 
 
 JNIEXPORT void JNICALL
-Java_com_citrus_suzaku_TagLibHelper_dumpTags(JNIEnv *env, jobject instance, jclass type)
+Java_com_citrus_suzaku_TagLibHelper_dumpTags(JNIEnv *env, jobject instance)
 {
 
     TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");

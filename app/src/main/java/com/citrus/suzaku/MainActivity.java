@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 
 		
 		mDrawer = (DrawerLayout)findViewById(R.id.drawerLayout);
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer, R.string.drawer_open, R.string.drawer_close){
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer, R.string.open_drawer, R.string.close_drawer){
 			@Override
 			public void onDrawerOpened(View drawer){
 			}
@@ -73,12 +73,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 			@Override
 			public void onDrawerClosed(View drawer){
 			}
-			
-			@Override
-			public void onDrawerSlide(View drawer, float slideOffset){
-				super.onDrawerSlide(drawer, slideOffset);
-			}
-			
+
 			@Override
 			public void onDrawerStateChanged(int newState){
 			}
@@ -262,10 +257,6 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 	public void showDrawerIndicator(boolean show)
 	{
 		mDrawerToggle.setDrawerIndicatorEnabled(show);
-	}
-
-	public Toolbar getToolbar(){
-		return toolbar;
 	}
 
 	// パーミッションをリクエスト

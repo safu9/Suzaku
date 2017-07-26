@@ -9,13 +9,14 @@ import android.support.v4.app.*;
 import android.util.*;
 import android.widget.*;
 import java.io.*;
+import java.lang.ref.WeakReference;
 
 
 public class PlayerService extends Service implements AudioManager.OnAudioFocusChangeListener
 {
 	private static final int NOTIFICATION_ID = 1;
 	
-	// From Activity, RemoteViews & RemoteControll
+	// From Activity, RemoteViews & RemoteControl
 	public static final String ACTION_PLAY = "Citrus.suzaku.action.ACTION_PLAY";
 	public static final String ACTION_ENQUEUE = "Citrus.suzaku.action.ACTION_ENQUEUE";
 	public static final String ACTION_PLAY_PAUSE = "Citrus.suzaku.action.ACTION_PLAY_PAUSE";
@@ -48,7 +49,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 	public static final String KEY_STOPPED = "STOPPED";
 	public static final String KEY_TIME = "TIME";
 	
-	private final Messenger mMessenger = new Messenger(new MyHandler());
+	private final Messenger mMessenger = new Messenger(new MyHandler(this));
 	private Messenger mReplyTo;
 	
 	private PlaylistManager playlist;				// 保存される情報
@@ -166,6 +167,54 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 				
 			case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
 				player.setVolume(0.2f, 0.2f);
+				break;
+		}
+	}
+
+	private void handleMessage(Message msg)
+	{
+		switch(msg.what){
+			case MSG_REQUEST_INFO:
+				App.logd("PS Received : MSG_REQUEST_INFO");
+				mReplyTo = msg.replyTo;
+				notifyTrack();
+				notifyState();
+				notifyTime();
+				break;
+			case MSG_PLAY_PAUSE:
+				App.logd("PS Received : MSG_PLAY_PAUSE");
+				playPauseSong();
+				break;
+			case MSG_NEXT:
+				App.logd("PS Received : MSG_NEXT");
+				nextSong();
+				break;
+			case MSG_PREV:
+				App.logd("PS Received : MSG_PREV");
+				prevSong();
+				break;
+			case MSG_STOP:
+				App.logd("PS Received : MSG_STOP");
+				stopSong();
+				break;
+			case MSG_SEEK:
+				App.logd("PS Received : MSG_SEEK");
+				int time = msg.getData().getInt(KEY_TIME, 0);
+				if(!isStopped){
+					player.seekTo(time);
+				}else{
+					playlist.setStartTime(time);
+				}
+				break;
+			case MSG_SWITCH_LOOPMODE:
+				App.logd("PS Received : MSG_SWITCH_LOOPMODE");
+				playlist.switchLoopMode();
+				notifyTrack();
+				break;
+			case MSG_SWITCH_SHUFFLEMODE:
+				App.logd("PS Received : MSG_SWITCH_SHUFFLEMODE");
+				playlist.switchShuffleMode();
+				notifyTrack();
 				break;
 		}
 	}
@@ -525,7 +574,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		PendingIntent stopIntent = PendingIntent.getService(this, R.id.closeButton, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		ntfViews.setOnClickPendingIntent(R.id.closeButton, stopIntent);
 		
-/*		// REcreate MainActivity!!! (without saving instantState)
+/*		// Recreate MainActivity!!! (without saving instantState)
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 		stackBuilder.addParentStack(TrackActivity.class);
 		stackBuilder.addNextIntent(new Intent(this, TrackActivity.class));
@@ -604,56 +653,21 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 	}
 	
 	
-	private class MyHandler extends Handler
+	private static class MyHandler extends Handler
 	{
+		private WeakReference<PlayerService> mServiceRef;
+
+		public MyHandler(PlayerService service)
+		{
+			mServiceRef = new WeakReference<>(service);
+		}
+
 		@Override
 		public void handleMessage(Message msg)
 		{
-			switch(msg.what){
-				case MSG_REQUEST_INFO:
-					App.logd("PS Received : MSG_REQUEST_INFO");
-					mReplyTo = msg.replyTo;
-					notifyTrack();
-					notifyState();
-					notifyTime();
-					break;
-				case MSG_PLAY_PAUSE:
-					App.logd("PS Received : MSG_PLAY_PAUSE");
-					playPauseSong();
-					break;
-				case MSG_NEXT:
-					App.logd("PS Received : MSG_NEXT");
-					nextSong();
-					break;
-				case MSG_PREV:
-					App.logd("PS Received : MSG_PREV");
-					prevSong();
-					break;
-				case MSG_STOP:
-					App.logd("PS Received : MSG_STOP");
-					stopSong();
-					break;
-				case MSG_SEEK:
-					App.logd("PS Received : MSG_SEEK");
-					int time = msg.getData().getInt(KEY_TIME, 0);
-					if(!isStopped){
-						player.seekTo(time);
-					}else{
-						playlist.setStartTime(time);
-					}
-					break;
-				case MSG_SWITCH_LOOPMODE:
-					App.logd("PS Received : MSG_SWITCH_LOOPMODE");
-					playlist.switchLoopMode();
-					notifyTrack();
-					break;
-				case MSG_SWITCH_SHUFFLEMODE:
-					App.logd("PS Received : MSG_SWITCH_SHUFFLEMODE");
-					playlist.switchShuffleMode();
-					notifyTrack();
-					break;
-				default:
-					super.handleMessage(msg);
+			PlayerService service = mServiceRef.get();
+			if(service != null){
+				service.handleMessage(msg);
 			}
 		}
 	}

@@ -72,7 +72,8 @@ public class MusicDBService extends IntentService
 
 		if(action == null){
 			return;
-		}else switch(action){
+		}
+		switch(action){
 			case ACTION_UPDATE_DATABASE:
 				updateDB();
 

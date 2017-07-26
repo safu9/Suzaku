@@ -170,7 +170,7 @@ public class PlaylistManager
 		return playlist.size();
 	}
 
-	//! UNUSE
+	//! UNUSED
 	public void setCurrentPosition(int position)
 	{
 		currentPosition = position;

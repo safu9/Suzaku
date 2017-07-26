@@ -32,7 +32,7 @@ public class SettingActivity extends AppCompatActivity
 				.commit();
 	}
 
-	public void replaceFragment(Fragment fragment)
+	private void replaceFragment(Fragment fragment)
 	{
 		getSupportFragmentManager()
 				.beginTransaction()
@@ -67,6 +67,7 @@ public class SettingActivity extends AppCompatActivity
 			addPreferencesFromResource(R.xml.preference);
 
 			findPreference("pref_lib").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					SettingActivity activity = (SettingActivity)getActivity();
 					activity.replaceFragment(new LibrarySettingFragment());
@@ -76,6 +77,7 @@ public class SettingActivity extends AppCompatActivity
 			});
 
 			findPreference("pref_ui").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					((SettingActivity)getActivity()).replaceFragment(new UiSettingFragment());
 					return true;

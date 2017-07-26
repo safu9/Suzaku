@@ -302,7 +302,7 @@ public class TrackDetailActivity extends AppCompatActivity
 
 	// SD Card へのアクセス許可
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public boolean checkSdcardAccessPermission(File root)
+	private boolean checkSdcardAccessPermission(File root)
 	{
 		if(root == null){
 			return false;
@@ -645,7 +645,7 @@ public class TrackDetailActivity extends AppCompatActivity
 			try {
 				outStream = new BufferedOutputStream(dst);
 
-				int data = -1;
+				int data;
 				byte[] buf = new byte[4096];
 				while ((data = inStream.read(buf)) != -1) {
 					outStream.write(buf, 0, data);
@@ -800,6 +800,7 @@ public class TrackDetailActivity extends AppCompatActivity
 			return (!isMultiple) ? NUM_PAGES : NUM_PAGES_MULTIPLE;
 		}
 
+		@Override
 		public String getPageTitle(int position)
 		{
 			int id = (!isMultiple) ? FRAGMENT_IDS[position] : FRAGMENT_IDS_MULTIPLE[position];

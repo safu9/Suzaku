@@ -11,6 +11,7 @@ import android.widget.Chronometer.*;
 import android.widget.SeekBar.*;
 
 import java.io.*;
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 
@@ -19,7 +20,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 	private Messenger mService;
 	private boolean isBound;
 
-	private final Messenger mMessenger = new Messenger(new MyHandler());
+	private final Messenger mMessenger = new Messenger(new MyHandler(this));
 	
 	private Track trackItem;
 	private boolean isPlaying = false;
@@ -44,7 +45,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 	private Button detailButton;
 
 	private ListView playlistView;
-	PlaylistTrackListAdapter playlistAdapter;
+	private PlaylistTrackListAdapter playlistAdapter;
 
 	private boolean animInProgress;
 	private int animDuration;
@@ -127,6 +128,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		
 		playButton.setImageResource(R.drawable.ic_pause);
 		playButton.setOnClickListener(new ImageButton.OnClickListener(){
+			@Override
 			public void onClick(View v)
 			{
 				if(isStopped){
@@ -140,6 +142,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		});
 		
 		nextButton.setOnClickListener(new ImageButton.OnClickListener(){
+			@Override
 			public void onClick(View v)
 			{
 				sendMessage(PlayerService.MSG_NEXT, null);
@@ -147,6 +150,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		});
 		
 		prevButton.setOnClickListener(new ImageButton.OnClickListener(){
+			@Override
 			public void onClick(View v)
 			{
 				sendMessage(PlayerService.MSG_PREV, null);
@@ -508,40 +512,53 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		}
 	}
 
+	private void handleMessage(Message msg)
+	{
+		if(!isBound){
+			return;
+		}
+
+		Bundle bundle = msg.getData();
+
+		switch(msg.what){
+			case PlayerService.MSG_NOTIFY_STATE:
+				isPlaying = bundle.getBoolean(PlayerService.KEY_PLAYING, false);
+				isStopped = bundle.getBoolean(PlayerService.KEY_STOPPED, true);
+				updateState();
+				break;
+			case PlayerService.MSG_NOTIFY_TRACK:
+				updateView(bundle);
+				break;
+			case PlayerService.MSG_STOPPED:
+				finish();
+				break;
+			case PlayerService.MSG_NOTIFY_TIME:
+				updateTime(bundle.getInt(PlayerService.KEY_TIME));
+				break;
+		}
+	}
+
 	private static String convertNewlineCode(String org)
 	{
 		String code = System.getProperty("line.separator");
 		return (org != null)? org.replaceAll("\r\n|[\n\r\u2028\u2029\u0085]", code) : null;
 	}
 	
-	private class MyHandler extends Handler
+	private static class MyHandler extends Handler
 	{
+		private WeakReference<TrackActivity> mActivityRef;
+
+		public MyHandler(TrackActivity activity)
+		{
+			mActivityRef = new WeakReference<>(activity);
+		}
+
 		@Override
 		public void handleMessage(Message msg)
 		{
-			if(!isBound){
-				return;
-			}
-			
-			Bundle bundle = msg.getData();
-			
-			switch(msg.what){
-				case PlayerService.MSG_NOTIFY_STATE:
-					isPlaying = bundle.getBoolean(PlayerService.KEY_PLAYING, false);
-					isStopped = bundle.getBoolean(PlayerService.KEY_STOPPED, true);
-					updateState();
-					break;
-				case PlayerService.MSG_NOTIFY_TRACK:
-					updateView(bundle);
-					break;
-				case PlayerService.MSG_STOPPED:
-					finish();
-					break;
-				case PlayerService.MSG_NOTIFY_TIME:
-					updateTime(bundle.getInt(PlayerService.KEY_TIME));
-					break;
-				default:
-					super.handleMessage(msg);
+			TrackActivity activity = mActivityRef.get();
+			if(activity != null){
+				activity.handleMessage(msg);
 			}
 		}
 	}
@@ -573,7 +590,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		@Override
 		public View newView(ViewGroup parent)
 		{
-			View view = inflater.inflate(R.layout.listitem_track_dark, null, false);
+			View view = inflater.inflate(R.layout.listitem_track_dark, parent, false);
 
 			ViewHolder holder = new ViewHolder();
 

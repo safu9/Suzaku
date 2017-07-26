@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_clear"
         android:tint="@color/gray_dark"
-        android:background="@android:color/transparent"/>
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/clear"/>
 
 </LinearLayout>

@@ -112,7 +112,7 @@ public class ArtistListFragment extends TrackGroupListFragment<Artist>
 		@Override
 		public View newView(ViewGroup parent)
 		{
-			View view = inflater.inflate(R.layout.listitem_artist, null, false);
+			View view = inflater.inflate(R.layout.listitem_artist, parent, false);
 
 			ViewHolder holder = new ViewHolder();
 
