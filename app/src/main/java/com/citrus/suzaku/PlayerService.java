@@ -476,7 +476,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 			return;
 		}
 		
-		if(!track.artworkHash.equals(ArtworkCache.Large.getArtworkHash())){
+		if(ArtworkCache.Large.getArtworkCache(track) == null){
 			new ImageGetTask(track).execute();
 		}
 		
