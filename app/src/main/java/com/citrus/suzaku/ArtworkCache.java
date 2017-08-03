@@ -363,24 +363,24 @@ public class ArtworkCache
 		}
 
 		private static String dir;
-		private static String largeHash;
-		private static Bitmap largeCache;
+		private static LruCache<String, Bitmap> cache;
+
+//		private static String largeHash;
+//		private static Bitmap largeCache;
 
 
 		public static void initialize()
 		{
+			cache = new LruCache<>(2);			// 2枚まで
+
 			dir = App.getContext().getExternalCacheDir().getAbsolutePath() + "/LARGE";
 			new File(dir).mkdirs();
 		}
 
 		public static void release()
 		{
-			if(largeCache != null && !largeCache.isRecycled()){
-				largeHash = null;
-
-				largeCache.recycle();
-				largeCache = null;
-			}
+			cache.evictAll();
+			cache = null;
 		}
 
 		// ImageView に画像を設定
@@ -391,8 +391,10 @@ public class ArtworkCache
 				return;
 			}
 
-			if(track.artworkHash.equals(largeHash) && largeCache != null){
-				image.setImageBitmap(largeCache);
+			Bitmap bmp = cache.get(track.artworkHash);
+
+			if(bmp != null){
+				image.setImageBitmap(bmp);
 			}else{
 				new ImageGetTask(track, image, false).execute();
 			}
@@ -404,8 +406,10 @@ public class ArtworkCache
 				return;
 			}
 
-			if(track.artworkHash.equals(largeHash) && largeCache != null){
-				image.setImageBitmap(largeCache);
+			Bitmap bmp = cache.get(track.artworkHash);
+
+			if(bmp != null){
+				image.setImageBitmap(bmp);
 			}else{
 				new ImageGetTask(track, image, true).execute();
 			}
@@ -417,8 +421,10 @@ public class ArtworkCache
 				return;
 			}
 
-			if(album.artworkHash.equals(largeHash) && largeCache != null){
-				image.setImageBitmap(largeCache);
+			Bitmap bmp = cache.get(album.artworkHash);
+
+			if(bmp != null){
+				image.setImageBitmap(bmp);
 			}else{
 				new ImageGetTask(album.getTracks().get(0), image, false).execute();
 			}
@@ -426,12 +432,14 @@ public class ArtworkCache
 
 		// メモリキャッシュ
 
-		private static void setArtworkCache(String hash, Bitmap artwork)
+		private static Bitmap setArtworkCache(String hash, Bitmap artwork)
 		{
-			release();
-
-			largeHash = hash;
-			largeCache = artwork;
+			if(cache.get(hash) != null){
+				return cache.get(hash);
+			}else{
+				cache.put(hash, artwork);
+				return artwork;
+			}
 		}
 
 		public static Bitmap getArtworkCache(Track track)
@@ -440,25 +448,9 @@ public class ArtworkCache
 				return null;
 			}
 
-			if(!track.artworkHash.equals(largeHash)){
-		//		ImageGetTask task = new ImageGetTask(track, Size.LARGE);
-		//		task.execute();
-
-				return null;
-			}
-
-			if(largeCache.isRecycled()){
-				return null;
-			}
-
-			return largeCache;
+			return cache.get(track.artworkHash);
 		}
 
-		public static String getArtworkHash()
-		{
-			return largeHash;
-		}
-		
 		// AsyncTask : ImageView に画像を設定
 		public static class ImageGetTask extends AsyncTask<Void, Void, Bitmap>
 		{
