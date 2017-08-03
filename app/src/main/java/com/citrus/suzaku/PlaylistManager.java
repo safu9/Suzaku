@@ -283,15 +283,21 @@ public class PlaylistManager
 		try{
 			FileOutputStream fos = new FileOutputStream(App.getContext().getExternalFilesDir(null) + "/" + FILE_PLAYLIST);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			
+
 			oos.writeInt(playRange);
 			oos.writeObject(item);
 			oos.writeInt(currentPosition);
 			oos.writeInt(loopMode);
 			oos.writeBoolean(shuffleMode);
-			oos.writeObject(shuffleList);
 			oos.writeInt(startTime);
-			
+
+			if(shuffleMode){
+				oos.writeInt(shuffleList.size());
+				for(int i : shuffleList){
+					oos.writeInt(i);
+				}
+			}
+
 			oos.close();
 		}catch(IOException e){
 			e.printStackTrace();
@@ -317,8 +323,15 @@ public class PlaylistManager
 			currentPosition = ois.readInt();
 			setLoopMode(ois.readInt());
 			shuffleMode = ois.readBoolean();
-			shuffleList = (ArrayList<Integer>)ois.readObject();
 			startTime = ois.readInt();
+
+			if(shuffleMode){
+				int length = ois.readInt();
+				shuffleList = new ArrayList<>();
+				for(int i = 0; i < length; i++){
+					shuffleList.add(i, ois.readInt());
+				}
+			}
 			
 			ois.close();
 		}catch(IOException e){
@@ -326,7 +339,7 @@ public class PlaylistManager
 		}catch(ClassNotFoundException e){
 			e.printStackTrace();
 		}
-		
+
 		queryPlaylist();
 	}
 	
