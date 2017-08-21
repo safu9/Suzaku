@@ -8,9 +8,11 @@ public class TagLibHelper
         System.loadLibrary("taglib_wrapper");
     }
 
+    @SuppressWarnings("unused")
     private long fileRefHandle;
-
+    @SuppressWarnings("unused")
     private long tagHandle;
+    @SuppressWarnings("unused")
     private long tagMapHandle;
 
     public native void setFile(String path);

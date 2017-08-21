@@ -137,8 +137,7 @@ public class App extends Application
 						// StorageVolumeの中で、取り外し可能でかつマウント済みのパスは、SDカード。
 						// マウント済みかどうかを確認しないと、機種によっては /mnt/Private などのパスも含まれてしまうことがある。
 						if (!sdCardFilesDirPathList.contains(storageBasePath)) {
-							String sdCardFilesDirPath = storageBasePath;// + "/Android/data/com.citrus.suzaku/files";
-							sdCardFilesDirPathList.add(sdCardFilesDirPath);
+							sdCardFilesDirPathList.add(storageBasePath);// + "/Android/data/com.citrus.suzaku/files";
 						}
 
 					}
