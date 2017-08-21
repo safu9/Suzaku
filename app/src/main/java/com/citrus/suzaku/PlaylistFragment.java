@@ -5,6 +5,11 @@ import android.os.*;
 import android.support.v4.app.*;
 import android.view.*;
 import android.widget.*;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.*;
 
 // Attached to MainActivity
@@ -12,9 +17,6 @@ public class PlaylistFragment extends Fragment
 {
 	private static final String FRAGMENT_TAG = "PlaylistTrackListFragment";
 	private static final int LOADER_ID = 1001;
-
-	private MyPlaylistBroadcastReceiver receiver;
-	private IntentFilter filter;
 	
 	private Playlist playlistItem;
 	
@@ -69,27 +71,17 @@ public class PlaylistFragment extends Fragment
 	}
 
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState)
-	{
-		super.onActivityCreated(savedInstanceState);
-		
-		receiver = new MyPlaylistBroadcastReceiver();
-		filter = receiver.createIntentFilter();
-	}
-	
-
-	@Override
 	public void onStart()
 	{
 		super.onStart();
-		getActivity().registerReceiver(receiver, filter);
+		EventBus.getDefault().register(this);
 	}
 
 	@Override
 	public void onStop()
 	{
 		super.onStop();
-		getActivity().unregisterReceiver(receiver);
+		EventBus.getDefault().unregister(this);
 	}
 	
 	
@@ -143,16 +135,12 @@ public class PlaylistFragment extends Fragment
 		
 		artworkImageView.setImageBitmap(null);
 	}
-	
-	
-	private class MyPlaylistBroadcastReceiver extends PlaylistBroadcastReceiver
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onEvent(MusicDBService.PlaylistChangedEvent event)
 	{
-		@Override
-		public void onReceive(Context c, Intent i)
-		{
-			playlistItem = (new MusicDB()).getPlaylist(playlistItem.id);
-			updateView();
-		}
+		playlistItem = (new MusicDB()).getPlaylist(playlistItem.id);
+		updateView();
 	}
 
 }

@@ -1,9 +1,7 @@
 package com.citrus.suzaku;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -21,6 +19,10 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +34,6 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 	
 	private int mLoaderId;
 	private ActionMode mActionMode;
-
-	private DatabaseBroadcastReceiver receiver;
 
 	private ListView mListView;
 	private BaseAdapter mAdapter;
@@ -104,8 +104,6 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 
 		mListView.setAdapter(mAdapter);
 		mListView.setEmptyView(mEmptyView);
-
-		receiver = new DatabaseBroadcastReceiver();
 	}
 
 	@Override
@@ -113,7 +111,7 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 	{
 		super.onStart();		
 		startLoader(true);
-		getActivity().registerReceiver(receiver, receiver.getIntentFilter());
+		EventBus.getDefault().register(this);
 	}
 
 	@Override
@@ -127,7 +125,13 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 	public void onStop()
 	{
 		super.onStop();
-		getActivity().unregisterReceiver(receiver);
+		EventBus.getDefault().unregister(this);
+	}
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onEvent(MusicDBService.DatabaseChangedEvent event)
+	{
+		startLoader(true);
 	}
 
 	public void onListItemClick(ListView l, View v, int position, long id)
@@ -358,30 +362,6 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 		{
 			super.onReset();
 			fragment = null;
-		}
-	}
-
-	
-	// BroadcastReceiver
-	private class DatabaseBroadcastReceiver extends BroadcastReceiver
-	{
-		private IntentFilter filter;
-
-		public DatabaseBroadcastReceiver()
-		{
-			filter = new IntentFilter();
-			filter.addAction(MusicDBService.ACTION_DATABASE_CHANGED);
-		}
-
-		@Override
-		public void onReceive(Context c, Intent i)
-		{
-			startLoader(true);
-		}
-
-		public IntentFilter getIntentFilter()
-		{
-			return filter;
 		}
 	}
 	

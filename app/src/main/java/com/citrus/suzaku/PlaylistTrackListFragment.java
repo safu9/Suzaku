@@ -2,7 +2,6 @@ package com.citrus.suzaku;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
@@ -13,6 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +23,6 @@ import java.util.List;
 public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 {
 	private static final String PLAYLIST = "PLAYLIST";
-	
-	private MyPlaylistBroadcastReceiver receiver;
-	private IntentFilter filter;
 	
 	private Playlist playlist;
 
@@ -49,9 +49,6 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
 		super.onActivityCreated(savedInstanceState);
-
-		receiver = new MyPlaylistBroadcastReceiver();
-		filter = receiver.createIntentFilter();
 		
 		setListAdapter(new PlaylistTrackListAdapter());
 	}
@@ -60,14 +57,14 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 	public void onStart()
 	{
 		super.onStart();
-		getActivity().registerReceiver(receiver, filter);
+		EventBus.getDefault().register(this);
 	}
 
 	@Override
 	public void onStop()
 	{
 		super.onStop();
-		getActivity().unregisterReceiver(receiver);
+		EventBus.getDefault().unregister(this);
 	}
 
 	@Override
@@ -127,6 +124,12 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 	protected List<PlaylistTrack> getDataList()
 	{
 		return playlist.getPlaylistTracks();
+	}
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onEvent(MusicDBService.PlaylistChangedEvent event)
+	{
+		startLoader(true);
 	}
 
 
@@ -243,16 +246,6 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 		TextView durationTextView;
 
 	//	ImageButton popupButton;
-	}
-	
-
-	private class MyPlaylistBroadcastReceiver extends PlaylistBroadcastReceiver
-	{
-		@Override
-		public void onReceive(Context c, Intent i)
-		{
-			startLoader(true);
-		}
 	}
 	
 }

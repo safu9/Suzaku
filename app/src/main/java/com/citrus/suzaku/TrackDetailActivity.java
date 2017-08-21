@@ -2,12 +2,10 @@ package com.citrus.suzaku;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -43,6 +41,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -85,8 +87,6 @@ public class TrackDetailActivity extends AppCompatActivity
 	private File mRoot;									// Storage Access Framework のURIを取得中のルートディレクトリ
 	private boolean isWaitingFinish = false;			// SAF の許可待ち
 
-	private DatabaseBroadcastReceiver receiver;
-
 	private Toolbar mToolbar;
 	private TabLayout mTabs;
 	private ViewPager mViewPager;
@@ -103,8 +103,6 @@ public class TrackDetailActivity extends AppCompatActivity
 
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);    // キーボードを隠す
 		setContentView(R.layout.activity_track_detail);
-
-		receiver = new DatabaseBroadcastReceiver();
 
 		handler = new DialogHandler(this);
 
@@ -169,14 +167,14 @@ public class TrackDetailActivity extends AppCompatActivity
 	protected void onStart()
 	{
 		super.onStart();
-		registerReceiver(receiver, receiver.getIntentFilter());
+		EventBus.getDefault().register(this);
 	}
 
 	@Override
 	protected void onStop()
 	{
 		super.onStop();
-		unregisterReceiver(receiver);
+		EventBus.getDefault().unregister(this);
 	}
 
 	@Override
@@ -261,6 +259,12 @@ public class TrackDetailActivity extends AppCompatActivity
 		}else{
 			finish();
 		}
+	}
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onEvent(MusicDBService.DatabaseChangedEvent event)
+	{
+		getSupportLoaderManager().restartLoader(READ_TAG_LOADER_ID, null, new ReadTagLoaderCallbacks());
 	}
 
 	private String[] getTag()
@@ -483,8 +487,6 @@ public class TrackDetailActivity extends AppCompatActivity
 		@Override
 		public Loader<Bundle> onCreateLoader(int id, Bundle args)
 		{
-			App.logd("TDA RTLC onCreateLoader");
-
 			List<Long> ids = (List<Long>)getIntent().getSerializableExtra("IDS");
 			if(ids == null || ids.size() == 0){
 				finish();
@@ -501,8 +503,6 @@ public class TrackDetailActivity extends AppCompatActivity
 		@Override
 		public void onLoadFinished(Loader<Bundle> loader, Bundle result)
 		{
-			App.logd("TDA RTLC onLoadFinished");
-
 			// Using FragmentTransaction
 			Message msg = new Message();
 			msg.obj = READ_DIALOG_TAG;
@@ -899,32 +899,6 @@ public class TrackDetailActivity extends AppCompatActivity
 		public Fragment getFragmentAtPosition(int position)
 		{
 			return (Fragment)instantiateItem(mViewPager, position);
-		}
-	}
-
-	// BroadcastReceiver
-	private class DatabaseBroadcastReceiver extends BroadcastReceiver
-	{
-		private IntentFilter filter;
-
-		public DatabaseBroadcastReceiver()
-		{
-			filter = new IntentFilter();
-			filter.addAction(MusicDBService.ACTION_DATABASE_CHANGED);
-		}
-
-		@Override
-		public void onReceive(Context context, Intent intent)
-		{
-			MusicDB mdb = new MusicDB();
-			mTrack = mdb.getTrack(mTrack.id);
-
-			mPagerAdapter.notifyDataSetChanged();
-		}
-
-		public IntentFilter getIntentFilter()
-		{
-			return filter;
 		}
 	}
 

@@ -23,6 +23,8 @@ import com.citrus.suzaku.MusicDB.PlaylistTracks;
 import com.citrus.suzaku.MusicDB.Playlists;
 import com.citrus.suzaku.MusicDB.Tracks;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,11 +43,7 @@ public class MusicDBService extends IntentService
 	public static final String ACTION_ADD_TO_PLAYLIST = "Citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST";
 	public static final String ACTION_DELETE_PLAYLISTTRACKS = "Citrus.suzaku.action.ACTION_DELETE_PLAYLISTTRACKS";
 	public static final String ACTION_DELETE_PLAYLIST = "Citrus.suzaku.action.ACTION_DELETE_PLAYLIST";
-	
-	// BroadCast To ListFragments
-	public static final String ACTION_DATABASE_CHANGED = "Citrus.suzaku.action.ACTION_DATABASE_CHANGED";
-	public static final String ACTION_PLAYLIST_CHANGED = "Citrus.suzaku.action.ACTION_PLAYLIST_CHANGED";
-	
+
 	// Intent Extra Key
 	public static final String INTENT_KEY_PATHS = "PATHS";
 	public static final String INTENT_KEY_PLAYLIST = "PLAYLIST";
@@ -77,28 +75,28 @@ public class MusicDBService extends IntentService
 			case ACTION_UPDATE_DATABASE:
 				updateDB();
 
-				notifyAction(ACTION_DATABASE_CHANGED);
+				postEvent(new DatabaseChangedEvent());
 				break;
 		
 			case ACTION_UPDATE_TRACKS:
 				List<String> paths = (List<String>)intent.getSerializableExtra(INTENT_KEY_PATHS);
 				updateTracks(paths);
 			
-				notifyAction(ACTION_DATABASE_CHANGED);
+				postEvent(new DatabaseChangedEvent());
 				break;
 		
 			case ACTION_CREATE_PLAYLIST:{
 				Playlist playlist = (Playlist) intent.getSerializableExtra(INTENT_KEY_PLAYLIST);
 				createPlaylist(playlist);
 
-				notifyAction(ACTION_PLAYLIST_CHANGED);
+				postEvent(new PlaylistChangedEvent());
 				break;
 			}
 			case ACTION_EDIT_PLAYLIST:{
 				Playlist playlist = (Playlist) intent.getSerializableExtra(INTENT_KEY_PLAYLIST);
 				updatePlaylist(playlist);
 
-				notifyAction(ACTION_PLAYLIST_CHANGED);
+				postEvent(new PlaylistChangedEvent());
 				break;
 			}
 			case ACTION_ADD_TO_PLAYLIST:{
@@ -106,7 +104,7 @@ public class MusicDBService extends IntentService
 				List<Long> trackIds = (List<Long>) intent.getSerializableExtra(INTENT_KEY_TRACK_IDS);
 				addPlaylistTracks(playlist, trackIds);
 
-				notifyAction(ACTION_PLAYLIST_CHANGED);
+				postEvent(new PlaylistChangedEvent());
 				break;
 			}
 			case ACTION_DELETE_PLAYLISTTRACKS: {
@@ -114,14 +112,14 @@ public class MusicDBService extends IntentService
 				List<Long> trackIds = (List<Long>) intent.getSerializableExtra(INTENT_KEY_TRACK_IDS);
 				deletePlaylistTracks(playlist, trackIds);
 
-				notifyAction(ACTION_PLAYLIST_CHANGED);
+				postEvent(new PlaylistChangedEvent());
 				break;
 			}
 			case ACTION_DELETE_PLAYLIST:
 				long playlistId = intent.getLongExtra(INTENT_KEY_PLAYLIST_ID, -1);
 				deletePlaylist(playlistId);
 			
-				notifyAction(ACTION_PLAYLIST_CHANGED);
+				postEvent(new PlaylistChangedEvent());
 				break;
 		}
 	}
@@ -830,13 +828,13 @@ public class MusicDBService extends IntentService
 			}
 		}.setArgs(stringId));
 	}
-	
-	// Broadcast
-	private void notifyAction(String action)
+
+	// 通知
+	private void postEvent(Object event)
 	{
-		sendBroadcast(new Intent(action));
+		EventBus.getDefault().post(event);
 	}
-	
+
 	
 	// Content Provider Manager
 	private static class MyMediaStoreManager
@@ -898,6 +896,14 @@ public class MusicDBService extends IntentService
 			cursor.close();
 			return tracks;
 		}
+	}
+
+	public static class DatabaseChangedEvent
+	{
+	}
+
+	public static class PlaylistChangedEvent
+	{
 	}
 	
 }

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -14,6 +13,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.Serializable;
 import java.util.List;
@@ -26,9 +29,6 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 	
 	private List<Playlist> playlists;
 	private PlaylistListAdapter adapter;
-	
-	private MyPlaylistBroadcastReceiver receiver;
-	private IntentFilter filter;
 	
 	
 	public static PlaylistSelectDialog newInstance(List<Long> trackIds)
@@ -46,9 +46,6 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState)
 	{
-		receiver = new MyPlaylistBroadcastReceiver();
-		filter = receiver.createIntentFilter();
-		
 		LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View content = inflater.inflate(R.layout.dialog_select_playlist, null, false);
 		
@@ -76,14 +73,14 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 	public void onStart()
 	{
 		super.onStart();
-		getActivity().registerReceiver(receiver, filter);
+		EventBus.getDefault().register(this);
 	}
 
 	@Override
 	public void onStop()
 	{
 		super.onStop();
-		getActivity().unregisterReceiver(receiver);
+		EventBus.getDefault().unregister(this);
 	}
 
 	@Override
@@ -111,6 +108,14 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 	private void updatePlaylistList()
 	{
 		playlists = (new MusicDB()).getAllPlaylists();
+	}
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onEvent(MusicDBService.PlaylistChangedEvent event)
+	{
+		updatePlaylistList();
+		adapter.setDataList(playlists);
+		adapter.notifyDataSetChanged();
 	}
 	
 	// Adapter
@@ -155,18 +160,6 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 		{
 			TextView titleTextView;
 			TextView songsTextView;
-		}
-	}
-
-
-	private class MyPlaylistBroadcastReceiver extends PlaylistBroadcastReceiver
-	{
-		@Override
-		public void onReceive(Context c, Intent i)
-		{
-			updatePlaylistList();
-			adapter.setDataList(playlists);
-			adapter.notifyDataSetChanged();
 		}
 	}
 	

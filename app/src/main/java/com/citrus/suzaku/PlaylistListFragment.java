@@ -1,18 +1,26 @@
 package com.citrus.suzaku;
 
-import android.content.*;
-import android.os.*;
-import android.view.*;
-import android.view.View.*;
-import android.widget.*;
-import java.util.*;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.TextView;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 
 public class PlaylistListFragment extends TrackGroupListFragment<Playlist>
 {
-	private MyPlaylistBroadcastReceiver receiver;
-	private IntentFilter filter;
-	
 
 	public static PlaylistListFragment newInstance(int loaderId)
 	{
@@ -29,25 +37,8 @@ public class PlaylistListFragment extends TrackGroupListFragment<Playlist>
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
 		super.onActivityCreated(savedInstanceState);
-
-		receiver = new MyPlaylistBroadcastReceiver();
-		filter = receiver.createIntentFilter();
 		
 		setListAdapter(new PlaylistListAdapter());
-	}
-
-	@Override
-	public void onStart()
-	{
-		super.onStart();
-		getActivity().registerReceiver(receiver, filter);
-	}
-
-	@Override
-	public void onStop()
-	{
-		super.onStop();
-		getActivity().unregisterReceiver(receiver);
 	}
 
 	@Override
@@ -61,6 +52,13 @@ public class PlaylistListFragment extends TrackGroupListFragment<Playlist>
 	protected List<Playlist> getDataList()
 	{
 		return (new MusicDB()).getAllPlaylists();
+	}
+
+	// BaseListFragment にて EventBus の 登録済み
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onEvent(MusicDBService.PlaylistChangedEvent event)
+	{
+		startLoader(true);
 	}
 	
 	// Adapter
@@ -162,16 +160,6 @@ public class PlaylistListFragment extends TrackGroupListFragment<Playlist>
 		TextView songsTextView;
 		
 		ImageButton popupButton;
-	}
-
-	
-	private class MyPlaylistBroadcastReceiver extends PlaylistBroadcastReceiver
-	{
-		@Override
-		public void onReceive(Context c, Intent i)
-		{
-			startLoader(true);
-		}
 	}
 	
 }
