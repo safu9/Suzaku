@@ -137,7 +137,9 @@ public class ArtworkCache
 		Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
 
 		if(bitmap == null){
-			throw new IllegalArgumentException("decodeBitmap Error  hash : " + getHash(bytes));
+			// 不正なデータ
+			App.loge("decodeBitmap Error  hash : " + getHash(bytes));
+			return null;
 		}
 
 		bitmap = matrixSquareBitmap(bitmap, reqSize);
@@ -448,7 +450,13 @@ public class ArtworkCache
 				return null;
 			}
 
-			return cache.get(track.artworkHash);
+			Bitmap artwork = cache.get(track.artworkHash);
+			if(artwork != null && artwork.isRecycled()){
+				artwork = null;
+				cache.remove(track.artworkHash);
+				App.logd("AC Bitmap has been recycled!");
+			}
+			return artwork;
 		}
 
 		// AsyncTask : ImageView に画像を設定

@@ -68,6 +68,8 @@
 	<string name="playing_list">再生中リスト</string>
 	
 	<string name="choose_from_gallery">ギャラリーから選択</string>
+	<string name="delete_artwork">アートワークを削除</string>
+	<string name="undo_the_changes">元に戻す</string>
 	
 	<string name="ok">OK</string>
 	<string name="cancel">キャンセル</string>

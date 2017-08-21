@@ -28,8 +28,24 @@
 			android:textColor="@color/black"/>
 
 		<Button
-			android:id="@+id/gallry"
+			android:id="@+id/gallery"
 			android:text="@string/choose_from_gallery"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:textSize="@dimen/text_small"
+			android:textColor="@color/black"/>
+
+		<Button
+			android:id="@+id/delete"
+			android:text="@string/delete_artwork"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:textSize="@dimen/text_small"
+			android:textColor="@color/black"/>
+
+		<Button
+			android:id="@+id/undo"
+			android:text="@string/undo_the_changes"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"

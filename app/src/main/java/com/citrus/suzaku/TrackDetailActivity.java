@@ -3,11 +3,15 @@ package com.citrus.suzaku;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -40,6 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -73,7 +79,10 @@ public class TrackDetailActivity extends AppCompatActivity
 	private boolean[] mMultipleValue = new boolean[TagLibHelper.NUMBER_OF_KEY];
 	private SparseArray<String> mChangedTag = new SparseArray<>();
 
-	private File mRoot;			// Storage Access Framework のURIを取得中のルートディレクトリ
+	private Uri mArtworkUri;
+	private boolean isDeletingArtwork = false;			// アートワークを消去
+
+	private File mRoot;									// Storage Access Framework のURIを取得中のルートディレクトリ
 	private boolean isWaitingFinish = false;			// SAF の許可待ち
 
 	private DatabaseBroadcastReceiver receiver;
@@ -119,6 +128,9 @@ public class TrackDetailActivity extends AppCompatActivity
 					saveTagChanges(i, tag);
 				}
 			}
+
+			saveArtworkUri((Uri)savedInstanceState.getParcelable("ARTWORK_URI"));
+			setDeletingArtwork(savedInstanceState.getBoolean("DELETING_ARTWORK", false));
 
 			getSupportLoaderManager().initLoader(SAVE_TAG_LOADER_ID, null, new SaveTagLoaderCallbacks());	// 再度 Callbacks への紐づけのみを行う
 		}
@@ -187,6 +199,9 @@ public class TrackDetailActivity extends AppCompatActivity
 		for(int i = 0; i < TagLibHelper.NUMBER_OF_KEY; i++){
 			outState.putString("CHANGED_TAG_" + i, mChangedTag.get(i));
 		}
+
+		outState.putParcelable("ARTWORK_URI", mArtworkUri);
+		outState.putBoolean("DELETING_ARTWORK", isDeletingArtwork);
 	}
 
 	@Override
@@ -222,7 +237,7 @@ public class TrackDetailActivity extends AppCompatActivity
 
 	private void confirmAndFinish()
 	{
-		if(mChangedTag.size() > 0){
+		if(mChangedTag.size() > 0 || mArtworkUri != null){
 			new AlertDialog.Builder(this)
 					.setTitle(R.string.save)
 					.setMessage(R.string.msg_confirm_saving)
@@ -261,6 +276,21 @@ public class TrackDetailActivity extends AppCompatActivity
 	private void saveTagChanges(int key, String value)
 	{
 		mChangedTag.put(key, value);
+	}
+
+	private void saveArtworkUri(Uri artwork)
+	{
+		mArtworkUri = artwork;
+	}
+
+	private void setDeletingArtwork(boolean deletingArtwork)
+	{
+		isDeletingArtwork = deletingArtwork;
+	}
+
+	private boolean getDeletingArtwork()
+	{
+		return isDeletingArtwork;
 	}
 
 	private void saveTrackInfo()
@@ -332,8 +362,11 @@ public class TrackDetailActivity extends AppCompatActivity
 		return true;
 	}
 
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent resultData)
 	{
+		super.onActivityResult(requestCode, resultCode, resultData);
+
 		if(requestCode == 1 && resultCode == Activity.RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
 			// IntentからtreeのURIを取得します。
 			Uri treeUri = resultData.getData();
@@ -396,7 +429,7 @@ public class TrackDetailActivity extends AppCompatActivity
 				App.logd("TDA TrackID : " + track.id);
 
 				tagHelper.setFile(track.path);
-			//	tagHelper.dumpTags();
+				tagHelper.dumpTags();
 
 				if(i == 0){
 					for(int j = 0; j < TagLibHelper.NUMBER_OF_KEY; j++){
@@ -496,14 +529,19 @@ public class TrackDetailActivity extends AppCompatActivity
 		private Context mContext;
 		private List<Bundle> mPathInfoList;
 		private SparseArray<String> mChangedTag;
+		private Uri mArtworkUri;
+		private boolean isDeletingArtwork;
 
-		public SaveTagLoader(Context context, List<Bundle> pathInfo, SparseArray<String> changedTag)
+		public SaveTagLoader(Context context, List<Bundle> pathInfo, SparseArray<String> changedTag, Uri artworkUri, boolean deletingArtwork)
 		{
 			super(context);
 
 			mContext = context;
+
 			mPathInfoList = pathInfo;
 			mChangedTag = changedTag;
+			mArtworkUri = artworkUri;
+			isDeletingArtwork = deletingArtwork;
 		}
 
 		@Override
@@ -511,6 +549,21 @@ public class TrackDetailActivity extends AppCompatActivity
 		{
 			List<String> succeededPaths = new ArrayList<>();
 			List<String> failedPaths = new ArrayList<>();
+
+			// artwork
+			byte[] artworkData = null;
+			String mime = null;
+			if(mArtworkUri != null){
+				ContentResolver cr = getContext().getContentResolver();
+				mime = cr.getType(mArtworkUri);
+				try{
+					InputStream is = cr.openInputStream(mArtworkUri);
+					artworkData = getBytes(is);
+					is.close();
+				}catch(IOException e){
+					e.printStackTrace();
+				}
+			}
 
 			for(int i = 0; i < mPathInfoList.size(); i++){
 				Bundle pathInfo = mPathInfoList.get(i);
@@ -533,6 +586,12 @@ public class TrackDetailActivity extends AppCompatActivity
 					for(int j = 0; j < size; j++){
 						tagHelper.setTag(mChangedTag.keyAt(j), mChangedTag.valueAt(j));
 					}
+					if(mArtworkUri != null){
+						tagHelper.setArtwork(artworkData, mime);
+					}else if(isDeletingArtwork){
+						tagHelper.deleteArtwork();
+					}
+
 					boolean result = tagHelper.saveTag();
 					tagHelper.release();
 
@@ -659,6 +718,19 @@ public class TrackDetailActivity extends AppCompatActivity
 				}
 			}
 		}
+
+		private static byte[] getBytes(InputStream inputStream) throws IOException
+		{
+			ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+			int bufferSize = 1024;
+			byte[] buffer = new byte[bufferSize];
+
+			int len = 0;
+			while ((len = inputStream.read(buffer)) != -1) {
+				byteBuffer.write(buffer, 0, len);
+			}
+			return byteBuffer.toByteArray();
+		}
 	}
 
 	private class SaveTagLoaderCallbacks implements LoaderManager.LoaderCallbacks<Bundle>
@@ -676,7 +748,7 @@ public class TrackDetailActivity extends AppCompatActivity
 
 			List<Bundle> pathInfoList = (List<Bundle>)args.getSerializable("PATH_INFO_LIST");
 
-			return new SaveTagLoader(TrackDetailActivity.this, pathInfoList, mChangedTag);
+			return new SaveTagLoader(TrackDetailActivity.this, pathInfoList, mChangedTag, mArtworkUri, isDeletingArtwork);
 		}
 
 		@Override
@@ -1035,9 +1107,19 @@ public class TrackDetailActivity extends AppCompatActivity
 	
 	public static class ArtworkFragment extends Fragment
 	{
+		private static final int REQUEST_GALLERY = 1000;
+		private static final String[] FILE_TYPES = {
+				"image/jpeg",
+				"image/jpg",
+				"image/png",
+		};
+
 		private Track mTrack;
-	
+		private Bitmap artwork;
+
 		private ImageView artworkImageView;
+		private Button deleteButton;
+		private Button undoButton;
 		
 		
 		private static ArtworkFragment newInstance(Track track)
@@ -1056,8 +1138,59 @@ public class TrackDetailActivity extends AppCompatActivity
 			mTrack = (Track)getArguments().getSerializable("TRACK");
 			
 			View view = inflater.inflate(R.layout.fragment_track_detail_artwork, container, false);
+
 			artworkImageView = (ImageView)view.findViewById(R.id.artwork);
-			
+
+			Button galleryButton = (Button)view.findViewById(R.id.gallery);
+			galleryButton.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					// ギャラリー呼び出し
+					Intent intentGallery;
+					if(Build.VERSION.SDK_INT < 19){
+						intentGallery = new Intent(Intent.ACTION_GET_CONTENT);
+						intentGallery.setType("image/*");
+					}else{
+						intentGallery = new Intent(Intent.ACTION_GET_CONTENT);
+						intentGallery.addCategory(Intent.CATEGORY_OPENABLE);
+						intentGallery.setType("image/*");
+						intentGallery.putExtra(Intent.EXTRA_MIME_TYPES, FILE_TYPES);
+					}
+
+					Intent intent = Intent.createChooser(intentGallery, "画像の選択");
+					startActivityForResult(intent, REQUEST_GALLERY);
+				}
+			});
+
+			deleteButton = (Button)view.findViewById(R.id.delete);
+			deleteButton.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					((TrackDetailActivity)getActivity()).setDeletingArtwork(true);
+					updateView();
+				}
+			});
+
+			undoButton = (Button)view.findViewById(R.id.undo);
+			undoButton.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					((TrackDetailActivity)getActivity()).saveArtworkUri(null);
+					artwork = null;
+					((TrackDetailActivity)getActivity()).setDeletingArtwork(false);
+					updateView();
+				}
+			});
+
+			if(savedInstanceState != null){
+				artwork = savedInstanceState.getParcelable("ARTWORK_BITMAP");
+			}
 			updateView();
 			
 			return view;
@@ -1065,8 +1198,65 @@ public class TrackDetailActivity extends AppCompatActivity
 		
 		private void updateView()
 		{
-			if(mTrack != null){
+			boolean isDeletingArtwork = ((TrackDetailActivity)getActivity()).getDeletingArtwork();
+
+			if(artwork != null){
+				artworkImageView.setImageBitmap(artwork);
+			}else if(isDeletingArtwork){
+				artworkImageView.setImageDrawable(null);
+			}else if(mTrack != null){
 				ArtworkCache.Large.setArtworkView(artworkImageView, mTrack);
+			}
+
+			deleteButton.setEnabled(!isDeletingArtwork);
+			undoButton.setEnabled(artwork != null || isDeletingArtwork);
+		}
+
+		@Override
+		public void onSaveInstanceState(Bundle outState)
+		{
+			super.onSaveInstanceState(outState);
+			outState.putParcelable("ARTWORK_BITMAP", artwork);
+		}
+
+		@Override
+		public void onActivityResult(int requestCode, int resultCode, Intent data)
+		{
+			if(requestCode == REQUEST_GALLERY && resultCode == RESULT_OK){
+				Uri uri = data.getData();
+				((TrackDetailActivity)getActivity()).saveArtworkUri(uri);
+				new UpdateImageTask(uri).execute();
+			}
+		}
+
+		private class UpdateImageTask extends AsyncTask<Void, Void, Bitmap>
+		{
+			private Uri mUri;
+
+			UpdateImageTask(Uri uri)
+			{
+				mUri = uri;
+			}
+
+			@Override
+			protected Bitmap doInBackground(Void... params)
+			{
+				Bitmap bmp = null;
+				try{
+					InputStream in = App.getContext().getContentResolver().openInputStream(mUri);
+					bmp = BitmapFactory.decodeStream(in);
+					in.close();
+				}catch(IOException e){
+					e.printStackTrace();
+				}
+				return bmp;
+			}
+
+			@Override
+			protected void onPostExecute(Bitmap bmp)
+			{
+				artwork = bmp;
+				updateView();
 			}
 		}
 	}

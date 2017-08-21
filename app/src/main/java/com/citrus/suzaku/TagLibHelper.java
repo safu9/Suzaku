@@ -89,5 +89,8 @@ public class TagLibHelper
     public native void setDiscNumber(int discNum);
     public native void setCompilation(boolean compilation);
 
+    public native void setArtwork(byte[] artwork, String mime);
+    public native void deleteArtwork();
+
     public native void release();
 }

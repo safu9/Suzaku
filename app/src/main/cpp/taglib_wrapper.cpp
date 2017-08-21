@@ -13,7 +13,7 @@
 #include <mp4file.h>
 
 
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "HelloJni", __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "TagLibJNI", __VA_ARGS__)
 
 // static jclass myClass;
 // static jfieldID fieldID;
@@ -62,11 +62,25 @@ void setHandle(JNIEnv *env, jobject obj, const char* name, T *t)
 
 // Writing
 
+// Convert
+jbyteArray asJByteArray(JNIEnv *env, TagLib::ByteVector vector)
+{
+    int len = vector.size();
+    signed char *buf = reinterpret_cast<signed char*>(vector.data());
 
-jbyteArray as_byte_array(JNIEnv* env, signed char* buf, int len) {
-    jbyteArray array = env->NewByteArray (len);
-    env->SetByteArrayRegion (array, 0, len, buf);
+    jbyteArray array = env->NewByteArray(len);
+    env->SetByteArrayRegion(array, 0, len, buf);
     return array;
+}
+
+TagLib::ByteVector asByteVector(JNIEnv *env, jbyteArray array)
+{
+    int len = env->GetArrayLength(array);
+    signed char* buf = new signed char[len];
+    env->GetByteArrayRegion(array, 0, len, buf);
+
+    TagLib::ByteVector vector(reinterpret_cast<char*>(buf), len);
+    return vector;
 }
 
 
@@ -75,16 +89,17 @@ void releaseFile(JNIEnv *env, jobject instance)
     TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
     delete file;
     setHandle<TagLib::FileRef>(env, instance, "fileRefHandle", 0);
-    TagLib::PropertyMap* tagMap = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
-    delete tagMap;
+    TagLib::PropertyMap* map = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
+    delete map;
     setHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle", 0);
 }
 
-
-TagLib::String findTagFromMap(TagLib::PropertyMap* tags, const char* key)
+TagLib::String getTag(JNIEnv *env, jobject instance, const char* key)
 {
-    TagLib::PropertyMap::ConstIterator i = tags->find(key);
-    if(i == tags->end()){
+    TagLib::PropertyMap* map = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
+
+    TagLib::PropertyMap::ConstIterator i = map->find(key);
+    if(i == map->end()){
         return TagLib::String::null;
     }
 
@@ -96,31 +111,14 @@ TagLib::String findTagFromMap(TagLib::PropertyMap* tags, const char* key)
     return str;
 }
 
-TagLib::String getTag(JNIEnv *env, jobject instance, const char* key)
-{
-    TagLib::PropertyMap* tags = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
-    if(!tags){
-        TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
-        tags = new TagLib::PropertyMap(file->file()->properties());
-        setHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle", tags);
-    }
-
-    return findTagFromMap(tags, key);
-}
-
 void setTag(JNIEnv *env, jobject instance, const char* key, const char* value)
 {
-    TagLib::PropertyMap* tags = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
-    if(!tags){
-        TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
-        tags = new TagLib::PropertyMap(file->file()->properties());
-        setHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle", tags);
-    }
+    TagLib::PropertyMap* map = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
 
-    if(tags->contains(key)){
-        tags->replace(key, TagLib::String(value, TagLib::String::UTF8));
+    if(map->contains(key)){
+        map->replace(key, TagLib::String(value, TagLib::String::UTF8));
     }else{
-        tags->insert(key, TagLib::String(value, TagLib::String::UTF8));
+        map->insert(key, TagLib::String(value, TagLib::String::UTF8));
     }
 }
 
@@ -152,11 +150,15 @@ Java_com_citrus_suzaku_TagLibHelper_setFile(JNIEnv *env, jobject instance, jstri
     if(file){
         releaseFile(env, instance);
     }
+
     file = new TagLib::FileRef(path);
     setHandle<TagLib::FileRef>(env, instance, "fileRefHandle", file);
 
     TagLib::Tag* tag = file->tag();
     setHandle<TagLib::Tag>(env, instance, "tagHandle", tag);
+
+    TagLib::PropertyMap* map = new TagLib::PropertyMap(file->file()->properties());
+    setHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle", map);
 
     env->ReleaseStringUTFChars(path_, path);
 }
@@ -165,7 +167,6 @@ Java_com_citrus_suzaku_TagLibHelper_setFile(JNIEnv *env, jobject instance, jstri
 JNIEXPORT void JNICALL
 Java_com_citrus_suzaku_TagLibHelper_dumpTags(JNIEnv *env, jobject instance)
 {
-
     TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
     if(!file){
         return;
@@ -176,10 +177,8 @@ Java_com_citrus_suzaku_TagLibHelper_dumpTags(JNIEnv *env, jobject instance)
         return;
     }
 
-    if (file->tag()) {
-
-        TagLib::Tag *tag = file->tag();
-
+    TagLib::Tag *tag = file->tag();
+    if (tag) {
         LOGI("-- TAG (basic) --");
         LOGI("title - %s", tag->title().toCString(true));
         LOGI("artist - %s", tag->artist().toCString(true));
@@ -189,26 +188,24 @@ Java_com_citrus_suzaku_TagLibHelper_dumpTags(JNIEnv *env, jobject instance)
         LOGI("track - %d", tag->track());
         LOGI("genre - %s", tag->genre().toCString(true));
 
-        TagLib::PropertyMap tags = file->file()->properties();
+        TagLib::PropertyMap map = file->file()->properties();
 
         LOGI("-- TAG (properties) --");
-        for (TagLib::PropertyMap::ConstIterator i = tags.begin(); i != tags.end(); ++i) {
+        for (TagLib::PropertyMap::ConstIterator i = map.begin(); i != map.end(); ++i) {
             for (TagLib::StringList::ConstIterator j = i->second.begin(); j != i->second.end(); ++j) {
                 LOGI("%s - %s", i->first.toCString(true), j->toCString(true));
             }
         }
 
         LOGI("-- TAG (unsupported) --");
-        TagLib::StringList untags = tags.unsupportedData();
+        TagLib::StringList untags = map.unsupportedData();
         for (TagLib::StringList::ConstIterator k = untags.begin(); k != untags.end(); ++k) {
             LOGI("%s", k->toCString(true));
         }
     }
 
-    if (file->audioProperties()) {
-
-        TagLib::AudioProperties *properties = file->audioProperties();
-
+    TagLib::AudioProperties *properties = file->audioProperties();
+    if (properties) {
         int seconds = properties->length() % 60;
         int minutes = (properties->length() - seconds) / 60;
 
@@ -221,7 +218,6 @@ Java_com_citrus_suzaku_TagLibHelper_dumpTags(JNIEnv *env, jobject instance)
 }
 
 // Read
-
 
 
 JNIEXPORT jstring JNICALL
@@ -373,18 +369,11 @@ Java_com_citrus_suzaku_TagLibHelper_getCompilation(JNIEnv *env, jobject instance
 JNIEXPORT jbyteArray JNICALL
 Java_com_citrus_suzaku_TagLibHelper_getArtwork(JNIEnv *env, jobject instance)
 {
-    TagLib::PropertyMap* tags = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
-    if(!tags){
-        TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
-        tags = new TagLib::PropertyMap(file->file()->properties());
-        setHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle", tags);
-    }
-
     TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
-    TagLib::StringList untags = tags->unsupportedData();
+    TagLib::PropertyMap* map = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
+    TagLib::StringList untags = map->unsupportedData();
 
     if(untags.contains("APIC")){            // ID3v2 MP3
-
         TagLib::File* ffile = file->file();
         TagLib::MPEG::File *mfile = dynamic_cast<TagLib::MPEG::File*>(ffile);
         if(mfile == NULL){
@@ -398,7 +387,7 @@ Java_com_citrus_suzaku_TagLibHelper_getArtwork(JNIEnv *env, jobject instance)
         TagLib::ID3v2::AttachedPictureFrame *frame = static_cast<TagLib::ID3v2::AttachedPictureFrame *>(frames.front());
         TagLib::ByteVector artwork = frame->picture();
 
-        return as_byte_array(env, (signed char*)artwork.data(), artwork.size());
+        return asJByteArray(env, artwork);
 
     }else if(untags.contains("covr")){      // MP4 M4A
         TagLib::File* ffile = file->file();
@@ -414,7 +403,7 @@ Java_com_citrus_suzaku_TagLibHelper_getArtwork(JNIEnv *env, jobject instance)
         TagLib::MP4::CoverArtList list = i->second.toCoverArtList();
         TagLib::ByteVector artwork = list.begin()->data();
 
-        return as_byte_array(env, (signed char*)artwork.data(), artwork.size());
+        return asJByteArray(env, artwork);
     }
 
     return NULL;
@@ -464,14 +453,11 @@ Java_com_citrus_suzaku_TagLibHelper_setTag(JNIEnv *env, jobject instance, jint k
 JNIEXPORT jboolean JNICALL
 Java_com_citrus_suzaku_TagLibHelper_saveTag(JNIEnv *env, jobject instance)
 {
-    TagLib::PropertyMap* tags = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
-    if(!tags){
-        return 0;
-    }
+    TagLib::PropertyMap* map = getHandle<TagLib::PropertyMap>(env, instance, "tagMapHandle");
 
     TagLib::FileRef* file = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
     TagLib::File* f = file->file();
-    TagLib::PropertyMap rejected = f->setProperties(*tags);
+    TagLib::PropertyMap rejected = f->setProperties(*map);
     bool ret = f->save();
 
     return (jboolean)((rejected.size() == 0) && ret);
@@ -627,6 +613,90 @@ JNIEXPORT void JNICALL
 Java_com_citrus_suzaku_TagLibHelper_setCompilation(JNIEnv *env, jobject instance, jboolean compilation)
 {
     setTag(env, instance, "COMPILATION", (compilation)? "1" : "0");
+}
+
+JNIEXPORT void JNICALL
+Java_com_citrus_suzaku_TagLibHelper_setArtwork(JNIEnv *env, jobject instance, jbyteArray artwork, jstring mime_)
+{
+    TagLib::FileRef* fileRef = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
+    TagLib::File* file = fileRef->file();
+
+	const char *mime = env->GetStringUTFChars(mime_, 0);
+	TagLib::ByteVector data = asByteVector(env, artwork);
+
+    if(dynamic_cast<TagLib::MPEG::File*>(file)){            // ID3v2 MP3
+        TagLib::MPEG::File *mfile = dynamic_cast<TagLib::MPEG::File*>(file);
+        TagLib::ID3v2::Tag *tag = mfile->ID3v2Tag();
+
+        TagLib::ID3v2::FrameList frames = tag->frameList("APIC");
+        if(frames.size() > 0){
+            TagLib::ID3v2::AttachedPictureFrame *frame = static_cast<TagLib::ID3v2::AttachedPictureFrame *>(frames.front());
+            tag->removeFrame(frame);
+        }
+
+        TagLib::ID3v2::AttachedPictureFrame *frame = new TagLib::ID3v2::AttachedPictureFrame;
+
+        frame->setMimeType(TagLib::String(mime));
+        frame->setPicture(data);
+
+        tag->addFrame(frame);
+    }
+	if(dynamic_cast<TagLib::MP4::File*>(file)){      // MP4, M4A
+        TagLib::MP4::File *mfile = dynamic_cast<TagLib::MP4::File*>(file);
+        TagLib::MP4::Tag *tag = mfile->tag();
+
+        TagLib::MP4::ItemListMap itemsListMap = tag->itemListMap();
+        auto i = itemsListMap.find("covr");
+        if(i != itemsListMap.end()){
+            tag->removeItem("covr");
+        }
+
+		TagLib::MP4::CoverArt::Format format = TagLib::MP4::CoverArt::Format::Unknown;
+		if(strcmp(mime, "image/jpeg") == 0 || strcmp(mime, "image/jpg") == 0){
+			format = TagLib::MP4::CoverArt::Format::JPEG;
+		}else if(strcmp(mime, "image/png") == 0){
+			format = TagLib::MP4::CoverArt::Format::PNG;
+		}
+
+        TagLib::MP4::CoverArt coverArt(format, data);
+
+        // create cover art list
+        TagLib::MP4::CoverArtList coverArtList;
+        coverArtList.append(coverArt);
+
+        // convert to item
+        TagLib::MP4::Item coverItem(coverArtList);
+        itemsListMap.insert("covr", coverItem);
+    }
+	env->ReleaseStringUTFChars(mime_, mime);
+}
+
+JNIEXPORT void JNICALL
+Java_com_citrus_suzaku_TagLibHelper_deleteArtwork(JNIEnv *env, jobject instance)
+{
+	TagLib::FileRef* fileRef = getHandle<TagLib::FileRef>(env, instance, "fileRefHandle");
+	TagLib::File* file = fileRef->file();
+
+	if(dynamic_cast<TagLib::MPEG::File*>(file)){            // ID3v2 MP3
+		TagLib::MPEG::File *mfile = dynamic_cast<TagLib::MPEG::File*>(file);
+		TagLib::ID3v2::Tag *tag = mfile->ID3v2Tag();
+
+		TagLib::ID3v2::FrameList frames = tag->frameList("APIC");
+		if(frames.size() > 0){
+			TagLib::ID3v2::AttachedPictureFrame *frame = static_cast<TagLib::ID3v2::AttachedPictureFrame *>(frames.front());
+			tag->removeFrame(frame);
+		}
+	}
+	if(dynamic_cast<TagLib::MP4::File*>(file)){      // MP4, M4A
+		TagLib::MP4::File *mfile = dynamic_cast<TagLib::MP4::File*>(file);
+		TagLib::MP4::Tag *tag = mfile->tag();
+
+		TagLib::MP4::ItemListMap itemsListMap = tag->itemListMap();
+		auto i = itemsListMap.find("covr");
+		if(i != itemsListMap.end()){
+			tag->removeItem("covr");
+		}
+	}
 }
 
 

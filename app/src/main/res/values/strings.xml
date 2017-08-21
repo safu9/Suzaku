@@ -88,7 +88,9 @@
 
 	<string name="playing_list">Playing List</string>
 	
-	<string name="choose_from_gallery">Choose From Gallery</string>
+	<string name="choose_from_gallery">Choose from Gallery</string>
+	<string name="delete_artwork">Delete Artwork</string>
+	<string name="undo_the_changes">Undo the Changes</string>
 	
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
