@@ -1,152 +1,142 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="fill_parent"
-             android:layout_height="fill_parent"
-             android:background="@color/white">
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="wrap_content"
+        android:padding="@dimen/margin_small"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/titleLabel"
+            android:text="@string/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"/>
+
+        <EditText
+            android:id="@+id/title"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/margin_small"
-            android:orientation="vertical">
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"
+            android:inputType="text"/>
 
-            <TextView
-                android:id="@+id/titleLabel"
-                android:text="@string/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"/>
+        <TextView
+            android:id="@+id/titleSortLabel"
+            android:text="@string/sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"/>
 
-            <EditText
-                android:id="@+id/title"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"
-                android:inputType="text"/>
-
-            <TextView
-                android:id="@+id/titleSortLabel"
-                android:text="@string/sort"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"/>
-
-            <EditText
-                android:id="@+id/title_sort"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/margin_medium"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"
-                android:inputType="text"/>
+        <EditText
+            android:id="@+id/title_sort"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"
+            android:inputType="text"/>
 
 
-            <TextView
-                android:text="@string/artist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"/>
+        <TextView
+            android:text="@string/artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"/>
 
-            <EditText
-                android:id="@+id/artist"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"
-                android:inputType="text"/>
+        <EditText
+            android:id="@+id/artist"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"
+            android:inputType="text"/>
 
-            <TextView
-                android:text="@string/sort"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"/>
+        <TextView
+            android:text="@string/sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"/>
 
-            <EditText
-                android:id="@+id/artist_sort"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/margin_medium"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"
-                android:inputType="text"/>
-
-
-            <TextView
-                android:text="@string/album"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"/>
-
-            <EditText
-                android:id="@+id/album"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"
-                android:inputType="text"/>
-
-            <TextView
-                android:text="@string/sort"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"/>
-
-            <EditText
-                android:id="@+id/album_sort"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/margin_medium"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"
-                android:inputType="text"/>
+        <EditText
+            android:id="@+id/artist_sort"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"
+            android:inputType="text"/>
 
 
-            <TextView
-                android:text="@string/album_artist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"/>
+        <TextView
+            android:text="@string/album"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"/>
 
-            <EditText
-                android:id="@+id/album_artist"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"
-                android:inputType="text"/>
+        <EditText
+            android:id="@+id/album"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"
+            android:inputType="text"/>
 
-            <TextView
-                android:text="@string/sort"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"/>
+        <TextView
+            android:text="@string/sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"/>
 
-            <EditText
-                android:id="@+id/album_artist_sort"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_small"
-                android:textColor="@color/black"
-                android:inputType="text"/>
+        <EditText
+            android:id="@+id/album_sort"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"
+            android:inputType="text"/>
 
-        </LinearLayout>
-    </ScrollView>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@drawable/shadow_bottom"/>
+        <TextView
+            android:text="@string/album_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"/>
 
-</FrameLayout>
+        <EditText
+            android:id="@+id/album_artist"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"
+            android:inputType="text"/>
+
+        <TextView
+            android:text="@string/sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"/>
+
+        <EditText
+            android:id="@+id/album_artist_sort"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/black"
+            android:inputType="text"/>
+
+    </LinearLayout>
+</ScrollView>

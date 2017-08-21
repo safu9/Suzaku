@@ -1,116 +1,106 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
 	android:background="@color/white">
 
-	<ScrollView
+	<TableLayout
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
+		android:layout_height="wrap_content"
+		android:padding="@dimen/margin_small"
+		android:shrinkColumns="1">
 
-		<TableLayout
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:padding="@dimen/margin_small"
-			android:shrinkColumns="1">
+		<TableRow
+			android:layout_marginBottom="@dimen/margin_medium">
+			<TextView
+				android:text="@string/path"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:padding="@dimen/margin_tiny"/>
 
-			<TableRow
-				android:layout_marginBottom="@dimen/margin_medium">
-				<TextView
-					android:text="@string/path"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="@dimen/text_small"
-					android:textColor="@color/black"
-					android:padding="@dimen/margin_tiny"/>
-
-				<TextView
-					android:id="@+id/path"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:textSize="@dimen/text_small"
-					android:textColor="@color/black"
-					android:padding="@dimen/margin_tiny"/>
-			</TableRow>
+			<TextView
+				android:id="@+id/path"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:padding="@dimen/margin_tiny"/>
+		</TableRow>
 
 
-			<TableRow>
-				<TextView
-					android:text="@string/length"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="@dimen/text_small"
-					android:textColor="@color/black"
-					android:padding="@dimen/margin_tiny"/>
+		<TableRow>
+			<TextView
+				android:text="@string/length"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:padding="@dimen/margin_tiny"/>
 
-				<TextView
-					android:id="@+id/length"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:textSize="@dimen/text_small"
-					android:textColor="@color/black"
-					android:padding="@dimen/margin_tiny"/>
-			</TableRow>
+			<TextView
+				android:id="@+id/length"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:padding="@dimen/margin_tiny"/>
+		</TableRow>
 
-			<TableRow>
-				<TextView
-					android:text="@string/bitrate"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="@dimen/text_small"
-					android:textColor="@color/black"
-					android:padding="@dimen/margin_tiny"/>
+		<TableRow>
+			<TextView
+				android:text="@string/bitrate"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:padding="@dimen/margin_tiny"/>
 
-				<TextView
-					android:id="@+id/bitrate"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:textSize="@dimen/text_small"
-					android:textColor="@color/black"
-					android:padding="@dimen/margin_tiny"/>
-			</TableRow>
+			<TextView
+				android:id="@+id/bitrate"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:padding="@dimen/margin_tiny"/>
+		</TableRow>
 
-			<TableRow>
-				<TextView
-					android:text="@string/sample_rate"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="@dimen/text_small"
-					android:textColor="@color/black"
-					android:padding="@dimen/margin_tiny"/>
+		<TableRow>
+			<TextView
+				android:text="@string/sample_rate"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:padding="@dimen/margin_tiny"/>
 
-				<TextView
-					android:id="@+id/sample_rate"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:textSize="@dimen/text_small"
-					android:textColor="@color/black"
-					android:padding="@dimen/margin_tiny"/>
-			</TableRow>
+			<TextView
+				android:id="@+id/sample_rate"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:padding="@dimen/margin_tiny"/>
+		</TableRow>
 
-			<TableRow>
-				<TextView
-					android:text="@string/channels"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="@dimen/text_small"
-					android:textColor="@color/black"
-					android:padding="@dimen/margin_tiny"/>
+		<TableRow>
+			<TextView
+				android:text="@string/channels"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:padding="@dimen/margin_tiny"/>
 
-				<TextView
-					android:id="@+id/channels"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:textSize="@dimen/text_small"
-					android:textColor="@color/black"
-					android:padding="@dimen/margin_tiny"/>
-			</TableRow>
+			<TextView
+				android:id="@+id/channels"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/black"
+				android:padding="@dimen/margin_tiny"/>
+		</TableRow>
 
-		</TableLayout>
-	</ScrollView>
-
-	<View
-		android:layout_width="match_parent"
-		android:layout_height="2dp"
-		android:background="@drawable/shadow_bottom"/>
-
-</FrameLayout>
+	</TableLayout>
+</ScrollView>

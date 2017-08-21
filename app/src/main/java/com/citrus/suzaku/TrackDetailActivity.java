@@ -237,7 +237,7 @@ public class TrackDetailActivity extends AppCompatActivity
 
 	private void confirmAndFinish()
 	{
-		if(mChangedTag.size() > 0 || mArtworkUri != null){
+		if(mChangedTag.size() > 0 || mArtworkUri != null || isDeletingArtwork){
 			new AlertDialog.Builder(this)
 					.setTitle(R.string.save)
 					.setMessage(R.string.msg_confirm_saving)
@@ -281,6 +281,11 @@ public class TrackDetailActivity extends AppCompatActivity
 	private void saveArtworkUri(Uri artwork)
 	{
 		mArtworkUri = artwork;
+	}
+
+	private Uri getArtworkUri()
+	{
+		return mArtworkUri;
 	}
 
 	private void setDeletingArtwork(boolean deletingArtwork)
@@ -1115,7 +1120,6 @@ public class TrackDetailActivity extends AppCompatActivity
 		};
 
 		private Track mTrack;
-		private Bitmap artwork;
 
 		private ImageView artworkImageView;
 		private Button deleteButton;
@@ -1170,6 +1174,7 @@ public class TrackDetailActivity extends AppCompatActivity
 				@Override
 				public void onClick(View v)
 				{
+					((TrackDetailActivity)getActivity()).saveArtworkUri(null);
 					((TrackDetailActivity)getActivity()).setDeletingArtwork(true);
 					updateView();
 				}
@@ -1182,15 +1187,11 @@ public class TrackDetailActivity extends AppCompatActivity
 				public void onClick(View v)
 				{
 					((TrackDetailActivity)getActivity()).saveArtworkUri(null);
-					artwork = null;
 					((TrackDetailActivity)getActivity()).setDeletingArtwork(false);
 					updateView();
 				}
 			});
 
-			if(savedInstanceState != null){
-				artwork = savedInstanceState.getParcelable("ARTWORK_BITMAP");
-			}
 			updateView();
 			
 			return view;
@@ -1198,10 +1199,11 @@ public class TrackDetailActivity extends AppCompatActivity
 		
 		private void updateView()
 		{
+			Uri uri = ((TrackDetailActivity)getActivity()).getArtworkUri();
 			boolean isDeletingArtwork = ((TrackDetailActivity)getActivity()).getDeletingArtwork();
 
-			if(artwork != null){
-				artworkImageView.setImageBitmap(artwork);
+			if(uri != null){
+				new UpdateImageTask(uri).execute();
 			}else if(isDeletingArtwork){
 				artworkImageView.setImageDrawable(null);
 			}else if(mTrack != null){
@@ -1209,14 +1211,7 @@ public class TrackDetailActivity extends AppCompatActivity
 			}
 
 			deleteButton.setEnabled(!isDeletingArtwork);
-			undoButton.setEnabled(artwork != null || isDeletingArtwork);
-		}
-
-		@Override
-		public void onSaveInstanceState(Bundle outState)
-		{
-			super.onSaveInstanceState(outState);
-			outState.putParcelable("ARTWORK_BITMAP", artwork);
+			undoButton.setEnabled(uri != null || isDeletingArtwork);
 		}
 
 		@Override
@@ -1225,7 +1220,8 @@ public class TrackDetailActivity extends AppCompatActivity
 			if(requestCode == REQUEST_GALLERY && resultCode == RESULT_OK){
 				Uri uri = data.getData();
 				((TrackDetailActivity)getActivity()).saveArtworkUri(uri);
-				new UpdateImageTask(uri).execute();
+				((TrackDetailActivity)getActivity()).setDeletingArtwork(false);
+				updateView();
 			}
 		}
 
@@ -1255,8 +1251,7 @@ public class TrackDetailActivity extends AppCompatActivity
 			@Override
 			protected void onPostExecute(Bitmap bmp)
 			{
-				artwork = bmp;
-				updateView();
+				artworkImageView.setImageBitmap(bmp);
 			}
 		}
 	}
