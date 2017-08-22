@@ -66,6 +66,7 @@
 			android:visibility="gone">
 
 			<ScrollView
+				android:id="@+id/lyrics_scroll"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
 				android:layout_alignParentTop="true"
@@ -82,6 +83,15 @@
 
 			</ScrollView>
 
+			<ListView
+				android:id="@+id/playlist"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_alignParentTop="true"
+				android:layout_above="@+id/buttons"
+				android:listSelector="@android:color/transparent"
+				android:visibility="gone" />
+
 			<LinearLayout
 				android:id="@+id/buttons"
 				android:layout_width="match_parent"
@@ -91,7 +101,7 @@
 
 				<Button
 					style="@style/myButton"
-					android:id="@+id/playlist_button"
+					android:id="@+id/switch_panel_button"
 					android:layout_width="0dp"
 					android:layout_height="wrap_content"
 					android:layout_weight="1"
@@ -114,17 +124,6 @@
 			</LinearLayout>
 
 		</RelativeLayout>
-
-		<ListView
-			android:id="@+id/playlist"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_alignBottom="@id/artwork_view"
-			android:layout_alignTop="@id/artwork_view"
-			android:background="@color/black_alpha"
-			android:listSelector="@android:color/transparent"
-			android:visibility="gone" />
-
 	</RelativeLayout>
 
 	<LinearLayout

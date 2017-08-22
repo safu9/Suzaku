@@ -1,14 +1,36 @@
 package com.citrus.suzaku.track;
 
-import android.animation.*;
-import android.app.*;
-import android.content.*;
-import android.os.*;
-import android.support.v4.content.*;
-import android.view.*;
-import android.widget.*;
-import android.widget.Chronometer.*;
-import android.widget.SeekBar.*;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.Chronometer;
+import android.widget.Chronometer.OnChronometerTickListener;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.ScrollView;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 
 import com.citrus.suzaku.App;
 import com.citrus.suzaku.ArtworkCache;
@@ -19,9 +41,10 @@ import com.citrus.suzaku.base.BaseListAdapter;
 import com.citrus.suzaku.player.PlayerService;
 import com.citrus.suzaku.player.PlaylistManager;
 
-import java.io.*;
+import java.io.Serializable;
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class TrackActivity extends Activity implements OnChronometerTickListener, ServiceConnection
@@ -47,14 +70,15 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 	private TextView numberTextView;
 	
 	private View panelView;
+	private Button switchPanelButton;
+
+	private ScrollView lyricsScrollView;
 	private TextView lyricsTextView;
 
 	private ListView playlistView;
 	private PlaylistTrackListAdapter playlistAdapter;
 
-	private boolean animInProgress;
 	private int animDuration;
-//	private Handler panelHandler;
 
 	private PlaylistManager playlist;
 
@@ -183,6 +207,8 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		panelView = findViewById(R.id.panel);
 		panelView.setVisibility(View.GONE);
 
+		lyricsScrollView = (ScrollView)findViewById(R.id.lyrics_scroll);
+
 		lyricsTextView = (TextView)findViewById(R.id.lyrics_view);
 		lyricsTextView.setClickable(true);
 		lyricsTextView.setOnClickListener(new View.OnClickListener(){
@@ -210,13 +236,13 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			}
 		});
 
-		Button playlistButton = (Button)findViewById(R.id.playlist_button);
-		playlistButton.setOnClickListener(new View.OnClickListener()
+		switchPanelButton = (Button)findViewById(R.id.switch_panel_button);
+		switchPanelButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
-				fadePlaylistView();
+				switchPanel();
 			}
 		});
 
@@ -224,11 +250,15 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		playlistAdapter = new PlaylistTrackListAdapter();
 		playlistAdapter.setDataList(playlist.getPlaylist());
 		playlistView.setAdapter(playlistAdapter);
+		playlistView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+		{
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+			{
+			}
+		});
 
-		
 		animDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
-		
-	//	panelHandler = new Handler();
 	}
 
 	@Override
@@ -323,93 +353,57 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 				return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
+	// パネルの表示/非表示の切り替え
 	private void fadePanel()
 	{
-		if(animInProgress){
-			return;
-		}
-
-		if(panelView.getVisibility() == View.GONE){
-			panelView.setAlpha(0f);
-			panelView.setVisibility(View.VISIBLE);
-
-			panelView.animate()
-				.alpha(1f)
-				.setDuration(animDuration)
-				.setListener(new AnimatorListenerAdapter(){
-					@Override
-					public void onAnimationEnd(Animator animation)
-					{
-						animInProgress = false;
-					}
-				});
-			
-			// 遅延実行
-/*			panelHandler.postDelayed(new Runnable(){
-				@Override
-				public void run(){
-					fadePanel();
-				}
-			}, 10000);
-*/
-		}else{
-			panelView.animate()
-				.alpha(0f)
-				.setDuration(animDuration)
-				.setListener(new AnimatorListenerAdapter(){
-					@Override
-					public void onAnimationEnd(Animator animation)
-					{
-						panelView.setVisibility(View.GONE);
-						animInProgress = false;
-					}
-				});
-			
-		//	panelHandler.removeCallbacksAndMessages(null);
-		}
-		
-		animInProgress = true;
+		fadeView(panelView);
 	}
 
-	private void fadePlaylistView()
+	// パネルの歌詞/プレイリストの切り替え
+	private void switchPanel()
 	{
-		if(animInProgress){
+		switchPanelButton.setText((lyricsScrollView.getVisibility() == View.VISIBLE)? R.string.lyrics : R.string.playlist);
+
+		fadeView(lyricsScrollView);
+		fadeView(playlistView);
+	}
+
+	private void fadeView(final View view)
+	{
+		Object tag = view.getTag();
+		if(tag != null && (boolean)tag){
 			return;
 		}
+		view.setTag(true);
 
-		if(playlistView.getVisibility() == View.GONE){
-			playlistView.setAlpha(0f);
-			playlistView.setVisibility(View.VISIBLE);
+		if(view.getVisibility() == View.GONE){
+			view.setAlpha(0f);
+			view.setVisibility(View.VISIBLE);
 
-			playlistView.animate()
+			view.animate()
 					.alpha(1f)
 					.setDuration(animDuration)
 					.setListener(new AnimatorListenerAdapter(){
 						@Override
 						public void onAnimationEnd(Animator animation)
 						{
-							animInProgress = false;
+							view.setTag(false);
 						}
 					});
-
-			fadePanel();
-
 		}else{
-			playlistView.animate()
+			view.animate()
 					.alpha(0f)
 					.setDuration(animDuration)
 					.setListener(new AnimatorListenerAdapter(){
 						@Override
 						public void onAnimationEnd(Animator animation)
 						{
-							playlistView.setVisibility(View.GONE);
-							animInProgress = false;
+							view.setVisibility(View.GONE);
+							view.setTag(false);
 						}
 					});
 		}
-
-		animInProgress = true;
 	}
 	
 	private void updateView(Bundle bundle)
