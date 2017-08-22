@@ -97,6 +97,7 @@
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
 	<string name="later">Later</string>
+	<string name="all">All</string>
 
 	<plurals name="num_songs">
 		<item quantity="one">%1$d song</item>
@@ -114,6 +115,8 @@
 	<string name="sd_card">SD card</string>
 
 	<string name="sd_card_access">SD Card Access</string>
+
+	<string name="slash">/</string>
 
 	<!-- Accessibility -->
 

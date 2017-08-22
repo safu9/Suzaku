@@ -7,26 +7,26 @@
 	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:padding="@dimen/margin_small"
+		android:padding="@dimen/spacing_small"
 		android:orientation="vertical">
 
-		<com.citrus.suzaku.SquareImageView
-			android:id="@+id/artwork"
+		<com.citrus.suzaku.view.SquareImageView
+			android:id="@+id/artwork_view"
 			android:layout_width="match_parent"
 			android:layout_height="0dp"
-			android:layout_marginTop="@dimen/margin_small"
+			android:layout_marginTop="@dimen/spacing_small"
 			android:scaleType="fitCenter"
 			custom:adjust="height"/>
 
 		<TextView
-			android:id="@+id/info"
+			android:id="@+id/info_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
 			android:textColor="@color/black"/>
 
 		<Button
-			android:id="@+id/gallery"
+			android:id="@+id/gallery_button"
 			android:text="@string/choose_from_gallery"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
 			android:textColor="@color/black"/>
 
 		<Button
-			android:id="@+id/delete"
+			android:id="@+id/delete_button"
 			android:text="@string/delete_artwork"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
 			android:textColor="@color/black"/>
 
 		<Button
-			android:id="@+id/undo"
+			android:id="@+id/undo_button"
 			android:text="@string/undo_the_changes"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"

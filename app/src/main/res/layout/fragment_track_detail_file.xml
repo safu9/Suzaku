@@ -7,26 +7,26 @@
 	<TableLayout
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:padding="@dimen/margin_small"
+		android:padding="@dimen/spacing_small"
 		android:shrinkColumns="1">
 
 		<TableRow
-			android:layout_marginBottom="@dimen/margin_medium">
+			android:layout_marginBottom="@dimen/spacing_medium">
 			<TextView
 				android:text="@string/path"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:padding="@dimen/margin_tiny"/>
+				android:padding="@dimen/spacing_tiny"/>
 
 			<TextView
-				android:id="@+id/path"
+				android:id="@+id/path_view"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:padding="@dimen/margin_tiny"/>
+				android:padding="@dimen/spacing_tiny"/>
 		</TableRow>
 
 
@@ -37,15 +37,15 @@
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:padding="@dimen/margin_tiny"/>
+				android:padding="@dimen/spacing_tiny"/>
 
 			<TextView
-				android:id="@+id/length"
+				android:id="@+id/length_view"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:padding="@dimen/margin_tiny"/>
+				android:padding="@dimen/spacing_tiny"/>
 		</TableRow>
 
 		<TableRow>
@@ -55,15 +55,15 @@
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:padding="@dimen/margin_tiny"/>
+				android:padding="@dimen/spacing_tiny"/>
 
 			<TextView
-				android:id="@+id/bitrate"
+				android:id="@+id/bitrate_view"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:padding="@dimen/margin_tiny"/>
+				android:padding="@dimen/spacing_tiny"/>
 		</TableRow>
 
 		<TableRow>
@@ -73,15 +73,15 @@
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:padding="@dimen/margin_tiny"/>
+				android:padding="@dimen/spacing_tiny"/>
 
 			<TextView
-				android:id="@+id/sample_rate"
+				android:id="@+id/sample_rate_view"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:padding="@dimen/margin_tiny"/>
+				android:padding="@dimen/spacing_tiny"/>
 		</TableRow>
 
 		<TableRow>
@@ -91,15 +91,15 @@
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:padding="@dimen/margin_tiny"/>
+				android:padding="@dimen/spacing_tiny"/>
 
 			<TextView
-				android:id="@+id/channels"
+				android:id="@+id/channels_view"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:padding="@dimen/margin_tiny"/>
+				android:padding="@dimen/spacing_tiny"/>
 		</TableRow>
 
 	</TableLayout>

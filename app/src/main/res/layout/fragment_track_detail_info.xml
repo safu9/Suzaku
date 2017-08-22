@@ -7,19 +7,20 @@
 	<LinearLayout
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:padding="@dimen/margin_small"
+		android:padding="@dimen/spacing_small"
 		android:orientation="vertical">
 
 		<TextView
-			android:id="@+id/titleLabel"
+			android:id="@+id/title_label"
 			android:text="@string/title"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
-			android:textColor="@color/black"/>
+			android:textColor="@color/black"
+			android:labelFor="@+id/title_edit"/>
 
 		<EditText
-			android:id="@+id/title"
+			android:id="@+id/title_edit"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
@@ -31,10 +32,11 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
-			android:textColor="@color/black"/>
+			android:textColor="@color/black"
+			android:labelFor="@+id/artist_edit"/>
 
 		<EditText
-			android:id="@+id/artist"
+			android:id="@+id/artist_edit"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
@@ -46,10 +48,11 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
-			android:textColor="@color/black"/>
+			android:textColor="@color/black"
+			android:labelFor="@+id/album_edit"/>
 
 		<EditText
-			android:id="@+id/album"
+			android:id="@+id/album_edit"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
@@ -61,10 +64,11 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
-			android:textColor="@color/black"/>
+			android:textColor="@color/black"
+			android:labelFor="@+id/album_artist_edit"/>
 
 		<EditText
-			android:id="@+id/album_artist"
+			android:id="@+id/album_artist_edit"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
@@ -76,10 +80,11 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
-			android:textColor="@color/black"/>
+			android:textColor="@color/black"
+			android:labelFor="@+id/composer_edit"/>
 
 		<EditText
-			android:id="@+id/composer"
+			android:id="@+id/composer_edit"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
@@ -91,10 +96,11 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
-			android:textColor="@color/black"/>
+			android:textColor="@color/black"
+			android:labelFor="@+id/genre_edit"/>
 
 		<EditText
-			android:id="@+id/genre"
+			android:id="@+id/genre_edit"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
@@ -113,7 +119,7 @@
 			android:layout_height="wrap_content"
 			android:orientation="horizontal">
 			<EditText
-				android:id="@+id/track_num"
+				android:id="@+id/track_num_edit"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
@@ -126,10 +132,10 @@
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:text="/"/>
+				android:text="@string/slash"/>
 
 			<EditText
-				android:id="@+id/track_count"
+				android:id="@+id/track_count_edit"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
@@ -150,7 +156,7 @@
 			android:layout_height="wrap_content"
 			android:orientation="horizontal">
 			<EditText
-				android:id="@+id/disc_num"
+				android:id="@+id/disc_num_edit"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
@@ -163,10 +169,10 @@
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
 				android:textColor="@color/black"
-				android:text="/"/>
+				android:text="@string/slash"/>
 
 			<EditText
-				android:id="@+id/disc_count"
+				android:id="@+id/disc_count_edit"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
@@ -180,10 +186,11 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
-			android:textColor="@color/black"/>
+			android:textColor="@color/black"
+			android:labelFor="@+id/year_edit"/>
 
 		<EditText
-			android:id="@+id/year"
+			android:id="@+id/year_edit"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
@@ -195,10 +202,11 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
-			android:textColor="@color/black"/>
+			android:textColor="@color/black"
+			android:labelFor="@+id/comment_edit"/>
 
 		<EditText
-			android:id="@+id/comment"
+			android:id="@+id/comment_edit"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
@@ -206,7 +214,7 @@
 			android:inputType="textMultiLine"/>
 
 		<CheckBox
-			android:id="@+id/compilation"
+			android:id="@+id/compilation_check"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:text="@string/compilation"

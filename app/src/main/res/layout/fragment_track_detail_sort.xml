@@ -7,19 +7,20 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/margin_small"
+        android:padding="@dimen/spacing_small"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/titleLabel"
+            android:id="@+id/title_label"
             android:text="@string/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:labelFor="@+id/title_edit"/>
 
         <EditText
-            android:id="@+id/title"
+            android:id="@+id/title_edit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
@@ -27,18 +28,19 @@
             android:inputType="text"/>
 
         <TextView
-            android:id="@+id/titleSortLabel"
+            android:id="@+id/title_sort_label"
             android:text="@string/sort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:labelFor="@+id/title_sort_edit"/>
 
         <EditText
-            android:id="@+id/title_sort"
+            android:id="@+id/title_sort_edit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/spacing_medium"
             android:textSize="@dimen/text_small"
             android:textColor="@color/black"
             android:inputType="text"/>
@@ -49,10 +51,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:labelFor="@+id/album_edit"/>
 
         <EditText
-            android:id="@+id/artist"
+            android:id="@+id/artist_edit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
@@ -64,13 +67,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:labelFor="@+id/album_sort_edit"/>
 
         <EditText
-            android:id="@+id/artist_sort"
+            android:id="@+id/artist_sort_edit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/spacing_medium"
             android:textSize="@dimen/text_small"
             android:textColor="@color/black"
             android:inputType="text"/>
@@ -81,10 +85,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:labelFor="@+id/album_edit"/>
 
         <EditText
-            android:id="@+id/album"
+            android:id="@+id/album_edit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
@@ -96,13 +101,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:labelFor="@+id/album_sort_edit"/>
 
         <EditText
-            android:id="@+id/album_sort"
+            android:id="@+id/album_sort_edit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/margin_medium"
+            android:layout_marginBottom="@dimen/spacing_medium"
             android:textSize="@dimen/text_small"
             android:textColor="@color/black"
             android:inputType="text"/>
@@ -113,10 +119,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:labelFor="@+id/album_artist_edit"/>
 
         <EditText
-            android:id="@+id/album_artist"
+            android:id="@+id/album_artist_edit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
@@ -128,10 +135,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:labelFor="@+id/album_artist_sort_edit"/>
 
         <EditText
-            android:id="@+id/album_artist_sort"
+            android:id="@+id/album_artist_sort_edit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_small"

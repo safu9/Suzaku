@@ -7,11 +7,12 @@
 	android:orientation="horizontal">
 
 	<ImageView
-		android:id="@+id/dock_artwork"
-		android:layout_width="@dimen/artwork_size"
-		android:layout_height="@dimen/artwork_size"
-		android:layout_margin="@dimen/margin_tiny"
-		android:scaleType="fitCenter"/>
+		android:id="@+id/artwork_view"
+		android:layout_width="@dimen/view_medium"
+		android:layout_height="@dimen/view_medium"
+		android:layout_margin="@dimen/spacing_tiny"
+		android:scaleType="fitCenter"
+		android:contentDescription="@string/artwork"/>
 
 	<LinearLayout
 		android:layout_width="0dp"
@@ -21,7 +22,7 @@
 
 		<TextView
 			style="@style/myEllipsizeEndText"
-			android:id="@+id/dock_track"
+			android:id="@+id/track_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textSize="@dimen/text_small"
@@ -29,18 +30,18 @@
 
 		<TextView
 			style="@style/myEllipsizeEndText"
-			android:id="@+id/dock_album"
+			android:id="@+id/album_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:textSize="@dimen/text_micro"
+			android:textSize="@dimen/text_tiny"
 			android:textColor="@color/gray_light"/>
 
 		<TextView
 			style="@style/myEllipsizeEndText"
-			android:id="@+id/dock_artist"
+			android:id="@+id/artist_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:textSize="@dimen/text_micro"
+			android:textSize="@dimen/text_tiny"
 			android:textColor="@color/gray_light"/>
 
 	</LinearLayout>
@@ -52,27 +53,27 @@
 
 		<ImageButton
 			style="@style/myButton"
-			android:id="@+id/dock_prevButton"
+			android:id="@+id/prev_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:padding="@dimen/margin_tiny"
+			android:padding="@dimen/spacing_tiny"
 			android:src="@drawable/ic_skip_prev"
 			android:contentDescription="@string/previous"/>
 
 		<ImageButton
 			style="@style/myButton"
-			android:id="@+id/dock_playButton"
+			android:id="@+id/play_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:padding="@dimen/margin_tiny"
+			android:padding="@dimen/spacing_tiny"
 			android:contentDescription="@string/play"/>
 
 		<ImageButton
 			style="@style/myButton"
-			android:id="@+id/dock_nextButton"
+			android:id="@+id/next_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:padding="@dimen/margin_tiny"
+			android:padding="@dimen/spacing_tiny"
 			android:src="@drawable/ic_skip_next"
 			android:contentDescription="@string/next"/>
 

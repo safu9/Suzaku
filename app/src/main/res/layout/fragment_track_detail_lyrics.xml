@@ -2,15 +2,15 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:padding="@dimen/margin_small"
+	android:padding="@dimen/spacing_small"
 	android:background="@color/white"
 	android:fillViewport="true"
 	android:fastScrollEnabled="true" >
 
 	<EditText
-		android:id="@+id/lyrics"
+		android:id="@+id/lyrics_edit"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
+		android:layout_height="wrap_content"
 		android:gravity="top"
 		android:textSize="@dimen/text_small"
 		android:textColor="@color/black"

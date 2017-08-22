@@ -5,10 +5,11 @@
 	android:background="@drawable/button_background">
     
 	<ImageView
-		android:id="@+id/artwork"
-		android:layout_width="@dimen/artwork_size"
-		android:layout_height="@dimen/artwork_size"
-		android:layout_margin="@dimen/margin_tiny"
-		android:scaleType="fitCenter"/>
+		android:id="@+id/artwork_view"
+		android:layout_width="@dimen/view_medium"
+		android:layout_height="@dimen/view_medium"
+		android:layout_margin="@dimen/spacing_tiny"
+		android:scaleType="fitCenter"
+		android:contentDescription="@string/artwork"/>
 	
 </FrameLayout>

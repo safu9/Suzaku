@@ -6,12 +6,12 @@
 	<TextView
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:padding="@dimen/margin_tiny"
+		android:padding="@dimen/spacing_tiny"
 		android:text="@string/name"
 		android:textSize="@dimen/text_small"/>
 	
 	<EditText
-		android:id="@+id/edit"
+		android:id="@+id/title_edit"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:textSize="@dimen/text_large"
@@ -24,7 +24,7 @@
 		
 		<Button
 			style="@style/myButton"
-			android:id="@+id/cancelButton"
+			android:id="@+id/cancel_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
@@ -33,7 +33,7 @@
 		
 		<Button
 			style="@style/myButton"
-			android:id="@+id/okButton"
+			android:id="@+id/ok_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"

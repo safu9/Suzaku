@@ -3,13 +3,13 @@ package com.citrus.suzaku;
 import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Environment;
 import android.os.storage.StorageManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.citrus.suzaku.pref.PreferenceUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.BufferedReader;
@@ -45,13 +45,13 @@ public class App extends Application
 		PreferenceUtils.initPreference();
 	}
 
-	@Override
+/*	@Override
 	public void onConfigurationChanged(Configuration newConfig)
 	{
 		super.onConfigurationChanged(newConfig);
-	//	LocaleUtils.updateConfig(newConfig);
+		LocaleUtils.updateConfig(newConfig);
 	}
-	
+*/
 	
 	// Statics
 	
@@ -89,7 +89,8 @@ public class App extends Application
 				path = path.substring(0, path.indexOf("/Android/data/com.citrus.suzaku/files"));
 
 				// isExternalStorageRemovableはAndroid5.0 (API 21) から利用できるAPI
-				// 取り外し可能かどうか（SDカードかどうか）を判定している
+				// 取り外し可能かどうか（SDカードかどうか）を判定する
+
 				if (Environment.isExternalStorageRemovable(dir)) {
 
 					// 取り外し可能であればSDカード
@@ -97,9 +98,8 @@ public class App extends Application
 						sdCardFilesDirPathList.add(path);
 					}
 
-				} else {
-					// 取り外し不可能であれば内部ストレージ
 				}
+				// else 取り外し不可能であれば内部ストレージ
 			}
 		}
 		return sdCardFilesDirPathList;
@@ -119,19 +119,19 @@ public class App extends Application
 
 			for (Object volume : volumeList) {
 
-				// getPathFileメソッドは、StorageVolumeのFileオブジェクトを取得するメソッド。
+				// getPathFileメソッドは、StorageVolumeのFileオブジェクトを取得するメソッド
 				Method getPathFileMethod = volume.getClass().getDeclaredMethod("getPathFile");
 				File file = (File) getPathFileMethod.invoke(volume);
 				String storageBasePath = file.getAbsolutePath();
 
-				// isRemovableメソッドは、StorageVolumeが取り外し可能かどうかを判定するメソッド。
+				// isRemovableメソッドは、StorageVolumeが取り外し可能かどうかを判定するメソッド
 				Method isRemovableMethod = volume.getClass().getDeclaredMethod("isRemovable");
 				boolean isRemovable = (boolean) isRemovableMethod.invoke(volume);
 
-				// ストレージが取り外し可能かどうか（SDカードかどうか）を判定。
+				// ストレージが取り外し可能かどうか（SDカードかどうか）を判定
 				if (isRemovable) {
 
-					// ベースパスがマウントされているかどうかを判定。
+					// ベースパスがマウントされているかどうかを判定
 					if (isMountedBasePath(storageBasePath)) {
 
 						// StorageVolumeの中で、取り外し可能でかつマウント済みのパスは、SDカード。
@@ -141,9 +141,8 @@ public class App extends Application
 						}
 
 					}
-				} else {
-					// StorageVolumeの中で、取り外し不可能なパスは、内部ストレージ。
 				}
+				// else StorageVolumeの中で、取り外し不可能なパスは、内部ストレージ
 			}
 
 		} catch (NoSuchMethodException e) {
@@ -197,7 +196,9 @@ public class App extends Application
 			e.printStackTrace();
 		} finally {
 			try {
-				br.close();
+				if(br != null){
+					br.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

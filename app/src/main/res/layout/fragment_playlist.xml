@@ -4,8 +4,8 @@
     android:layout_height="match_parent"
 	android:background="@color/white">
 	
-	<com.citrus.suzaku.SquareImageView
-		android:id="@+id/artwork"
+	<com.citrus.suzaku.view.SquareImageView
+		android:id="@+id/artwork_view"
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
 		android:layout_alignParentTop="true"
@@ -19,17 +19,17 @@
 		android:layout_height="wrap_content"
 		android:layout_alignParentTop="true"
 		android:orientation="vertical"
-		android:padding="@dimen/margin_small">
+		android:padding="@dimen/spacing_small">
 
 		<TextView
 			style="@style/myMainText"
-			android:id="@+id/title"
+			android:id="@+id/title_view"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"/>
 
 		<TextView
 			style="@style/mySubText"
-			android:id="@+id/songs"
+			android:id="@+id/songs_view"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"/>
 

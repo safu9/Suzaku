@@ -5,40 +5,40 @@
 
 	<TextView
 		style="@style/myListText"
-		android:id="@+id/title"
+		android:id="@+id/title_view"
 		android:layout_height="@dimen/view_tiny"
 		android:layout_width="match_parent"
-		android:layout_toLeftOf="@+id/icon"
+		android:layout_toLeftOf="@+id/icon_view"
 		android:textColor="@color/white"/>
 
 	<ImageView
-		android:id="@+id/icon"
-		android:layout_height="@dimen/small_icon_size"
+		android:id="@+id/icon_view"
+		android:layout_height="@dimen/view_tiny"
 		android:layout_width="wrap_content"
 		android:minWidth="0dp"
 		android:layout_alignParentRight="true"/>
 
 	<TextView
 		style="@style/myListDetailText"
-		android:id="@+id/artist"
+		android:id="@+id/artist_view"
 		android:layout_height="@dimen/view_tiny"
 		android:layout_width="match_parent"
-		android:layout_below="@id/title"
-		android:layout_toLeftOf="@+id/duration"
+		android:layout_below="@id/title_view"
+		android:layout_toLeftOf="@+id/duration_view"
 		android:textColor="@color/gray_light"/>
 
 	<TextView
 		style="@style/myListDetailText"
-		android:id="@+id/duration"
+		android:id="@+id/duration_view"
 		android:layout_height="@dimen/view_tiny"
 		android:layout_width="wrap_content"
-		android:layout_below="@id/title"
+		android:layout_below="@id/title_view"
 		android:layout_alignParentRight="true"
 		android:textColor="@color/gray_light"/>
 
 	<!--
 	<ImageButton
-		android:id="@+id/popupButton"
+		android:id="@+id/popup_button"
 		android:src="@drawable/ic_popup"
 		android:layout_height="@dimen/small_icon_size"
 		android:layout_width="@dimen/small_icon_size"

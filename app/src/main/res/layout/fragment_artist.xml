@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
 	android:background="@color/white">
 
-	<com.citrus.suzaku.SquareImageView
-		android:id="@+id/artwork"
+	<com.citrus.suzaku.view.SquareImageView
+		android:id="@+id/artwork_view"
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
 		android:layout_alignParentTop="true"
@@ -19,11 +19,11 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentTop="true"
-		android:padding="@dimen/margin_small">
+		android:padding="@dimen/spacing_small">
 
 		<TextView
 			style="@style/myMainText"
-			android:id="@+id/artist"
+			android:id="@+id/artist_view"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_alignParentTop="true">
@@ -32,18 +32,18 @@
 
 		<TextView
 			style="@style/mySubText"
-			android:id="@+id/albums"
+			android:id="@+id/albums_view"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_below="@id/artist"
-			android:layout_toLeftOf="@+id/songs"/>
+			android:layout_below="@id/artist_view"
+			android:layout_toLeftOf="@+id/songs_view"/>
 
 		<TextView
 			style="@style/mySubText"
-			android:id="@+id/songs"
+			android:id="@+id/songs_view"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_below="@id/artist"
+			android:layout_below="@id/artist_view"
 			android:layout_alignParentRight="true"/>
 
 	</RelativeLayout>

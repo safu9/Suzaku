@@ -16,6 +16,9 @@ import android.view.Display;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.citrus.suzaku.album.Album;
+import com.citrus.suzaku.track.Track;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -78,6 +81,9 @@ public class ArtworkCache
 		}
 
 		Bitmap bmp = decodeBitmap(bytes, size);
+		if(bmp == null){
+			return null;
+		}
 
 		try{
 			String fileName = track.artworkHash + ".jpg";
@@ -177,7 +183,7 @@ public class ArtworkCache
 			byte[] hash = md.digest(bytes);
 
 			// 16進文字列の作成
-			//! USE Apatch Commons
+			//! USE Apache Commons
 			for(byte num : hash){				// 2桁ずつ0でパディング
 				builder.append(String.format("%02X", num & 0xff));
 			}
@@ -223,9 +229,12 @@ public class ArtworkCache
 					// bitmap.getRowBytes() * bitmap.getHeight();
 				}
 			};
-			
-			dir = App.getContext().getExternalCacheDir().getAbsolutePath() + "/SMALL";
-			new File(dir).mkdirs();
+
+			File extDir = App.getContext().getExternalCacheDir();
+			if(extDir != null){
+				dir = extDir.getAbsolutePath() + "/SMALL";
+				new File(dir).mkdirs();
+			}
 		}
 
 		public static void release()
@@ -375,8 +384,11 @@ public class ArtworkCache
 		{
 			cache = new LruCache<>(2);			// 2枚まで
 
-			dir = App.getContext().getExternalCacheDir().getAbsolutePath() + "/LARGE";
-			new File(dir).mkdirs();
+			File extDir = App.getContext().getExternalCacheDir();
+			if(extDir != null){
+				dir = extDir.getAbsolutePath() + "/LARGE";
+				new File(dir).mkdirs();
+			}
 		}
 
 		public static void release()

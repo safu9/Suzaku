@@ -13,6 +13,11 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.citrus.suzaku.database.MusicDBService;
+import com.citrus.suzaku.pref.LibraryFolderDialog;
+import com.citrus.suzaku.pref.LibraryFolderPreference;
+import com.citrus.suzaku.pref.PreferenceUtils;
+
 
 public class SettingActivity extends AppCompatActivity
 {
@@ -128,7 +133,7 @@ public class SettingActivity extends AppCompatActivity
 		public void onSharedPreferenceChanged(SharedPreferences pref, String key)
 		{
 			if(key.equals(PreferenceUtils.LANGUAGE)){
-				PreferenceUtils.updateLocale();
+			//	PreferenceUtils.updateLocale();
 			}
 		}
 	}

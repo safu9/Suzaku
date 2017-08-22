@@ -54,7 +54,7 @@
 		android:fitsSystemWindows="true">
 
 		<ListView
-			android:id="@+id/drawerList"
+			android:id="@+id/drawer_list"
 			android:layout_width="fill_parent"
 			android:layout_height="match_parent"
 			android:listSelector="@android:color/transparent"/>

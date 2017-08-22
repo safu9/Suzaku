@@ -11,8 +11,8 @@
 		android:layout_width="wrap_content"
 		android:layout_height="match_parent">
 
-		<com.citrus.suzaku.SquareImageButton
-			android:id="@+id/artwork"
+		<com.citrus.suzaku.view.SquareImageButton
+			android:id="@+id/artwork_view"
 			android:layout_width="0dp"
 			android:layout_height="match_parent"
 			android:scaleType="fitCenter"
@@ -22,10 +22,10 @@
 			android:id="@+id/panel"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_alignTop="@id/artwork"
-			android:layout_alignBottom="@id/artwork"
-			android:layout_alignLeft="@id/artwork"
-			android:layout_alignRight="@id/artwork"
+			android:layout_alignTop="@id/artwork_view"
+			android:layout_alignBottom="@id/artwork_view"
+			android:layout_alignLeft="@id/artwork_view"
+			android:layout_alignRight="@id/artwork_view"
 			android:background="@color/black_alpha"
 			android:visibility="gone">
 
@@ -37,17 +37,17 @@
 				android:fillViewport="true">
 
 				<TextView
-					android:id="@+id/lyrics"
+					android:id="@+id/lyrics_view"
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
 					android:textSize="@dimen/text_small"
 					android:textColor="@color/white"
-					android:padding="@dimen/margin_small"/>
+					android:padding="@dimen/spacing_small"/>
 
 			</ScrollView>
 
 			<LinearLayout
-				android:id="@id/buttons"
+				android:id="@+id/buttons"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
@@ -55,22 +55,22 @@
 
 				<Button
 					style="@style/myButton"
-					android:id="@+id/playlistButton"
+					android:id="@+id/playlist_button"
 					android:layout_width="0dp"
 					android:layout_height="wrap_content"
 					android:layout_weight="1"
-					android:padding="@dimen/margin_small"
+					android:padding="@dimen/spacing_small"
 					android:drawableLeft="@drawable/ic_queue_music"
 					android:text="@string/playlist"
 					android:textColor="@color/white"/>
 
 				<Button
 					style="@style/myButton"
-					android:id="@+id/detailButton"
+					android:id="@+id/detail_button"
 					android:layout_width="0dp"
 					android:layout_height="wrap_content"
 					android:layout_weight="1"
-					android:padding="@dimen/margin_small"
+					android:padding="@dimen/spacing_small"
 					android:drawableLeft="@drawable/ic_edit"
 					android:text="@string/detail"
 					android:textColor="@color/white"/>
@@ -83,10 +83,10 @@
 			android:id="@+id/playlist"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_alignBottom="@id/artwork"
-			android:layout_alignTop="@id/artwork"
-			android:layout_alignLeft="@id/artwork"
-			android:layout_alignRight="@id/artwork"
+			android:layout_alignBottom="@id/artwork_view"
+			android:layout_alignTop="@id/artwork_view"
+			android:layout_alignLeft="@id/artwork_view"
+			android:layout_alignRight="@id/artwork_view"
 			android:background="@color/black_alpha"
 			android:listSelector="@android:color/transparent"
 			android:visibility="gone" />
@@ -94,7 +94,7 @@
 	</RelativeLayout>
 	
 	<LinearLayout
-		android:layout_width="wrap_content"
+		android:layout_width="0dp"
 		android:layout_height="match_parent"
 		android:layout_weight="1"
 		android:orientation="vertical"
@@ -104,13 +104,13 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
-			android:padding="@dimen/margin_tiny"
+			android:padding="@dimen/spacing_tiny"
 			android:gravity="center_vertical"
 			android:orientation="vertical">
 
 			<TextView
 				style="@style/myEllipsizeEndText"
-				android:id="@+id/artist"
+				android:id="@+id/artist_view"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
@@ -119,7 +119,7 @@
 
 			<TextView
 				style="@style/myMarqueeText"
-				android:id="@+id/track"
+				android:id="@+id/track_view"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_huge"
@@ -128,7 +128,7 @@
 
 			<TextView
 				style="@style/myEllipsizeEndText"
-				android:id="@+id/album"
+				android:id="@+id/album_view"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:textSize="@dimen/text_small"
@@ -139,7 +139,7 @@
 
 		<SeekBar
 
-			android:id="@+id/durationBar"
+			android:id="@+id/duration_bar"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:progress="0"/>
@@ -153,17 +153,19 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentLeft="true"
-				android:paddingLeft="@dimen/margin_tiny"
-				android:textSize="@dimen/text_micro"
+				android:paddingRight="@dimen/spacing_tiny"
+				android:paddingLeft="@dimen/spacing_tiny"
+				android:textSize="@dimen/text_tiny"
 				android:textColor="@color/gray"/>
 
 			<TextView
-				android:id="@+id/number"
+				android:id="@+id/number_view"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentRight="true"
-				android:paddingRight="@dimen/margin_tiny"
-				android:textSize="@dimen/text_micro"
+				android:paddingRight="@dimen/spacing_tiny"
+				android:paddingLeft="@dimen/spacing_tiny"
+				android:textSize="@dimen/text_tiny"
 				android:textColor="@color/gray"/>
 
 		</RelativeLayout>
@@ -172,60 +174,60 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
-			android:padding="@dimen/margin_tiny"
+			android:padding="@dimen/spacing_tiny"
 			android:orientation="horizontal"
 			android:gravity="center">
 
 			<ImageButton
 				style="@style/myButton"
-				android:id="@+id/loopButton"
+				android:id="@+id/loop_button"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:paddingTop="@dimen/margin_small"
-				android:paddingBottom="@dimen/margin_small"
+				android:paddingTop="@dimen/spacing_small"
+				android:paddingBottom="@dimen/spacing_small"
 				android:contentDescription="@string/loop_mode"/>
 
 			<ImageButton
 				style="@style/myButton"
-				android:id="@+id/prevButton"
+				android:id="@+id/prev_button"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:paddingTop="@dimen/margin_small"
-				android:paddingBottom="@dimen/margin_small"
+				android:paddingTop="@dimen/spacing_small"
+				android:paddingBottom="@dimen/spacing_small"
 				android:src="@drawable/ic_skip_prev"
 				android:contentDescription="@string/previous"/>
 
 			<ImageButton
 				style="@style/myButton"
-				android:id="@+id/playButton"
+				android:id="@+id/play_button"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:paddingTop="@dimen/margin_small"
-				android:paddingBottom="@dimen/margin_small"
+				android:paddingTop="@dimen/spacing_small"
+				android:paddingBottom="@dimen/spacing_small"
 				android:contentDescription="@string/play"/>
 
 			<ImageButton
 				style="@style/myButton"
-				android:id="@+id/nextButton"
+				android:id="@+id/next_button"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:paddingTop="@dimen/margin_small"
-				android:paddingBottom="@dimen/margin_small"
+				android:paddingTop="@dimen/spacing_small"
+				android:paddingBottom="@dimen/spacing_small"
 				android:src="@drawable/ic_skip_next"
 				android:contentDescription="@string/next"/>
 
 			<ImageButton
 				style="@style/myButton"
-				android:id="@+id/shuffleButton"
+				android:id="@+id/shuffle_button"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:paddingTop="@dimen/margin_small"
-				android:paddingBottom="@dimen/margin_small"
+				android:paddingTop="@dimen/spacing_small"
+				android:paddingBottom="@dimen/spacing_small"
 				android:src="@drawable/ic_shuffle"
 				android:contentDescription="@string/shuffle_mode"/>
 

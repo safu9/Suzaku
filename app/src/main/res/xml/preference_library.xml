@@ -32,7 +32,7 @@
 			android:title="@string/select_folder"
 			android:enabled="false"/>
 -->
-		<com.citrus.suzaku.LibraryFolderPreference
+		<com.citrus.suzaku.pref.LibraryFolderPreference
 			android:key="@string/key_music_folder"
 			android:title="@string/select_folder"/>
 
