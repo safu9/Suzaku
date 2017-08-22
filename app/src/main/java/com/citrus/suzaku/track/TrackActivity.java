@@ -155,7 +155,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		loopButton = (ImageButton)findViewById(R.id.loop_button);
 		shuffleButton = (ImageButton)findViewById(R.id.shuffle_button);
 		
-		playButton.setImageResource(R.drawable.ic_pause);
+		playButton.setImageResource(R.drawable.ic_pause_white_32dp);
 		playButton.setOnClickListener(new ImageButton.OnClickListener(){
 			@Override
 			public void onClick(View v)
@@ -186,7 +186,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			}
 		});
 		
-		loopButton.setImageResource(R.drawable.ic_loop);
+		loopButton.setImageResource(R.drawable.ic_loop_white_32dp);
 		loopButton.setOnClickListener(new ImageButton.OnClickListener(){
 			@Override
 			public void onClick(View v)
@@ -195,7 +195,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			}
 		});
 		
-		shuffleButton.setImageResource(R.drawable.ic_shuffle);
+		shuffleButton.setImageResource(R.drawable.ic_shuffle_white_32dp);
 		shuffleButton.setOnClickListener(new ImageButton.OnClickListener(){
 			@Override
 			public void onClick(View v)
@@ -432,7 +432,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 				ArtworkCache.Large.setArtworkViewWithCache(artworkImageButton, trackItem);
 			}
 		}else{
-			artworkImageButton.setImageResource(R.drawable.big_blank);
+			artworkImageButton.setImageResource(R.drawable.img_blank_big);
 			artworkImageButton.setTag("");
 		}
 		
@@ -445,15 +445,15 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		switch(loopMode){
 			case PlaylistManager.LOOPMODE_OFF:
 				loopButton.setColorFilter(ContextCompat.getColor(this, R.color.white));
-				loopButton.setImageResource(R.drawable.ic_loop);
+				loopButton.setImageResource(R.drawable.ic_loop_white_32dp);
 				break;
 			case PlaylistManager.LOOPMODE_ALL:
 				loopButton.setColorFilter(ContextCompat.getColor(this, R.color.orange_light));
-				loopButton.setImageResource(R.drawable.ic_loop);
+				loopButton.setImageResource(R.drawable.ic_loop_white_32dp);
 				break;
 			case PlaylistManager.LOOPMODE_ONE:
 				loopButton.setColorFilter(ContextCompat.getColor(this, R.color.orange_light));
-				loopButton.setImageResource(R.drawable.ic_loop_one);
+				loopButton.setImageResource(R.drawable.ic_loop_one_white_32dp);
 				break;
 		}
 		
@@ -475,10 +475,10 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 	private void updateState()
 	{
 		if(isPlaying){
-			playButton.setImageResource(R.drawable.ic_pause);
+			playButton.setImageResource(R.drawable.ic_pause_white_32dp);
 			chronometer.start();
 		}else{
-			playButton.setImageResource(R.drawable.ic_play);
+			playButton.setImageResource(R.drawable.ic_play_white_32dp);
 			chronometer.stop();
 		}
 	}

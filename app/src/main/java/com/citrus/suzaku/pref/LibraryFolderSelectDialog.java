@@ -205,9 +205,9 @@ public class LibraryFolderSelectDialog extends DialogFragment implements Adapter
 
 			int iconId;
 			if(file.getName().equals("..")){		//一つ上へ
-				iconId = R.drawable.ic_up;
+				iconId = R.drawable.ic_up_white_32dp;
 			}else{									//フォルダ
-				iconId = R.drawable.ic_dir;
+				iconId = R.drawable.ic_dir_white_32dp;
 			}
 
 			holder.iconView.setImageResource(iconId);

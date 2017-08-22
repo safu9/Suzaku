@@ -68,7 +68,7 @@ public class DockFragment extends Fragment implements ServiceConnection
 		ImageButton prevButton = (ImageButton)getActivity().findViewById(R.id.prev_button);
 		ImageButton nextButton = (ImageButton)getActivity().findViewById(R.id.next_button);
 
-		playButton.setImageResource(R.drawable.ic_play);
+		playButton.setImageResource(R.drawable.ic_play_white_32dp);
 		playButton.setOnClickListener(new ImageButton.OnClickListener(){
 			@Override
 			public void onClick(View v){
@@ -159,7 +159,7 @@ public class DockFragment extends Fragment implements ServiceConnection
 			if(ArtworkCache.isCorrectHash(track.artworkHash)){
 				ArtworkCache.Small.setArtworkView(artworkImageView, track);
 			}else{
-				artworkImageView.setImageResource(R.drawable.blank);
+				artworkImageView.setImageResource(R.drawable.img_blank);
 			}
 			
 			isReady = true;
@@ -167,7 +167,7 @@ public class DockFragment extends Fragment implements ServiceConnection
 			trackTextView.setText(R.string.app_name);
 			albumTextView.setText("");
 			artistTextView.setText("");
-			artworkImageView.setImageResource(R.drawable.blank);
+			artworkImageView.setImageResource(R.drawable.img_blank);
 			
 			isReady = false;
 		}
@@ -176,9 +176,9 @@ public class DockFragment extends Fragment implements ServiceConnection
 	private void updateState()
 	{
 		if(isPlaying){
-			playButton.setImageResource(R.drawable.ic_pause);
+			playButton.setImageResource(R.drawable.ic_pause_white_32dp);
 		}else{
-			playButton.setImageResource(R.drawable.ic_play);
+			playButton.setImageResource(R.drawable.ic_play_white_32dp);
 		}
 	}
 	

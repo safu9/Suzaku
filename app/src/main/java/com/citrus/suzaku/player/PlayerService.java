@@ -551,16 +551,16 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		ntfViews.setTextViewText(R.id.artist_view, track.getArtistString());
 		
 		if(isPlaying){
-			ntfViews.setImageViewResource(R.id.play_button, R.drawable.ic_pause);
+			ntfViews.setImageViewResource(R.id.play_button, R.drawable.ic_pause_white_32dp);
 		}else{
-			ntfViews.setImageViewResource(R.id.play_button, R.drawable.ic_play);
+			ntfViews.setImageViewResource(R.id.play_button, R.drawable.ic_play_white_32dp);
 		}
 
 		Bitmap artwork = ArtworkCache.Large.getArtworkCache(track);
 		if(artwork != null){
 			ntfViews.setImageViewBitmap(R.id.artwork_view, artwork);
 		}else{
-			ntfViews.setImageViewResource(R.id.artwork_view, R.drawable.big_blank);
+			ntfViews.setImageViewResource(R.id.artwork_view, R.drawable.img_blank_big);
 		}
 		
 		Intent intent;
@@ -598,7 +598,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		NotificationCompat.Builder ntfBuilder = new NotificationCompat.Builder(App.getContext())
 		.setContent(ntfViews)
 		.setContentIntent(contentIntent)
-		.setSmallIcon((isPlaying) ? R.drawable.ic_play : R.drawable.ic_pause)
+		.setSmallIcon((isPlaying) ? R.drawable.ic_play_white_32dp : R.drawable.ic_pause_white_32dp)
 		.setDefaults(Notification.FLAG_FOREGROUND_SERVICE);
 
 		if(Build.VERSION.SDK_INT >= 16){							// JellyBean(4.2)

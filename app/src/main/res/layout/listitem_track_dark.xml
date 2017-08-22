@@ -39,7 +39,7 @@
 	<!--
 	<ImageButton
 		android:id="@+id/popup_button"
-		android:src="@drawable/ic_popup"
+		android:src="@drawable/ic_popup_gray_32dp"
 		android:layout_height="@dimen/small_icon_size"
 		android:layout_width="@dimen/small_icon_size"
 		android:layout_below="@id/title"

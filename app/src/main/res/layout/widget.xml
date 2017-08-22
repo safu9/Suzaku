@@ -73,7 +73,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:padding="@dimen/spacing_tiny"
-			android:src="@drawable/ic_skip_prev"
+			android:src="@drawable/ic_skip_prev_white_32dp"
 			android:contentDescription="@string/previous"/>
 
 		<ImageButton
@@ -90,7 +90,7 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:padding="@dimen/spacing_tiny"
-			android:src="@drawable/ic_skip_next"
+			android:src="@drawable/ic_skip_next_white_32dp"
 			android:contentDescription="@string/next"/>
 
 	</LinearLayout>

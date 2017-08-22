@@ -75,7 +75,7 @@ public class AlbumListFragment extends TrackGroupListFragment<Album>
 			holder.artistTextView.setText(item.getArtistString());
 			holder.numSongsTextView.setText(item.getNumOfSongsString());
 
-			holder.artworkImageView.setImageResource(R.drawable.blank);
+			holder.artworkImageView.setImageResource(R.drawable.img_blank);
 			holder.artworkImageView.setTag(null);
 			if(ArtworkCache.isCorrectHash(item.artworkHash)){
 				ArtworkCache.Small.setArtworkView(holder.artworkImageView, item);

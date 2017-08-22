@@ -106,7 +106,7 @@
 					android:layout_height="wrap_content"
 					android:layout_weight="1"
 					android:padding="@dimen/spacing_small"
-					android:drawableLeft="@drawable/ic_queue_music"
+					android:drawableLeft="@drawable/ic_queue_music_white_24dp"
 					android:text="@string/playlist"
 					android:textColor="@color/white"/>
 
@@ -117,7 +117,7 @@
 					android:layout_height="wrap_content"
 					android:layout_weight="1"
 					android:padding="@dimen/spacing_small"
-					android:drawableLeft="@drawable/ic_edit"
+					android:drawableLeft="@drawable/ic_edit_white_24dp"
 					android:text="@string/detail"
 					android:textColor="@color/white"/>
 
@@ -192,7 +192,7 @@
 				android:layout_weight="1"
 				android:paddingTop="@dimen/spacing_small"
 				android:paddingBottom="@dimen/spacing_small"
-				android:src="@drawable/ic_skip_prev"
+				android:src="@drawable/ic_skip_prev_white_32dp"
 				android:contentDescription="@string/previous"/>
 
 			<ImageButton
@@ -213,7 +213,7 @@
 				android:layout_weight="1"
 				android:paddingTop="@dimen/spacing_small"
 				android:paddingBottom="@dimen/spacing_small"
-				android:src="@drawable/ic_skip_next"
+				android:src="@drawable/ic_skip_next_white_32dp"
 				android:contentDescription="@string/next"/>
 
 			<ImageButton
@@ -224,7 +224,7 @@
 				android:layout_weight="1"
 				android:paddingTop="@dimen/spacing_small"
 				android:paddingBottom="@dimen/spacing_small"
-				android:src="@drawable/ic_shuffle"
+				android:src="@drawable/ic_shuffle_white_32dp"
 				android:contentDescription="@string/shuffle_mode"/>
 
 		</LinearLayout>

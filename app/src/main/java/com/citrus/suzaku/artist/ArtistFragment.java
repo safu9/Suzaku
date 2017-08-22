@@ -101,9 +101,9 @@ public class ArtistFragment extends Fragment
 			ImageView imageView = (ImageView)tab.findViewById(R.id.artwork_view);
 
 			if(i == 0){
-				imageView.setImageResource(R.drawable.all);
+				imageView.setImageResource(R.drawable.img_all);
 			}else if(!ArtworkCache.isCorrectHash(item.artworkHash)){
-				imageView.setImageResource(R.drawable.blank);
+				imageView.setImageResource(R.drawable.img_blank);
 			}else{
 				ArtworkCache.Small.setArtworkView(imageView, item);
 			}

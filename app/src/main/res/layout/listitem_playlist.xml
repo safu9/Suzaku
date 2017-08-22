@@ -20,7 +20,7 @@
 	
 	<ImageButton
 		android:id="@+id/popup_button"
-		android:src="@drawable/ic_popup"
+		android:src="@drawable/ic_popup_gray_32dp"
 		android:layout_height="@dimen/view_tiny"
 		android:layout_width="@dimen/view_tiny"
 		android:layout_below="@id/title_view"

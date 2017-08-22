@@ -81,7 +81,7 @@ public class PlayerWidgetProvider extends AppWidgetProvider
 			if(artwork != null){
 				views.setImageViewBitmap(R.id.artwork_view, artwork);				// NPE 回避
 			}else{
-				views.setImageViewResource(R.id.artwork_view, R.drawable.big_blank);
+				views.setImageViewResource(R.id.artwork_view, R.drawable.img_blank_big);
 			}
 		
 		}else{
@@ -89,13 +89,13 @@ public class PlayerWidgetProvider extends AppWidgetProvider
 			views.setTextViewText(R.id.album_view, "");
 			views.setTextViewText(R.id.artist_view, "");
 
-			views.setImageViewResource(R.id.artwork_view, R.drawable.big_blank);		// NPE 回避
+			views.setImageViewResource(R.id.artwork_view, R.drawable.img_blank_big);		// NPE 回避
 		}
 		
 		if(isPlaying){
-			views.setImageViewResource(R.id.play_button, R.drawable.ic_pause);
+			views.setImageViewResource(R.id.play_button, R.drawable.ic_pause_white_32dp);
 		}else{
-			views.setImageViewResource(R.id.play_button, R.drawable.ic_play);
+			views.setImageViewResource(R.id.play_button, R.drawable.ic_play_white_32dp);
 		}
 
 		return views;
