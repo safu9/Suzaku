@@ -7,43 +7,91 @@
 	android:background="@color/black"
 	android:fitsSystemWindows="true">
 
-	<LinearLayout
+	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
-		android:padding="@dimen/spacing_tiny"
-		android:gravity="center_vertical"
-		android:orientation="vertical"
 		android:background="@drawable/grad_black_graydark">
+
+		<ImageButton
+			android:id="@+id/nav_before_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_centerVertical="true"
+			android:padding="@dimen/spacing_tiny"
+			android:src="@drawable/ic_navigate_before_white_24dp"
+			android:background="@android:color/transparent"/>
 
 		<TextView
 			style="@style/myEllipsizeEndText"
 			android:id="@+id/artist_view"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:layout_above="@+id/track_wrapper"
+			android:layout_toRightOf="@id/nav_before_button"
+			android:layout_toLeftOf="@+id/popup_buttons"
 			android:textSize="@dimen/text_small"
 			android:textColor="@color/gray_light"
 			android:gravity="center"/>
 
-		<TextView
-			style="@style/myMarqueeText"
-			android:id="@+id/track_view"
-			android:layout_width="match_parent"
+		<FrameLayout
+			android:id="@+id/track_wrapper"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:textSize="@dimen/text_huge"
-			android:textColor="@color/white"
-			android:gravity="center"/>
+			android:layout_centerVertical="true"
+			android:layout_toRightOf="@id/nav_before_button"
+			android:layout_toLeftOf="@+id/popup_buttons">
+			<!--marquee が正常に動作するように-->
+			<TextView
+				style="@style/myMarqueeText"
+				android:id="@+id/track_view"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_huge"
+				android:textColor="@color/white"
+				android:gravity="center"/>
+		</FrameLayout>
 
 		<TextView
 			style="@style/myEllipsizeEndText"
 			android:id="@+id/album_view"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:layout_below="@+id/track_wrapper"
+			android:layout_toRightOf="@id/nav_before_button"
+			android:layout_toLeftOf="@+id/popup_buttons"
 			android:textSize="@dimen/text_small"
 			android:textColor="@color/gray_light"
 			android:gravity="center"/>
 
-	</LinearLayout>
+		<FrameLayout
+			android:id="@+id/popup_buttons"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_centerVertical="true">
+
+			<ImageButton
+				android:id="@+id/popup_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:padding="@dimen/spacing_tiny"
+				android:src="@drawable/ic_popup_menu_white_24dp"
+				android:background="@android:color/transparent"/>
+
+			<ImageButton
+				android:id="@+id/close_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:padding="@dimen/spacing_tiny"
+				android:src="@drawable/ic_close_white_24dp"
+				android:background="@android:color/transparent"
+				android:visibility="gone"/>
+
+		</FrameLayout>
+
+	</RelativeLayout>
 
 	<RelativeLayout
 		android:layout_width="match_parent"

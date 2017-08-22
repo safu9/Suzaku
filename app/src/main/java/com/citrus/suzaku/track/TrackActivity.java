@@ -27,6 +27,7 @@ import android.widget.Chronometer;
 import android.widget.Chronometer.OnChronometerTickListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -47,7 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TrackActivity extends Activity implements OnChronometerTickListener, ServiceConnection
+public class TrackActivity extends Activity implements OnChronometerTickListener, PopupMenu.OnMenuItemClickListener, ServiceConnection
 {
 	private Messenger mService;
 	private boolean isBound;
@@ -61,6 +62,10 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 	private TextView titleTextView;
 	private TextView albumTextView;
 	private TextView artistTextView;
+
+	private ImageButton popupButton;
+	private ImageButton closeButton;
+
 	private ImageButton artworkImageButton;
 	private ImageButton playButton;
 	private ImageButton loopButton;
@@ -109,6 +114,39 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		albumTextView = (TextView)findViewById(R.id.album_view);
 		artistTextView = (TextView)findViewById(R.id.artist_view);
 		artworkImageButton = (ImageButton)findViewById(R.id.artwork_view);
+
+		ImageButton navBeforeButton = (ImageButton)findViewById(R.id.nav_before_button);
+		navBeforeButton.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				finish();
+			}
+		});
+
+		popupButton = (ImageButton)findViewById(R.id.popup_button);
+		popupButton.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				PopupMenu menu = new PopupMenu(TrackActivity.this, v);
+				menu.getMenuInflater().inflate(R.menu.menu_activity_track, menu.getMenu());
+				menu.setOnMenuItemClickListener(TrackActivity.this);
+				menu.show();
+			}
+		});
+
+		closeButton = (ImageButton)findViewById(R.id.close_button);
+		closeButton.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				fadePanel();
+			}
+		});
 
 		artworkImageButton.setTag("");
 		artworkImageButton.setOnClickListener(new View.OnClickListener(){
@@ -332,32 +370,65 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
+		return handleMenuItem(item) || super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public boolean onMenuItemClick(MenuItem item)
+	{
+		return handleMenuItem(item);
+	}
+
+	private boolean handleMenuItem(MenuItem item)
+	{
 		Intent intent;
 
 		switch(item.getItemId()){
+			case R.id.menu_lyrics:
+				if(panelView.getVisibility() != View.VISIBLE){
+					fadePanel();
+				}
+				if(lyricsScrollView.getVisibility() != View.VISIBLE){
+					switchPanel();
+				}
+				break;
+
+			case R.id.menu_playing_list:
+				if(panelView.getVisibility() != View.VISIBLE){
+					fadePanel();
+				}
+				if(playlistView.getVisibility() != View.VISIBLE){
+					switchPanel();
+				}
+				break;
+
 			case R.id.menu_detail:
 				List<Long> trackIds = new ArrayList<>();
 				trackIds.add(trackItem.id);
-				
+
 				intent = new Intent(this, TrackDetailActivity.class);
 				intent.putExtra("IDS", (Serializable)trackIds);
 				startActivity(intent);
-				return true;
+				break;
 
 			case R.id.menu_settings:
 				intent = new Intent(this, SettingActivity.class);
 				startActivity(intent);
-				return true;
-				
+				break;
+
 			default:
-				return super.onOptionsItemSelected(item);
+				return false;
 		}
+		return true;
 	}
 
 	// パネルの表示/非表示の切り替え
 	private void fadePanel()
 	{
 		fadeView(panelView);
+
+		fadeView(popupButton);
+		fadeView(closeButton);
 	}
 
 	// パネルの歌詞/プレイリストの切り替え
@@ -422,7 +493,8 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			finish();
 			return;
 		}
-		
+
+		// TODO : avoid resetting Marquee
 		titleTextView.setText(trackItem.title);
 		albumTextView.setText(trackItem.getAlbumString());
 		artistTextView.setText(trackItem.getArtistString());
@@ -542,7 +614,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		String code = System.getProperty("line.separator");
 		return (org != null)? org.replaceAll("\r\n|[\n\r\u2028\u2029\u0085]", code) : null;
 	}
-	
+
 	private static class MyHandler extends Handler
 	{
 		private WeakReference<TrackActivity> mActivityRef;
