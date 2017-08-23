@@ -44,9 +44,10 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 	
 	// To Activity
 	public static final int MSG_NOTIFY_TRACK = 10;
-	public static final int MSG_NOTIFY_STATE = 11;
-	public static final int MSG_NOTIFY_TIME = 12;
-	public static final int MSG_STOPPED = 13;
+	public static final int MSG_NOTIFY_PLAY_MODE = 11;
+	public static final int MSG_NOTIFY_STATE = 12;
+	public static final int MSG_NOTIFY_TIME = 13;
+	public static final int MSG_STOPPED = 14;
 	
 	// Intent Extra Key
 	public static final String KEY_TRACK = "TRACK";
@@ -105,11 +106,12 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 
 				playlist.setPlaylistInfo(playRange, item, position, shuffleStart);
 
-				if (!setupPlayer()) {
+				if(setupPlayer()){
+					playSong();
+				}else{
+					playlist.save();
 					notifyTrack();
 					stopSong();
-				} else {
-					playSong();
 				}
 				break;
 			case ACTION_PLAY_PAUSE:
@@ -185,6 +187,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 				App.logd("PS Received : MSG_REQUEST_INFO");
 				mReplyTo = msg.replyTo;
 				notifyTrack();
+				notifyPlayMode();
 				notifyState();
 				notifyTime();
 				break;
@@ -216,12 +219,14 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 			case MSG_SWITCH_LOOPMODE:
 				App.logd("PS Received : MSG_SWITCH_LOOPMODE");
 				playlist.switchLoopMode();
-				notifyTrack();
+				playlist.save();
+				notifyPlayMode();
 				break;
 			case MSG_SWITCH_SHUFFLEMODE:
 				App.logd("PS Received : MSG_SWITCH_SHUFFLEMODE");
 				playlist.switchShuffleMode();
-				notifyTrack();
+				playlist.save();
+				notifyPlayMode();
 				break;
 		}
 	}
@@ -242,7 +247,8 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		if(!isPlaying){
 			isPlaying = true;
 		}
-		
+
+		playlist.save();
 		notifyTrack();
 		notifyState();
 		notifyTime();
@@ -343,6 +349,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 	private void nextSong()
 	{
 		if(playlist.forwardTrack() == null){
+			playlist.save();
 			notifyTrack();
 			stopSong();
 			return;
@@ -358,7 +365,8 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 				player.start();
 			}
 		}
-		
+
+		playlist.save();
 		notifyTrack();
 		notifyTime();
 		
@@ -382,6 +390,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		}
 		
 		if(playlist.backTrack() == null){
+			playlist.save();
 			notifyTrack();
 			stopSong();
 			return;
@@ -398,6 +407,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 			}
 		}
 
+		playlist.save();
 		notifyTrack();
 		notifyTime();
 
@@ -493,8 +503,6 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 	
 	private void notifyTrack()
 	{
-		playlist.save();
-
 		Bundle bundle = new Bundle();
 		bundle.putSerializable(KEY_TRACK, playlist.getCurrentTrack());
 		bundle.putInt(KEY_POSITION, playlist.getCurrentPosition());
@@ -502,6 +510,14 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		bundle.putInt(KEY_LOOPMODE, playlist.getLoopMode());
 		bundle.putBoolean(KEY_SHUFFLEMODE, playlist.getShuffleMode());
 		replyMessage(MSG_NOTIFY_TRACK, bundle);
+	}
+
+	private void notifyPlayMode()
+	{
+		Bundle bundle = new Bundle();
+		bundle.putInt(KEY_LOOPMODE, playlist.getLoopMode());
+		bundle.putBoolean(KEY_SHUFFLEMODE, playlist.getShuffleMode());
+		replyMessage(MSG_NOTIFY_PLAY_MODE, bundle);
 	}
 	
 	private void notifyState()

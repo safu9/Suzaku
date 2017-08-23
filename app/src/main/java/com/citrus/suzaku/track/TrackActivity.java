@@ -479,15 +479,9 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 	
 	private void updateView(Bundle bundle)
 	{
-		playlist.load();
-		playlistAdapter.setDataList(playlist.getPlaylist());
-		playlistAdapter.notifyDataSetChanged();
-
 		trackItem = (Track)bundle.getSerializable(PlayerService.KEY_TRACK);
 		int position = bundle.getInt(PlayerService.KEY_POSITION);
 		int count = bundle.getInt(PlayerService.KEY_COUNT);
-		int loopMode = bundle.getInt(PlayerService.KEY_LOOPMODE);
-		boolean shuffleMode = bundle.getBoolean(PlayerService.KEY_SHUFFLEMODE);
 		
 		if(trackItem == null){
 			finish();
@@ -512,8 +506,23 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 	
 		chronometer.setFormat("%s / " + trackItem.getDurationString());
 		numberTextView.setText(String.valueOf(position + 1) + " / " + String.valueOf(count));
-		
-		
+
+		// Panel
+
+		TagLibHelper tagHelper = new TagLibHelper();
+		tagHelper.setFile(trackItem.path);
+		String lyrics = convertNewlineCode(tagHelper.getLyrics());
+		tagHelper.release();
+
+		lyricsTextView.setText(lyrics);
+
+		playlist.load();
+		playlistAdapter.setDataList(playlist.getPlaylist());
+		playlistAdapter.notifyDataSetChanged();
+	}
+
+	private void updatePlayMode(int loopMode, boolean shuffleMode)
+	{
 		switch(loopMode){
 			case PlaylistManager.LOOPMODE_OFF:
 				loopButton.setColorFilter(ContextCompat.getColor(this, R.color.white));
@@ -528,20 +537,12 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 				loopButton.setImageResource(R.drawable.ic_loop_one_white_32dp);
 				break;
 		}
-		
+
 		if(!shuffleMode){
 			shuffleButton.setColorFilter(ContextCompat.getColor(this, R.color.white));
 		}else{
 			shuffleButton.setColorFilter(ContextCompat.getColor(this, R.color.orange_light));
 		}
-
-		//! EXPERIMENTAL
-		TagLibHelper tagHelper = new TagLibHelper();
-		tagHelper.setFile(trackItem.path);
-		String lyrics = convertNewlineCode(tagHelper.getLyrics());
-		tagHelper.release();
-
-		lyricsTextView.setText(lyrics);
 	}
 	
 	private void updateState()
@@ -592,13 +593,18 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		Bundle bundle = msg.getData();
 
 		switch(msg.what){
+			case PlayerService.MSG_NOTIFY_TRACK:
+				updateView(bundle);
+				break;
+			case PlayerService.MSG_NOTIFY_PLAY_MODE:
+				int loopMode = bundle.getInt(PlayerService.KEY_LOOPMODE);
+				boolean shuffleMode = bundle.getBoolean(PlayerService.KEY_SHUFFLEMODE);
+				updatePlayMode(loopMode, shuffleMode);
+				break;
 			case PlayerService.MSG_NOTIFY_STATE:
 				isPlaying = bundle.getBoolean(PlayerService.KEY_PLAYING, false);
 				isStopped = bundle.getBoolean(PlayerService.KEY_STOPPED, true);
 				updateState();
-				break;
-			case PlayerService.MSG_NOTIFY_TRACK:
-				updateView(bundle);
 				break;
 			case PlayerService.MSG_STOPPED:
 				finish();
