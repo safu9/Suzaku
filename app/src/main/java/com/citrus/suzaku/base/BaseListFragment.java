@@ -19,11 +19,11 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.citrus.suzaku.R;
+import com.citrus.suzaku.database.MusicDBService;
 import com.citrus.suzaku.main.MainActivity;
 import com.citrus.suzaku.playlist.PlaylistSelectDialog;
-import com.citrus.suzaku.R;
 import com.citrus.suzaku.track.TrackDetailActivity;
-import com.citrus.suzaku.database.MusicDBService;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -74,14 +74,14 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				if(mActionMode != null){
-					if(mListView.getCheckedItemCount() == 0){
-						mActionMode.finish();
-					}else{
-						onItemCheckedStateChanged(mActionMode, position, id, mListView.isItemChecked(position));
-					}
-				}else{
+				if(mActionMode == null){
 					onListItemClick((ListView)parent, view, position, id);
+				}else{
+					if(mListView.getCheckedItemCount() > 0){
+						onItemCheckedStateChanged(mActionMode);
+					}else{
+						mActionMode.finish();
+					}
 				}
 			}
 		});
@@ -98,10 +98,10 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 				boolean checked = mListView.isItemChecked(position);
 				((ListView)parent).setItemChecked(position, !checked);
 
-				if(mListView.getCheckedItemCount() == 0){
-					mActionMode.finish();
+				if(mListView.getCheckedItemCount() > 0){
+					onItemCheckedStateChanged(mActionMode);
 				}else{
-					onItemCheckedStateChanged(mActionMode, position, id, !checked);
+					mActionMode.finish();
 				}
 
 				return true;
@@ -179,19 +179,6 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 	{
 		return false;
 	}
-
-
-	private void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked)
-	{
-		if(mode != null){
-			mode.setTitle(getListView().getCheckedItemCount() + " / " + getListView().getCount());
-		}
-		
-		View v = getListView().getChildAt(position);
-		if(v != null){
-			v.setActivated(checked);
-		}
-	}
 	
 	@Override
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item)
@@ -199,8 +186,13 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 		switch(item.getItemId()){
 			case R.id.menu_select_all:
 				int count = getListAdapter().getCount();
-				for(int i = 0; i < count; i++){
-					getListView().setItemChecked(i, true);			// called onItemCheckedStateChanged()
+				if(getListView().getCheckedItemCount() != count){
+					for(int i = 0; i < count; i++){
+						getListView().setItemChecked(i, true);
+					}
+					onItemCheckedStateChanged(mActionMode);
+				}else{
+					resetChoiceMode();
 				}
 				
 				break;
@@ -250,6 +242,13 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 		mListView.setChoiceMode(ListView.CHOICE_MODE_NONE);
 
 		mAdapter.notifyDataSetChanged();
+	}
+
+	private void onItemCheckedStateChanged(ActionMode mode)
+	{
+		if(mode != null){
+			mode.setTitle(mListView.getCheckedItemCount() + " / " + mListView.getCount());
+		}
 	}
 	
 	public void resetChoiceMode()

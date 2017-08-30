@@ -13,17 +13,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.citrus.suzaku.App;
-import com.citrus.suzaku.pref.PreferenceUtils;
 import com.citrus.suzaku.R;
-import com.citrus.suzaku.track.Track;
-import com.citrus.suzaku.track.TrackActivity;
 import com.citrus.suzaku.base.BaseListAdapter;
 import com.citrus.suzaku.base.BaseListFragment;
 import com.citrus.suzaku.database.MusicDBService;
 import com.citrus.suzaku.player.PlayerService;
 import com.citrus.suzaku.player.PlaylistManager;
+import com.citrus.suzaku.pref.PreferenceUtils;
+import com.citrus.suzaku.track.Track;
+import com.citrus.suzaku.track.TrackActivity;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -62,20 +61,6 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 		super.onActivityCreated(savedInstanceState);
 		
 		setListAdapter(new PlaylistTrackListAdapter());
-	}
-
-	@Override
-	public void onStart()
-	{
-		super.onStart();
-		EventBus.getDefault().register(this);
-	}
-
-	@Override
-	public void onStop()
-	{
-		super.onStop();
-		EventBus.getDefault().unregister(this);
 	}
 
 	@Override
