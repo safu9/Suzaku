@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.citrus.suzaku.App;
 import com.citrus.suzaku.ArtworkCache;
+import com.citrus.suzaku.R;
+import com.citrus.suzaku.TagLibHelper;
 import com.citrus.suzaku.database.MusicDB.Albums;
 import com.citrus.suzaku.database.MusicDB.Artists;
 import com.citrus.suzaku.database.MusicDB.Genres;
@@ -27,15 +29,12 @@ import com.citrus.suzaku.database.MusicDB.Tracks;
 import com.citrus.suzaku.playlist.Playlist;
 import com.citrus.suzaku.playlist.PlaylistTrack;
 import com.citrus.suzaku.pref.PreferenceUtils;
-import com.citrus.suzaku.R;
-import com.citrus.suzaku.TagLibHelper;
 import com.citrus.suzaku.track.Track;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -140,12 +139,10 @@ public class MusicDBService extends IntentService
 	{
 		long startTime = System.currentTimeMillis();
 		
-		showToast(R.string.notify_scanning);
+		showToast(R.string.msg_scanning);
 
 		Log.d("Suzaku", "MDBS Updating DB");
 		//! DEBUG
-	//	long kb = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024;
-	//	Log.d("Suzaku", "mem : " + kb + " KB");
 		ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
 		ActivityManager am = (ActivityManager)getSystemService(Activity.ACTIVITY_SERVICE);
 		am.getMemoryInfo(info);
@@ -168,12 +165,11 @@ public class MusicDBService extends IntentService
 		am.getMemoryInfo(info);
 		double newLinuxFreeHeap = info.availMem * 100 / 1024 / 1024 / 100.0;
 
-		showToast(R.string.notify_scan_finished);
+		showToast(R.string.msg_scan_finished);
 		
 		Log.d("Suzaku", "MDBS Updated DB  time:" + (System.currentTimeMillis() - startTime) / 1000.0 + "s memory:" + (newLinuxFreeHeap - linuxFreeHeap) + "MB");
 	}
-	
-	//!! MEMORY LEAK
+
 	private void updateAllTracks(SQLiteDatabase db)
 	{
 		long time = System.currentTimeMillis();
@@ -226,7 +222,11 @@ public class MusicDBService extends IntentService
 		db.beginTransactionNonExclusive();
 		try{
 			MusicDB mdb = new MusicDB(db);
-			
+
+			int i = 1;
+			MediaScanningEvent event = new MediaScanningEvent();
+			event.rootPath = rootPath;
+
 			for(Track track : tracks){
 
 				File file = new File(track.path);
@@ -240,6 +240,7 @@ public class MusicDBService extends IntentService
 						long lastModified = cursor.getLong(cursor.getColumnIndex(Tracks.FILE_LAST_MODIFIED));
 
 						if(file.lastModified() == lastModified){
+							i++;
 							continue;
 						}
 					}
@@ -247,19 +248,17 @@ public class MusicDBService extends IntentService
 					cursor.close();
 				}
 
-				App.logd("MDBS Updating : " + track.title + " (" + track.path + ")");
+				event.title = track.title;
+				event.percent = ++i * 100 / tracks.size();
+				EventBus.getDefault().post(event);
+
+//				App.logd("MDBS Updating : " + track.title + " (" + track.path + ")");
 
 				getMediaMetadata(track);
 				track.fileLastModified = file.lastModified();
 
 				mdb.insertTrack(track);
-/*
-				ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
-				ActivityManager am = (ActivityManager)getSystemService(Activity.ACTIVITY_SERVICE);
-				am.getMemoryInfo(info);
-				double linuxFreeHeap = info.availMem * 100 / 1024 / 1024 / 100.0;
-				App.logd("MDBS Free LinuxHeap : " + linuxFreeHeap + "MB");
-*/			}
+			}
 		
 			db.setTransactionSuccessful();
 			PreferenceUtils.putLong(PreferenceUtils.DB_LAST_UPDATED, System.currentTimeMillis());
@@ -267,7 +266,7 @@ public class MusicDBService extends IntentService
 			db.endTransaction();
 		}
 	}
-	
+/*
 	//! UNUSED
 	private void updateTracks(SQLiteDatabase db)
 	{
@@ -349,7 +348,7 @@ public class MusicDBService extends IntentService
 			}
 		}
 	}
-	
+*/
 	// ACTION_UPDATE_TRACKS
 	private void updateTracks(List<String> paths)
 	{
@@ -760,7 +759,7 @@ public class MusicDBService extends IntentService
 			db.endTransaction();
 		}
 		
-		showToast(R.string.notify_added_to_playlist);
+		showToast(R.string.msg_added_to_playlist);
 	}
 
 	// ACTION_DELETE_PLAYLISTTRACKS
@@ -906,6 +905,13 @@ public class MusicDBService extends IntentService
 			}
 			return tracks;
 		}
+	}
+
+	public static class MediaScanningEvent
+	{
+		public String title;
+		public String rootPath;
+		public int percent;
 	}
 
 	public static class DatabaseChangedEvent

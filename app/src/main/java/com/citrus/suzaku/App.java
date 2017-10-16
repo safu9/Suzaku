@@ -14,6 +14,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class App extends Application
@@ -66,18 +68,18 @@ public class App extends Application
 	public static List<String> getSdCardFilesDirPathList()
 	{
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-			return getSdCardFilesDirPathListForLollipop();
+			return getSdCardDirPathListForLollipop();
 		}else{
-			return getSdCardFilesDirPathListUnderLollippop();
+			return getSdCardDirPathListUnderLollippop();
 		}
 	}
 
 	// SDカードのfilesディレクトリパスのリストを取得する
 	// Android5.0 (API 21) 以上対応
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	private static List<String> getSdCardFilesDirPathListForLollipop()
+	private static List<String> getSdCardDirPathListForLollipop()
 	{
-		List<String> sdCardFilesDirPathList = new ArrayList<>();
+		List<String> sdCardDirPathList = new ArrayList<>();
 
 		// getExternalFilesDirsはAndroid4.4 (API 19) から利用できるAPI
 		// filesディレクトリのリストを取得できる
@@ -94,21 +96,21 @@ public class App extends Application
 				if (Environment.isExternalStorageRemovable(dir)) {
 
 					// 取り外し可能であればSDカード
-					if (!sdCardFilesDirPathList.contains(path)) {
-						sdCardFilesDirPathList.add(path);
+					if (!sdCardDirPathList.contains(path)) {
+						sdCardDirPathList.add(path);
 					}
 
 				}
 				// else 取り外し不可能であれば内部ストレージ
 			}
 		}
-		return sdCardFilesDirPathList;
+		return sdCardDirPathList;
 	}
 
 	// SDカードのfilesディレクトリパスのリストを取得する
-	private static List<String> getSdCardFilesDirPathListUnderLollippop()
+	private static List<String> getSdCardDirPathListUnderLollippop()
 	{
-		List<String> sdCardFilesDirPathList = new ArrayList<>();
+		List<String> sdCardDirPathList = new ArrayList<>();
 		StorageManager sm = (StorageManager) appContext.getSystemService(Context.STORAGE_SERVICE);
 		try {
 
@@ -136,8 +138,8 @@ public class App extends Application
 
 						// StorageVolumeの中で、取り外し可能でかつマウント済みのパスは、SDカード。
 						// マウント済みかどうかを確認しないと、機種によっては /mnt/Private などのパスも含まれてしまうことがある。
-						if (!sdCardFilesDirPathList.contains(storageBasePath)) {
-							sdCardFilesDirPathList.add(storageBasePath);// + "/Android/data/com.citrus.suzaku/files";
+						if (!sdCardDirPathList.contains(storageBasePath)) {
+							sdCardDirPathList.add(storageBasePath);// + "/Android/data/com.citrus.suzaku/files";
 						}
 
 					}
@@ -159,7 +161,50 @@ public class App extends Application
 			appContext.getExternalFilesDirs(null);
 		}
 
-		return sdCardFilesDirPathList;
+		//追加で "/system/etc/vold.fstab" を調べる
+		sdCardDirPathList = getSdCardDirPathListUnderLollippop2(sdCardDirPathList);
+
+		return sdCardDirPathList;
+	}
+
+	// SDカードのfilesディレクトリパスのリストを取得する(2)
+	private static List<String> getSdCardDirPathListUnderLollippop2(List<String> mountList)
+	{
+		Scanner scanner = null;
+		try {
+			// システム設定ファイルにアクセス
+			File vold_fstab = new File("/system/etc/vold.fstab");
+			// マウント情報を取得する
+			scanner = new Scanner(new FileInputStream(vold_fstab));
+			// 一行ずつ読み込む
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				// dev_mountまたはfuse_mountで始まる行の
+				if (line.startsWith("dev_mount") || line.startsWith("fuse_mount")) {
+					// 半角スペースではなくタブで区切られている機種もあるらしいので修正して
+					// 半角スペース区切り３つめ（path）を取得
+					String path = line.replaceAll("\t", " ").split(" ")[2];
+					// 取得したpathを重複しないようにリストに登録
+					if (!mountList.contains(path) && isMountedBasePath(path)){
+						mountList.add(path);
+					}
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} finally {
+			if (scanner != null) {
+				scanner.close();
+			}
+		}
+
+		// getExternalStorageDirectory()がSDカードでなければ、そのpathをリストから除外
+		// StorageRemovable 取り外し可能な外部ストレージ（つまりSDカード）ならばtrue
+		if (!Environment.isExternalStorageRemovable()) {
+			mountList.remove(Environment.getExternalStorageDirectory().getAbsolutePath());
+		}
+
+		return mountList;
 	}
 
 	// 指定したベースパスが、マウントされていれば、trueを返す

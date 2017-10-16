@@ -135,16 +135,17 @@
 
 	<!-- Errors -->
 
-	<string name="notify_added_to_playlist">Added to playlist.</string>
+	<string name="msg_added_to_playlist">Added to playlist.</string>
 	<string name="warn_input_playlist_title">Input playlist title.</string>
 	<string name="warn_title_already_exists">The title already exists.</string>
 
 	<string name="msg_confirm_saving">Do you want to save the changes?</string>
-	<string name="notify_saved_changes">Saved the changes.</string>
+	<string name="msg_saved_changes">Saved the changes.</string>
 	<string name="cant_save_changes">Can\'t save the changes.</string>
 	
-	<string name="notify_scanning">Scanning…</string>
-	<string name="notify_scan_finished">Scan finished.</string>
+	<string name="msg_scanning">Scanning…</string>
+	<string name="msg_scanning_place">Scanning… (%1$s)</string>
+	<string name="msg_scan_finished">Scan finished.</string>
 	
 	<string name="err_cant_play">Can\'t play \"%1$s\"</string>
 

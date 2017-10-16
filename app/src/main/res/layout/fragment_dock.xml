@@ -1,82 +1,97 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/dock"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-	android:gravity="center"
-	android:background="@color/black"
-	android:orientation="horizontal">
-
-	<ImageView
-		android:id="@+id/artwork_view"
-		android:layout_width="@dimen/view_medium"
-		android:layout_height="@dimen/view_medium"
-		android:layout_margin="@dimen/spacing_tiny"
-		android:scaleType="fitCenter"
-		android:contentDescription="@string/artwork"/>
+	android:background="@color/black">
 
 	<LinearLayout
+		android:id="@+id/dock"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:gravity="center_vertical">
+
+		<ImageView
+			android:id="@+id/artwork_view"
+			android:layout_width="@dimen/view_medium"
+			android:layout_height="@dimen/view_medium"
+			android:layout_margin="@dimen/spacing_tiny"
+			android:scaleType="fitCenter"
+			android:contentDescription="@string/artwork"/>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:orientation="vertical">
+
+			<TextView
+				style="@style/myEllipsizeEndText"
+				android:id="@+id/track_view"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_small"
+				android:textColor="@color/white"/>
+
+			<TextView
+				style="@style/myEllipsizeEndText"
+				android:id="@+id/album_view"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_tiny"
+				android:textColor="@color/gray_light"/>
+
+			<TextView
+				style="@style/myEllipsizeEndText"
+				android:id="@+id/artist_view"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textSize="@dimen/text_tiny"
+				android:textColor="@color/gray_light"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@id/buttons"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+			<ImageButton
+				style="@style/myButton"
+				android:id="@+id/prev_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:padding="@dimen/spacing_tiny"
+				android:src="@drawable/ic_skip_prev_white_32dp"
+				android:contentDescription="@string/previous"/>
+
+			<ImageButton
+				style="@style/myButton"
+				android:id="@+id/play_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:padding="@dimen/spacing_tiny"
+				android:contentDescription="@string/play"/>
+
+			<ImageButton
+				style="@style/myButton"
+				android:id="@+id/next_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:padding="@dimen/spacing_tiny"
+				android:src="@drawable/ic_skip_next_white_32dp"
+				android:contentDescription="@string/next"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<View
+		android:id="@+id/progress_view"
 		android:layout_width="0dp"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"
-		android:orientation="vertical">
+		android:layout_height="2dp"
+		android:layout_alignBottom="@id/dock"
+		android:layout_alignParentLeft="true"
+		android:background="@color/orange"/>
 
-		<TextView
-			style="@style/myEllipsizeEndText"
-			android:id="@+id/track_view"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textSize="@dimen/text_small"
-			android:textColor="@color/white"/>
-
-		<TextView
-			style="@style/myEllipsizeEndText"
-			android:id="@+id/album_view"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textSize="@dimen/text_tiny"
-			android:textColor="@color/gray_light"/>
-
-		<TextView
-			style="@style/myEllipsizeEndText"
-			android:id="@+id/artist_view"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textSize="@dimen/text_tiny"
-			android:textColor="@color/gray_light"/>
-
-	</LinearLayout>
-
-	<LinearLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal">
-
-		<ImageButton
-			style="@style/myButton"
-			android:id="@+id/prev_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:padding="@dimen/spacing_tiny"
-			android:src="@drawable/ic_skip_prev_white_32dp"
-			android:contentDescription="@string/previous"/>
-
-		<ImageButton
-			style="@style/myButton"
-			android:id="@+id/play_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:padding="@dimen/spacing_tiny"
-			android:contentDescription="@string/play"/>
-
-		<ImageButton
-			style="@style/myButton"
-			android:id="@+id/next_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:padding="@dimen/spacing_tiny"
-			android:src="@drawable/ic_skip_next_white_32dp"
-			android:contentDescription="@string/next"/>
-
-	</LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>

@@ -5,6 +5,7 @@ package com.citrus.suzaku;
 public class TagLibHelper
 {
     static{
+        System.loadLibrary("tag");
         System.loadLibrary("taglib_wrapper");
     }
 

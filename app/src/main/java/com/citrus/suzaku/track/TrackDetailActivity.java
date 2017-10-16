@@ -795,7 +795,7 @@ public class TrackDetailActivity extends AppCompatActivity
 				intent.setPackage(App.PACKAGE);
 				startService(intent);
 
-				Toast.makeText(TrackDetailActivity.this, R.string.notify_saved_changes, Toast.LENGTH_SHORT).show();
+				Toast.makeText(TrackDetailActivity.this, R.string.msg_saved_changes, Toast.LENGTH_SHORT).show();
 
 				if(isWaitingFinish){
 					finish();
