@@ -293,6 +293,9 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
+				Bundle bundle = new Bundle();
+				bundle.putInt(PlayerService.KEY_POSITION, position);
+				sendMessage(PlayerService.MSG_SET_POSITION, bundle);
 			}
 		});
 

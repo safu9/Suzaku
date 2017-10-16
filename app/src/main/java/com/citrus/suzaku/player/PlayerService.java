@@ -41,6 +41,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 	public static final int MSG_SEEK = 6;
 	public static final int MSG_SWITCH_LOOPMODE = 7;
 	public static final int MSG_SWITCH_SHUFFLEMODE = 8;
+	public static final int MSG_SET_POSITION = 9;
 	
 	// To Activity
 	public static final int MSG_NOTIFY_TRACK = 10;
@@ -227,6 +228,11 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 				playlist.switchShuffleMode();
 				playlist.save();
 				notifyPlayMode();
+				break;
+			case MSG_SET_POSITION:
+				App.logd("PS Received : MSG_SET_POSITION");
+				int position = msg.getData().getInt(KEY_POSITION, 0);
+				setCurrentPosition(position);
 				break;
 		}
 	}
@@ -483,6 +489,38 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		updateWidget();
 		
 		stopSelf(startId);
+	}
+
+	private void setCurrentPosition(int position)
+	{
+		playlist.setCurrentPosition(position);
+
+		if(!isStopped){
+			if(!setupPlayer()){
+				playlist.save();
+				notifyTrack();
+				stopSong();
+				return;
+			}
+
+			if(isPlaying){
+				player.start();
+			}
+		}
+
+		playlist.save();
+		notifyTrack();
+		notifyTime();
+
+		updateArtwork();
+		updateWidget();
+
+		if(!isStopped){
+			updateNotification();
+			updateRemoteControl();
+		}else{
+			stopSelf(startId);
+		}
 	}
 	
 	private void updateArtwork()

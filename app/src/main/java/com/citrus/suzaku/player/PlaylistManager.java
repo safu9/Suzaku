@@ -173,10 +173,11 @@ public class PlaylistManager
 		return playlist.size();
 	}
 
-	//! UNUSED
 	public void setCurrentPosition(int position)
 	{
 		currentPosition = position;
+		setShuffleMode(shuffleMode);
+
 		startTime = 0;
 	}
 
