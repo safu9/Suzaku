@@ -4,6 +4,7 @@
 
 #include <jni.h>
 #include <android/log.h>
+#include <string.h>
 #include <fileref.h>
 #include <tpropertymap.h>
 #include <mpegfile.h>
@@ -312,7 +313,7 @@ Java_com_citrus_suzaku_TagLibHelper_getYear(JNIEnv *env, jobject instance)
 {
     TagLib::Tag* tag = getHandle<TagLib::Tag>(env, instance, "tagHandle");
     if(!tag){
-        return NULL;
+        return -1;
     }
 
     return tag->year();
@@ -346,7 +347,7 @@ Java_com_citrus_suzaku_TagLibHelper_getTrackNumber(JNIEnv *env, jobject instance
 {
     TagLib::Tag* tag = getHandle<TagLib::Tag>(env, instance, "tagHandle");
     if(!tag){
-        return NULL;
+        return -1;
     }
 
     return tag->track();
