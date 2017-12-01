@@ -182,6 +182,25 @@ public class MusicDBService extends IntentService
 			rootPaths.addAll(App.getSdCardFilesDirPathList());
 		}
 
+		deleteTracksOutOfLibrary(db, rootPaths);
+		deleteNonexistentTracks(db);
+
+		for(String path : rootPaths){
+			App.logd("MDBS UT : " + path);
+			File rootDir = new File(path);
+			if(!rootDir.exists()){
+				continue;
+			}
+
+			updateAllTracksInStorage(db, path);
+		}
+
+		App.logd("MDBS UT " + (System.currentTimeMillis() - time));
+	}
+
+	// 指定フォルダ以外のトラックを削除
+	private void deleteTracksOutOfLibrary(SQLiteDatabase db, ArrayList<String> rootPaths)
+	{
 		String[] whereArgs = rootPaths.toArray(new String[rootPaths.size()]);
 		String where = "";
 		for(int i = 0; i < rootPaths.size(); i++){
@@ -199,18 +218,25 @@ public class MusicDBService extends IntentService
 		}finally{
 			db.endTransaction();
 		}
+	}
 
-		for(String path : rootPaths){
-			App.logd("MDBS UT : " + path);
-			File rootDir = new File(path);
-			if(!rootDir.exists()){
-				return;
+	// 存在しないトラックを削除
+	private void deleteNonexistentTracks(SQLiteDatabase db)
+	{
+		db.beginTransactionNonExclusive();
+		try{
+			MusicDB mdb = new MusicDB(db);
+			for(Track track : mdb.getAllTracks()){
+				File file = new File(track.path);
+				if(!file.exists()){
+					String[] whereArgs = { String.valueOf(track.id) };
+					mdb.deleteTracks(Tracks._ID + "= ?", whereArgs);
+				}
 			}
-
-			updateAllTracksInStorage(db, path);
+			db.setTransactionSuccessful();
+		}finally{
+			db.endTransaction();
 		}
-
-		App.logd("MDBS UT " + (System.currentTimeMillis() - time));
 	}
 
 	// 各ストレージ内のトラックを更新
@@ -266,89 +292,7 @@ public class MusicDBService extends IntentService
 			db.endTransaction();
 		}
 	}
-/*
-	//! UNUSED
-	private void updateTracks(SQLiteDatabase db)
-	{
-		String rootPath = PreferenceUtils.getString(PreferenceUtils.MUSIC_FOLDER, Environment.getExternalStorageDirectory().getAbsolutePath());
-		long lastUpdated = PreferenceUtils.getLong(PreferenceUtils.DB_LAST_UPDATED);
 
-		File rootDir = new File(rootPath);
-		if(!rootDir.exists()){
-			return;
-		}
-			
-		db.beginTransactionNonExclusive();
-		try{
-			MusicDB mdb = new MusicDB(db);
-			String[] selectionArgs = { rootDir.getAbsolutePath() + "/" };
-			mdb.deleteTracks(Tracks.PATH + " NOT LIKE ? || '%'", selectionArgs);
-			
-			updateTracksInDirectory(db, rootDir, lastUpdated);
-			
-			db.setTransactionSuccessful();
-			PreferenceUtils.putLong(PreferenceUtils.DB_LAST_UPDATED, System.currentTimeMillis());
-		}finally{
-			db.endTransaction();
-		}
-	}
-
-	// フォルダ内のトラックを再起呼び出しで更新
-	private void updateTracksInDirectory(SQLiteDatabase db, File dir, long lastUpdated)
-	{
-		File[] files = dir.listFiles();
-		String[] names = dir.list();
-		
-		if(Arrays.asList(names).contains(".nomedia")){
-			return;
-		}
-		
-		MusicDB mdb = new MusicDB(db);
-		
-		for(File file : files){
-			if(file.lastModified() < lastUpdated){
-				continue;
-			}
-			
-			if(file.isDirectory()){
-				updateTracksInDirectory(db, file, lastUpdated);
-			}else{
-				String where = MediaStore.Audio.Media.DATA + " LIKE ? || '%' AND " + MediaStore.Audio.Media.DATA + " NOT LIKE ? || '%/%'";
-				String[] whereArgs = { file.getAbsolutePath() };
-				List<Track> tracks = MyMediaStoreManager.getTracks(where, whereArgs);
-
-				if(tracks.size() == 0){
-					return;
-				}
-				
-				Track track = tracks.get(0);
-				
-				String[] columns = { Tracks.FILE_LAST_MODIFIED };
-				String[] selectionArgs = { track.path };
-				Cursor cursor = db.query(Tracks.TABLE, columns, Tracks.PATH + "= ?", selectionArgs, null, null, null);
-
-				try{
-					if(cursor.moveToFirst()){
-						long lastModified = cursor.getLong(cursor.getColumnIndex(Tracks.FILE_LAST_MODIFIED));
-
-						if(file.lastModified() == lastModified){
-							continue;
-						}
-					}
-				}finally{
-					cursor.close();
-				}
-
-				App.logd("MDBS Updating : " + track.title + " (" + track.path + ")");
-
-				getMediaMetadata(track);
-				track.fileLastModified = file.lastModified();
-
-				mdb.insertTrack(track);
-			}
-		}
-	}
-*/
 	// ACTION_UPDATE_TRACKS
 	private void updateTracks(List<String> paths)
 	{
