@@ -702,7 +702,7 @@ public class MusicDBService extends IntentService
 	private void updateNumSongsInPlaylist(SQLiteDatabase db, long playlistId)
 	{
 		String table = PlaylistTracks.TABLE + String.valueOf(playlistId);
-		Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + table + ";" , null);
+		Cursor cursor = db.rawQuery("SELECT COUNT(" + PlaylistTracks._ID + ") FROM " + table + ";" , null);
 		cursor.moveToFirst();
 		int songs = cursor.getInt(0);
 		cursor.close();
@@ -714,21 +714,6 @@ public class MusicDBService extends IntentService
 		db.update(Playlists.TABLE, values, Playlists._ID + " = ?", selectionArgs);
 	}
 
-	private void updateNumSongsInPlaylist(SQLiteDatabase db, long playlistId, int variation)
-	{
-		String stmt =
-			"UPDATE " + Playlists.TABLE + " SET " +
-			Playlists.NUMBER_OF_SONGS + " = " + Playlists.NUMBER_OF_SONGS + " + " + String.valueOf(variation) +
-			" WHERE " + Playlists._ID + " = " + String.valueOf(playlistId) + ";";
-
-		SQLiteStatement updateStmt = db.compileStatement(stmt);
-		try{
-			updateStmt.executeUpdateDelete();
-		}finally{
-			updateStmt.close();
-		}
-	}
-	
 	// PlaylistTrack
 
 	// ACTION_ADD_TO_PLAYLIST
@@ -752,7 +737,7 @@ public class MusicDBService extends IntentService
 				i++;
 			}
 
-			updateNumSongsInPlaylist(db, playlist.id, trackIds.size());
+			updateNumSongsInPlaylist(db, playlist.id);
 
 			db.setTransactionSuccessful();
 		}finally{
@@ -770,7 +755,7 @@ public class MusicDBService extends IntentService
 		try{
 			String stmt =
 				"DELETE FROM " + PlaylistTracks.TABLE + String.valueOf(playlist.id) +
-				" WHERE " + PlaylistTracks._ID + " = ?;";
+				" WHERE " + PlaylistTracks.TRACK_ID + " = ?;";
 
 			SQLiteStatement deleteStmt = db.compileStatement(stmt);
 
@@ -783,7 +768,7 @@ public class MusicDBService extends IntentService
 				deleteStmt.close();
 			}
 
-			updateNumSongsInPlaylist(db, playlist.id, -trackIds.size());
+			updateNumSongsInPlaylist(db, playlist.id);
 
 			// Playlist TrackNo を更新
 			List<PlaylistTrack> ptracks = playlist.getPlaylistTracks();
