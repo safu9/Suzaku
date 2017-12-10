@@ -1,19 +1,23 @@
 package com.citrus.suzaku.album;
 
-import android.content.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
+import android.content.Context;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.citrus.suzaku.App;
-import com.citrus.suzaku.ArtworkCache;
-import com.citrus.suzaku.base.BaseListAdapter;
-import com.citrus.suzaku.main.MainActivity;
-import com.citrus.suzaku.database.MusicDB;
 import com.citrus.suzaku.R;
+import com.citrus.suzaku.artwork.GlideApp;
+import com.citrus.suzaku.base.BaseListAdapter;
 import com.citrus.suzaku.base.TrackGroupListFragment;
+import com.citrus.suzaku.database.MusicDB;
+import com.citrus.suzaku.main.MainActivity;
 
-import java.util.*;
+import java.util.List;
 
 
 // Attached to MainActivity
@@ -75,11 +79,18 @@ public class AlbumListFragment extends TrackGroupListFragment<Album>
 			holder.artistTextView.setText(item.getArtistString());
 			holder.numSongsTextView.setText(item.getNumOfSongsString());
 
+/*
 			holder.artworkImageView.setImageResource(R.drawable.img_blank);
 			holder.artworkImageView.setTag(null);
 			if(ArtworkCache.isCorrectHash(item.artworkHash)){
 				ArtworkCache.Small.setArtworkView(holder.artworkImageView, item);
 			}
+*/
+
+			GlideApp.with(AlbumListFragment.this)
+					.load(item.getTracks().get(0))
+					.placeholder(R.drawable.img_blank)
+					.into(holder.artworkImageView);
 			
 			view.setActivated(getListView().isItemChecked(position));
 		}

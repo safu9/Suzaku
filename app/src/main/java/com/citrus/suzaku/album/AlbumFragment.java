@@ -7,6 +7,7 @@ import android.view.*;
 import android.widget.*;
 
 import com.citrus.suzaku.ArtworkCache;
+import com.citrus.suzaku.artwork.GlideApp;
 import com.citrus.suzaku.main.MainActivity;
 import com.citrus.suzaku.player.PlayerService;
 import com.citrus.suzaku.player.PlaylistManager;
@@ -63,7 +64,11 @@ public class AlbumFragment extends Fragment
 		songsTextView.setText(albumItem.getNumOfSongsString());
 
 		if(ArtworkCache.isCorrectHash(albumItem.artworkHash)){
-			ArtworkCache.Large.setArtworkView(artworkImageView, albumItem);
+			// ArtworkCache.Large.setArtworkView(artworkImageView, albumItem);
+
+			GlideApp.with(this)
+					.load(albumItem)
+					.into(artworkImageView);
 		}
 
 		// Fragment
