@@ -3,6 +3,7 @@ package com.citrus.suzaku.playlist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -67,7 +68,7 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 	public void onListItemClick(ListView l, View v, int position, long id)
 	{
 		Intent intent = PlayerService.newPlayIntent(PlaylistManager.PLAY_RANGE_TRACKS, playlist, position, false);
-		getActivity().startService(intent);
+		ContextCompat.startForegroundService(getActivity(), intent);
 
 		boolean ps = PreferenceUtils.getBoolean(PreferenceUtils.PLAYER_SCREEN);
 		if(ps){

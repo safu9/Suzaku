@@ -201,7 +201,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 				if(isStopped){
 					Intent intent = new Intent(PlayerService.ACTION_PLAY_PAUSE);
 					intent.setPackage(App.PACKAGE);
-					startService(intent);
+					ContextCompat.startForegroundService(TrackActivity.this, intent);
 				}else{
 					sendMessage(PlayerService.MSG_PLAY_PAUSE, null);
 				}

@@ -2,6 +2,7 @@ package com.citrus.suzaku.base;
 
 import android.content.*;
 import android.os.*;
+import android.support.v4.content.ContextCompat;
 import android.view.*;
 import android.widget.*;
 
@@ -45,7 +46,7 @@ public class TrackGroupTrackListFragment<T extends TrackGroup> extends TrackList
 	public void onListItemClick(ListView l, View v, int position, long id)
 	{
 		Intent intent = PlayerService.newPlayIntent(PlaylistManager.PLAY_RANGE_TRACKS, trackGroup, position, false);
-		getActivity().startService(intent);
+		ContextCompat.startForegroundService(getActivity(), intent);
 
 		boolean ps = PreferenceUtils.getBoolean(PreferenceUtils.PLAYER_SCREEN);
 		if(ps){

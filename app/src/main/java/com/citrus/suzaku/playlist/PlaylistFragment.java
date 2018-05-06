@@ -3,6 +3,7 @@ package com.citrus.suzaku.playlist;
 import android.content.*;
 import android.os.*;
 import android.support.v4.app.*;
+import android.support.v4.content.ContextCompat;
 import android.view.*;
 import android.widget.*;
 
@@ -116,7 +117,7 @@ public class PlaylistFragment extends Fragment
 			case R.id.menu_shuffle:
 
 				Intent intent = PlayerService.newPlayIntent(PlaylistManager.PLAY_RANGE_TRACKS, playlistItem, 0, true);
-				getActivity().startService(intent);
+				ContextCompat.startForegroundService(getActivity(), intent);
 
 				boolean ps = PreferenceUtils.getBoolean(PreferenceUtils.PLAYER_SCREEN);
 				if(ps){

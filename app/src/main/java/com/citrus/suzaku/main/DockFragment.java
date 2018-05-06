@@ -11,6 +11,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -91,7 +92,7 @@ public class DockFragment extends Fragment implements ServiceConnection
 					if(isStopped){
 						Intent intent = new Intent(PlayerService.ACTION_PLAY_PAUSE);
 						intent.setPackage(App.PACKAGE);
-						getActivity().startService(intent);
+						ContextCompat.startForegroundService(getActivity(), intent);
 					}else{
 						sendMessege(PlayerService.MSG_PLAY_PAUSE);
 					}

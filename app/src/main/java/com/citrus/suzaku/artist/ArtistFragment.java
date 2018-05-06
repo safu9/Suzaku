@@ -4,6 +4,7 @@ import android.content.*;
 import android.os.*;
 import android.support.design.widget.*;
 import android.support.v4.app.*;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.*;
 import android.view.*;
 import android.widget.*;
@@ -153,7 +154,7 @@ public class ArtistFragment extends Fragment
 				}else{
 					intent = PlayerService.newPlayIntent(PlaylistManager.PLAY_RANGE_TRACKS, albums.get(mPosition), 0, true);
 				}
-				getActivity().startService(intent);
+				ContextCompat.startForegroundService(getActivity(), intent);
 
 				boolean ps = PreferenceUtils.getBoolean(PreferenceUtils.PLAYER_SCREEN);
 				if(ps){

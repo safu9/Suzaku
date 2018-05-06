@@ -14,12 +14,12 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.citrus.suzaku.App;
-import com.citrus.suzaku.main.MainActivity;
 import com.citrus.suzaku.R;
-import com.citrus.suzaku.base.TrackGroupListFragment;
 import com.citrus.suzaku.base.BaseListAdapter;
+import com.citrus.suzaku.base.TrackGroupListFragment;
 import com.citrus.suzaku.database.MusicDB;
 import com.citrus.suzaku.database.MusicDBService;
+import com.citrus.suzaku.main.MainActivity;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;

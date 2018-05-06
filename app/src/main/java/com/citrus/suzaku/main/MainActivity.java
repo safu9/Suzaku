@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.PermissionChecker;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -155,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 			//! TODO : Add Tracks to Queue
 			
 			Intent serviceIntent = PlayerService.newPlayIntent(PlaylistManager.PLAY_RANGE_QUEUE, null, 0, false);
-			startService(serviceIntent);
+			ContextCompat.startForegroundService(this, serviceIntent);
 
 			boolean ps = PreferenceUtils.getBoolean(PreferenceUtils.PLAYER_SCREEN);
 			if(ps){
