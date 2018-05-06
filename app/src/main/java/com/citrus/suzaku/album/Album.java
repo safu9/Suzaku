@@ -1,15 +1,14 @@
 package com.citrus.suzaku.album;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.citrus.suzaku.App;
+import com.citrus.suzaku.R;
+import com.citrus.suzaku.base.TrackGroup;
 import com.citrus.suzaku.database.MusicDB;
 import com.citrus.suzaku.database.MusicDB.Albums;
 import com.citrus.suzaku.database.MusicDB.Tracks;
-import com.citrus.suzaku.R;
 import com.citrus.suzaku.track.Track;
-import com.citrus.suzaku.base.TrackGroup;
 
 import java.io.Serializable;
 import java.util.List;
@@ -22,8 +21,9 @@ public class Album extends TrackGroup implements Serializable
 	public String album;
 	public String albumSort;
 	public String artworkHash;
+	public long artistId;
 	public String artist;
-//	public long artistId;
+	public String artistSort;
 	public int numSongs;
 	public int year;
 	public boolean compilation;
@@ -38,7 +38,9 @@ public class Album extends TrackGroup implements Serializable
 		album = cursor.getString(cursor.getColumnIndex(Albums.ALBUM));
 		albumSort = cursor.getString(cursor.getColumnIndex(Albums.ALBUM_SORT));
 		artworkHash = cursor.getString(cursor.getColumnIndex(Albums.ARTWORK_HASH));
+		artistId = cursor.getLong(cursor.getColumnIndex(Albums.ARTIST_ID));
 		artist = cursor.getString(cursor.getColumnIndex(Albums.ARTIST));
+		artistSort = cursor.getString(cursor.getColumnIndex(Albums.ARTIST_SORT));
 		numSongs = cursor.getInt(cursor.getColumnIndex(Albums.NUMBER_OF_SONGS));
 		year = cursor.getInt(cursor.getColumnIndex(Albums.YEAR));
 		compilation = (cursor.getInt(cursor.getColumnIndex(Albums.COMPILATION)) != 0);
@@ -61,22 +63,6 @@ public class Album extends TrackGroup implements Serializable
 
 		return mdb.getTrackIds(Tracks.ALBUM_ID + "= ?", selectionArgs, Tracks.DISC_NO + "," + Tracks.TRACK_NO);
 	}
-
-	public ContentValues getContentValues()
-	{
-		ContentValues values = new ContentValues(8);
-
-		values.put(Albums._ID, id);
-		values.put(Albums.ALBUM, album);
-		values.put(Albums.ALBUM_SORT, albumSort);
-		values.put(Albums.ARTWORK_HASH, artworkHash);
-		values.put(Albums.ARTIST, artist);
-		values.put(Albums.YEAR, year);
-		values.put(Albums.NUMBER_OF_SONGS, numSongs);
-		values.put(Albums.COMPILATION, compilation);
-		
-		return values;
-	}
 	
 	// For Displaying String 
 	
@@ -87,11 +73,11 @@ public class Album extends TrackGroup implements Serializable
 	
 	public String getArtistString()
 	{
-		if(artist.equals(MusicDB._NULL)){
-			return App.getContext().getString(R.string.unknown_artist);
-		}else if(compilation){
+		if(compilation){
 			return App.getContext().getString(R.string.various_artists);
-		}else{
+		}else if(artist.equals(MusicDB._NULL)){
+			return App.getContext().getString(R.string.unknown_artist);
+		}else {
 			return artist;
 		}
 	}

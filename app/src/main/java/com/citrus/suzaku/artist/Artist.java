@@ -1,18 +1,19 @@
 package com.citrus.suzaku.artist;
 
-import android.content.*;
-import android.database.*;
+import android.database.Cursor;
 
 import com.citrus.suzaku.App;
-import com.citrus.suzaku.database.MusicDB;
-import com.citrus.suzaku.database.MusicDB.*;
-import com.citrus.suzaku.pref.PreferenceUtils;
 import com.citrus.suzaku.R;
-import com.citrus.suzaku.track.Track;
-import com.citrus.suzaku.base.TrackGroup;
 import com.citrus.suzaku.album.Album;
+import com.citrus.suzaku.base.TrackGroup;
+import com.citrus.suzaku.database.MusicDB;
+import com.citrus.suzaku.database.MusicDB.Albums;
+import com.citrus.suzaku.database.MusicDB.Artists;
+import com.citrus.suzaku.database.MusicDB.Tracks;
+import com.citrus.suzaku.pref.PreferenceUtils;
+import com.citrus.suzaku.track.Track;
 
-import java.util.*;
+import java.util.List;
 
 
 public class Artist extends TrackGroup
@@ -48,7 +49,7 @@ public class Artist extends TrackGroup
 		if(!gc){
 			return mdb.getTracks(Tracks.ARTIST_ID + "= ?", selectionArgs, Tracks.TITLE_SORT + MusicDB.COLLATE_LOCALIZED);
 		}else{
-			return mdb.getTracks(Tracks.ARTIST_ID + "= ? AND " + Tracks.COMPILATION + "= 0", selectionArgs, Tracks.TITLE_SORT + MusicDB.COLLATE_LOCALIZED);
+			return mdb.getTracks(Tracks.ALBUMARTIST_ID + "= ?", selectionArgs, Tracks.TITLE_SORT + MusicDB.COLLATE_LOCALIZED);
 		}
 	}
 
@@ -77,19 +78,6 @@ public class Artist extends TrackGroup
 			String[] selectionArgs = { String.valueOf(id) };
 			return mdb.getAlbums(Albums.ARTIST_ID + "= ? AND " + Albums.COMPILATION + "= 0", selectionArgs, Albums.ALBUM_SORT + MusicDB.COLLATE_LOCALIZED);
 		}
-	}
-	
-	public ContentValues getContentValues()
-	{
-		ContentValues values = new ContentValues(5);
-
-		values.put(Artists._ID, id);
-		values.put(Artists.ARTIST, artist);
-		values.put(Artists.ARTIST_SORT, artistSort);
-		values.put(Artists.NUMBER_OF_ALBUMS, numAlbums);
-		values.put(Artists.NUMBER_OF_SONGS, numSongs);
-		
-		return values;
 	}
 	
 	// For Displaying String 

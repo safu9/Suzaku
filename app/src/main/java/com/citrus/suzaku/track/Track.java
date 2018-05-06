@@ -1,6 +1,5 @@
 package com.citrus.suzaku.track;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.citrus.suzaku.App;
@@ -26,6 +25,7 @@ public class Track implements Serializable
 	public String album;
 	public long albumId;
 	public String albumSort;
+	public long albumArtistId;
 	public String albumArtist;
 	public String albumArtistSort;
 	public String composer;
@@ -56,6 +56,7 @@ public class Track implements Serializable
 		album = cursor.getString(cursor.getColumnIndex(Tracks.ALBUM));
 		albumId = cursor.getLong(cursor.getColumnIndex(Tracks.ALBUM_ID));
 		albumSort = cursor.getString(cursor.getColumnIndex(Tracks.ALBUM_SORT));
+		albumArtistId = cursor.getLong(cursor.getColumnIndex(Tracks.ALBUMARTIST_ID));
 		albumArtist = cursor.getString(cursor.getColumnIndex(Tracks.ALBUMARTIST));
 		albumArtistSort = cursor.getString(cursor.getColumnIndex(Tracks.ALBUMARTIST_SORT));
 		composer = cursor.getString(cursor.getColumnIndex(Tracks.COMPOSER));
@@ -69,37 +70,6 @@ public class Track implements Serializable
 		fileLastModified = cursor.getLong(cursor.getColumnIndex(Tracks.FILE_LAST_MODIFIED));
 		
 		artworkHash = cursor.getString(cursor.getColumnIndex(Tracks.ARTWORK_HASH));
-	}
-
-	public ContentValues getContentValues()
-	{
-		ContentValues values = new ContentValues(21);
-
-		values.put(Tracks._ID, id);
-		values.put(Tracks.PATH, path);
-		values.put(Tracks.TITLE, title);
-		values.put(Tracks.TITLE_SORT, titleSort);
-		values.put(Tracks.ARTIST, artist);
-		values.put(Tracks.ARTIST_ID, artistId);
-		values.put(Tracks.ARTIST_SORT, artistSort);
-		values.put(Tracks.ALBUM, album);
-		values.put(Tracks.ALBUM_ID, albumId);
-		values.put(Tracks.ALBUM_SORT, albumSort);
-		values.put(Tracks.ALBUMARTIST, albumArtist);
-		values.put(Tracks.ALBUMARTIST_SORT, albumArtistSort);
-		values.put(Tracks.COMPOSER, composer);
-		values.put(Tracks.GENRE, genre);
-		values.put(Tracks.TRACK_NO, trackNo);
-		values.put(Tracks.DISC_NO, discNo);
-		values.put(Tracks.DURATION, duration);
-		values.put(Tracks.YEAR, year);
-		values.put(Tracks.COMPILATION, compilation);
-
-		values.put(Tracks.FILE_LAST_MODIFIED, fileLastModified);
-
-		values.put(Tracks.ARTWORK_HASH, artworkHash);
-
-		return values;
 	}
 
 	// For Displaying String

@@ -1,19 +1,18 @@
 package com.citrus.suzaku.genre;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.citrus.suzaku.App;
+import com.citrus.suzaku.R;
+import com.citrus.suzaku.album.Album;
+import com.citrus.suzaku.base.TrackGroup;
 import com.citrus.suzaku.database.MusicDB;
 import com.citrus.suzaku.database.MusicDB.Albums;
 import com.citrus.suzaku.database.MusicDB.Genres;
 import com.citrus.suzaku.database.MusicDB.Tracks;
 import com.citrus.suzaku.database.MusicDBHelper;
-import com.citrus.suzaku.R;
 import com.citrus.suzaku.track.Track;
-import com.citrus.suzaku.base.TrackGroup;
-import com.citrus.suzaku.album.Album;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -61,13 +60,13 @@ public class Genre extends TrackGroup implements Serializable
 
 		String stmt =
 			"SELECT " + 
-			"t1." + Tracks.ALBUM_ID + " AS " + Albums._ID + ",t2." + Tracks.ALBUM + ",t2." + Albums.ALBUM_SORT + ",t2." + Albums.ARTIST +
-			",t2." + Tracks.ARTIST_ID + ",t2." + Albums.ARTWORK_HASH + ",t2." + Albums.YEAR + ",t1." + Albums.NUMBER_OF_SONGS + ",t2." + Albums.COMPILATION +
+			"t1." + Tracks.ALBUM_ID + " AS " + Albums._ID + "," + Albums.ALBUM + "," + Albums.ALBUM_SORT + "," + Albums.ARTIST_ID + "," + Albums.ARTIST +
+			"," + Albums.ARTIST_SORT + "," + Albums.ARTWORK_HASH + "," + Albums.YEAR + ",t1." + Albums.NUMBER_OF_SONGS + " AS " + Albums.NUMBER_OF_SONGS + "," + Albums.COMPILATION +
 			" FROM (" +
 				"SELECT " + Tracks.ALBUM_ID + ", COUNT(*) AS " + Albums.NUMBER_OF_SONGS +
 				" FROM " + Tracks.TABLE + " WHERE " + Tracks.GENRE + " = ? GROUP BY " + Tracks.ALBUM_ID +
 			") t1" +
-			" INNER JOIN " + Albums.TABLE + " t2 ON t1." + Tracks.ALBUM_ID + " = t2." + Albums._ID +
+			" INNER JOIN " + Albums.VIEW + " t2 ON t1." + Tracks.ALBUM_ID + " = t2." + Albums._ID +
 			" ORDER BY t2." + Albums.ALBUM_SORT + MusicDB.COLLATE_LOCALIZED + ";";
 
 		Cursor cursor = db.rawQuery(stmt, new String[]{ genre });
@@ -81,16 +80,6 @@ public class Genre extends TrackGroup implements Serializable
 		cursor.close();
 
 		return albums;
-	}
-	
-	public ContentValues getContentValues()
-	{
-		ContentValues values = new ContentValues(2);
-		
-		values.put(Genres._ID, id);
-		values.put(Genres.GENRE, genre);
-		
-		return values;
 	}
 
 	// For Displaying String 

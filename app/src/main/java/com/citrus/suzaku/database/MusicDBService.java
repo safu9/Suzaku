@@ -375,55 +375,12 @@ public class MusicDBService extends IntentService
 		
 		db.beginTransactionNonExclusive();
 		try{
-			db.execSQL("DELETE FROM " + Albums.TABLE + ";");
-
-			// 各アルバムで DISC_NO, TRACK_NO が最小のデータを INSERT
-			stmt =
-				"INSERT INTO " + Albums.TABLE + " (" +
-					Albums.ALBUM + "," + Albums.ALBUM_SORT + "," + Albums.ARTIST + "," + Albums.ARTIST_SORT + "," + Albums.ARTWORK_HASH + "," + Albums.YEAR + "," + Albums.NUMBER_OF_SONGS +
-				") " +
-				"SELECT t3." + Tracks.ALBUM + ",t3." + Tracks.ALBUM_SORT + ",t3." + Tracks.ALBUMARTIST + ",t3." + Tracks.ALBUMARTIST_SORT + ",t3." + Tracks.ARTWORK_HASH + ",t4." + Tracks.YEAR + ",t4." + Albums.NUMBER_OF_SONGS +
-				" FROM (" +
-					"SELECT " + Tracks.ALBUM + "," + Tracks.ALBUM_SORT + "," + Tracks.ALBUMARTIST + "," + Tracks.ALBUMARTIST_SORT + "," + Tracks.ARTWORK_HASH +
-					" FROM " + Tracks.TABLE + " t1 " +
-					"WHERE t1." + Tracks._ID + " = (" +
-						"SELECT " + Tracks._ID +
-						" FROM " + Tracks.TABLE + " t2 WHERE t1." + Tracks.ALBUM + " = t2." + Tracks.ALBUM + " ORDER BY " + Tracks.DISC_NO + "," + Tracks.TRACK_NO + " LIMIT 1" +
-					")" +
-				") t3 " +
-				"NATURAL INNER JOIN (" +
-					"SELECT " + Tracks.ALBUM + ", MAX(" + Tracks.YEAR + ") AS " + Tracks.YEAR + ", COUNT(" + Tracks._ID + ") AS " + Albums.NUMBER_OF_SONGS +
-					" FROM " + Tracks.TABLE + " GROUP BY " + Tracks.ALBUM +
-				") t4;";
-			//	"ON (t3." + Tracks.ALBUM + " = t4." + Tracks.ALBUM + ");";
-				
-			SQLiteStatement insertStmt = db.compileStatement(stmt);
-			try{
-				insertStmt.executeInsert();
-			}finally{
-				insertStmt.close();
-			}
-			
+			// 曲数を設定
 			stmt =
 				"UPDATE " + Albums.TABLE + " SET " +
-				Albums.COMPILATION + " = " + "(" +
-					"CASE WHEN (" +
-						"SELECT COUNT(DISTINCT " + Tracks.ALBUMARTIST + ") FROM " + Tracks.TABLE + " t " +
-						"WHERE t." + Tracks.ALBUM + " = " + Albums.TABLE + "." + Albums.ALBUM +
-					") > 1 THEN 1 ELSE 0 END" +
-				");";
-			
-			SQLiteStatement updateStmt2 = db.compileStatement(stmt);
-			try{
-				updateStmt2.executeUpdateDelete();
-			}finally{
-				updateStmt2.close();
-			}
-			
-			stmt =
-				"UPDATE " + Tracks.TABLE + " SET " +
-				Tracks.ALBUM_ID + " = (" +
-					"SELECT " + Albums._ID + " FROM " + Albums.TABLE + " t WHERE t." + Albums.ALBUM + " = " + Tracks.TABLE + "." + Tracks.ALBUM +
+				Albums.NUMBER_OF_SONGS + " = " + "(" +
+					"SELECT COUNT(*) FROM " + Tracks.TABLE + " t " +
+					"WHERE t." + Tracks.ALBUM_ID + " = " + Albums.TABLE + "." + Albums._ID +
 				");";
 
 			SQLiteStatement updateStmt = db.compileStatement(stmt);
@@ -432,7 +389,8 @@ public class MusicDBService extends IntentService
 			}finally{
 				updateStmt.close();
 			}
-			
+
+			// トラックにコンピレーションを設定
 			stmt =
 				"UPDATE " + Tracks.TABLE + " SET " +
 				Tracks.COMPILATION + " = 1 " +
@@ -465,83 +423,68 @@ public class MusicDBService extends IntentService
 		
 		db.beginTransactionNonExclusive();
 		try{
-			db.execSQL("DELETE FROM " + Artists.TABLE + ";");
-
 			if(!gc){
+				// 曲数を設定
 				stmt =
-					"INSERT INTO " + Artists.TABLE + "(" +
-						Artists.ARTIST + "," + Artists.ARTIST_SORT + "," + Artists.NUMBER_OF_SONGS + "," + Artists.NUMBER_OF_ALBUMS +
-					") SELECT " + 
-					"t." + Tracks.ARTIST + ",t." + Artists.ARTIST_SORT + ",t." + Artists.NUMBER_OF_SONGS + ",t." + Artists.NUMBER_OF_ALBUMS +
-					" FROM (" +
-						"SELECT " + Tracks.ARTIST + ", MAX(" + Tracks.ARTIST_SORT + ") AS " + Artists.ARTIST_SORT + ", COUNT(*) AS " + Artists.NUMBER_OF_SONGS + ", COUNT(DISTINCT " + Tracks.ALBUM + ") AS " + Artists.NUMBER_OF_ALBUMS +
-						" FROM " + Tracks.TABLE + " GROUP BY " + Tracks.ARTIST +
-					") t";
-					
-				SQLiteStatement insertStmt = db.compileStatement(stmt);
-				try{
-					insertStmt.executeInsert();
-				}finally{
-					insertStmt.close();
-				}
-
-				stmt =
-					"UPDATE " + Tracks.TABLE + " SET " +
-					Tracks.ARTIST_ID + " = (" +
-						"SELECT " + Artists._ID + " FROM " + Artists.TABLE + " t WHERE t." + Artists.ARTIST + " = " + Tracks.TABLE + "." + Tracks.ARTIST +
+					"UPDATE " + Artists.TABLE + " SET " +
+					Artists.NUMBER_OF_SONGS + " = (" +
+						"SELECT COUNT(*) AS " + Artists.NUMBER_OF_SONGS + " FROM " + Tracks.TABLE + " t " +
+						"WHERE t." + Tracks.ARTIST_ID + " = " + Artists.TABLE + "." + Artists._ID +
 					");";
-				
+
 				SQLiteStatement updateStmt = db.compileStatement(stmt);
 				try{
-					updateStmt.executeUpdateDelete();
+					updateStmt.executeInsert();
 				}finally{
 					updateStmt.close();
+				}
+
+				// アルバム数を設定
+				stmt =
+					"UPDATE " + Artists.TABLE + " SET " +
+					Artists.NUMBER_OF_ALBUMS + " = (" +
+						"SELECT COUNT(DISTINCT " + Tracks.ALBUM_ID + ") AS " + Artists.NUMBER_OF_ALBUMS + " FROM " + Tracks.TABLE + " t " +
+						"WHERE t." + Tracks.ARTIST_ID + " = " + Artists.TABLE + "." + Artists._ID +
+					");";
+
+				SQLiteStatement updateStmt2 = db.compileStatement(stmt);
+				try{
+					updateStmt2.executeInsert();
+				}finally{
+					updateStmt2.close();
 				}
 			}else{
+				// 曲数を設定
 				stmt =
-					"INSERT INTO " + Artists.TABLE + "(" +
-						Artists.ARTIST + "," + Artists.ARTIST_SORT + "," + Artists.NUMBER_OF_SONGS + "," + Artists.NUMBER_OF_ALBUMS +
-					") SELECT " + 
-					Albums.ARTIST + "," + Artists.ARTIST_SORT + "," + Artists.NUMBER_OF_SONGS + "," + Artists.NUMBER_OF_ALBUMS +
-					" FROM (" +
-						"SELECT " + Albums.ARTIST + ", MAX(" + Albums.ARTIST_SORT + ") AS " + Artists.ARTIST_SORT + ", SUM(" + Albums.NUMBER_OF_SONGS + ") AS " + Artists.NUMBER_OF_SONGS + ", COUNT(*) AS " + Artists.NUMBER_OF_ALBUMS +
-						" FROM " + Albums.TABLE + " WHERE " + Albums.COMPILATION + " = 0 GROUP BY " + Albums.ARTIST +
+					"UPDATE " + Artists.TABLE + " SET " +
+					Artists.NUMBER_OF_SONGS + " = (" +
+						"SELECT SUM(" + Albums.NUMBER_OF_SONGS + ") AS " + Artists.NUMBER_OF_SONGS + " FROM " + Albums.TABLE + " t " +
+						"WHERE t." + Albums.ARTIST_ID + " = " + Artists.TABLE + "." + Artists._ID + " AND t." + Albums.COMPILATION + "=0" +
 					");";
 
-				SQLiteStatement insertStmt = db.compileStatement(stmt);
-				try{
-					insertStmt.executeInsert();
-				}finally{
-					insertStmt.close();
-				}
-
-				stmt =
-					"UPDATE " + Tracks.TABLE + " SET " +
-					Tracks.ARTIST_ID + " = (" +
-						"SELECT " + Artists._ID + " FROM " + Artists.TABLE + " t WHERE t." + Artists.ARTIST + " = " + Tracks.TABLE + "." + Tracks.ALBUMARTIST +
-					");";
-			
 				SQLiteStatement updateStmt = db.compileStatement(stmt);
 				try{
-					updateStmt.executeUpdateDelete();
+					updateStmt.executeInsert();
 				}finally{
 					updateStmt.close();
 				}
+
+				// アルバム数を設定
+				stmt =
+					"UPDATE " + Artists.TABLE + " SET " +
+					Artists.NUMBER_OF_ALBUMS + " = (" +
+						"SELECT COUNT(*) AS " + Artists.NUMBER_OF_ALBUMS + " FROM " + Albums.TABLE + " t " +
+						"WHERE t." + Albums.ARTIST_ID + " = " + Artists.TABLE + "." + Artists._ID + " AND t." + Albums.COMPILATION + "=0" +
+					");";
+
+				SQLiteStatement updateStmt2 = db.compileStatement(stmt);
+				try{
+					updateStmt2.executeInsert();
+				}finally{
+					updateStmt2.close();
+				}
 			}
 
-			stmt =
-				"UPDATE " + Albums.TABLE + " SET " +
-				Albums.ARTIST_ID + " = (" +
-					"SELECT " + Artists._ID + " FROM " + Artists.TABLE + " t WHERE t." + Artists.ARTIST + " = " + Albums.TABLE + "." + Albums.ARTIST +
-				");";
-
-			SQLiteStatement updateStmt = db.compileStatement(stmt);
-			try{
-				updateStmt.executeUpdateDelete();
-			}finally{
-				updateStmt.close();
-			}
-			
 			db.setTransactionSuccessful();
 		}finally{
 			db.endTransaction();

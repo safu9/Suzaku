@@ -1,14 +1,13 @@
 package com.citrus.suzaku.playlist;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.citrus.suzaku.App;
 import com.citrus.suzaku.R;
-import com.citrus.suzaku.track.Track;
 import com.citrus.suzaku.base.TrackGroup;
 import com.citrus.suzaku.database.MusicDB;
 import com.citrus.suzaku.database.MusicDB.Playlists;
+import com.citrus.suzaku.track.Track;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -64,18 +63,6 @@ public class Playlist extends TrackGroup implements Serializable
 	{
 		MusicDB mdb = new MusicDB();
 		return mdb.getPlaylistTracks(id);
-	}
-	
-
-	public ContentValues getContentValues()
-	{
-		ContentValues values = new ContentValues(3);
-
-		values.put(Playlists._ID, id);
-		values.put(Playlists.TITLE, title);
-		values.put(Playlists.NUMBER_OF_SONGS, numSongs);
-		
-		return values;
 	}
 	
 	// For Displaying String

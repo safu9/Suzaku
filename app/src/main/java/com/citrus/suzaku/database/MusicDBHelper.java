@@ -1,11 +1,17 @@
 package com.citrus.suzaku.database;
 
-import android.content.*;
-import android.database.sqlite.*;
-import android.database.*;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import com.citrus.suzaku.App;
-import com.citrus.suzaku.database.MusicDB.*;
+import com.citrus.suzaku.database.MusicDB.Albums;
+import com.citrus.suzaku.database.MusicDB.Artists;
+import com.citrus.suzaku.database.MusicDB.Genres;
+import com.citrus.suzaku.database.MusicDB.PlaylistTracks;
+import com.citrus.suzaku.database.MusicDB.Playlists;
+import com.citrus.suzaku.database.MusicDB.Tracks;
 
 
 // SQLiteOpenHelper
@@ -59,6 +65,9 @@ public class MusicDBHelper extends SQLiteOpenHelper
 		createArtistTable(db);
 		createGenreTable(db);
 		createPlaylistTable(db);
+
+		createAlbumView(db);
+		createTrackView(db);
 	}
 
 	// 開くときにアップグレード
@@ -83,14 +92,8 @@ public class MusicDBHelper extends SQLiteOpenHelper
 				   Tracks.PATH + " TEXT UNIQUE NOT NULL," +
 				   Tracks.TITLE + " TEXT NOT NULL," +
 				   Tracks.TITLE_SORT + " TEXT," +
-				   Tracks.ARTIST + " TEXT," +
 				   Tracks.ARTIST_ID + " INTEGER," +
-				   Tracks.ARTIST_SORT + " TEXT," +
-				   Tracks.ALBUM + " TEXT," +
 				   Tracks.ALBUM_ID + " INTEGER," +
-				   Tracks.ALBUM_SORT + " TEXT," +
-				   Tracks.ALBUMARTIST + " TEXT," +
-				   Tracks.ALBUMARTIST_SORT + " TEXT," +
 				   Tracks.ARTWORK_HASH + " TEXT," +
 				   Tracks.COMPOSER + " TEXT," +
 				   Tracks.GENRE + " TEXT," +
@@ -107,12 +110,10 @@ public class MusicDBHelper extends SQLiteOpenHelper
 	{
 		db.execSQL("CREATE TABLE " + Albums.TABLE + " (" + 
 				   Albums._ID + " INTEGER PRIMARY KEY," +
-				   Albums.ALBUM + " TEXT," +
+				   Albums.ALBUM + " TEXT UNIQUE," +
 				   Albums.ALBUM_SORT + " TEXT," +
 				   Albums.ARTWORK_HASH + " TEXT," +
-				   Albums.ARTIST + " TEXT," +
 				   Albums.ARTIST_ID + " INTEGER," +
-				   Albums.ARTIST_SORT + " TEXT," +
 				   Albums.NUMBER_OF_SONGS + " INTEGER," +
 				   Albums.YEAR + " INTEGER," +
 				   Albums.COMPILATION + " INTEGER NOT NULL DEFAULT 0);");
@@ -122,7 +123,7 @@ public class MusicDBHelper extends SQLiteOpenHelper
 	{
 		db.execSQL("CREATE TABLE " + Artists.TABLE + " (" + 
 				   Artists._ID + " INTEGER PRIMARY KEY," +
-				   Artists.ARTIST + " TEXT," +
+				   Artists.ARTIST + " TEXT UNIQUE," +
 				   Artists.ARTIST_SORT + " TEXT," +
 				   Artists.NUMBER_OF_ALBUMS + " INTEGER," +
 				   Artists.NUMBER_OF_SONGS + " INTEGER);");
@@ -158,6 +159,7 @@ public class MusicDBHelper extends SQLiteOpenHelper
 				   PlaylistTracks.ALBUM + " TEXT," +
 				   PlaylistTracks.ALBUM_ID + " INTEGER," +
 				   PlaylistTracks.ALBUM_SORT + " TEXT," +
+				   PlaylistTracks.ALBUMARTIST_ID + " INTEGER," +
 				   PlaylistTracks.ALBUMARTIST + " TEXT," +
 				   PlaylistTracks.ALBUMARTIST_SORT + " TEXT," +
 				   PlaylistTracks.ARTWORK_HASH + " TEXT," +
@@ -171,7 +173,68 @@ public class MusicDBHelper extends SQLiteOpenHelper
 				   PlaylistTracks.FILE_LAST_MODIFIED + " INTEGER NOT NULL DEFAULT 0," +
 				   PlaylistTracks.PLAYLIST_TRACK_NO + " INTEGER);");
 	}
-	
+
+	private static void createAlbumView(SQLiteDatabase db)
+	{
+		db.execSQL("CREATE VIEW " + Albums.VIEW +
+				" AS SELECT " +
+				"al." + Albums._ID + "," +
+				"al." + Albums.ALBUM + "," +
+				"al." + Albums.ALBUM_SORT + "," +
+				"al." + Albums.ARTWORK_HASH + "," +
+
+				"ar." + Artists._ID + " AS " + Albums.ARTIST_ID + "," +
+				"ar." + Artists.ARTIST + "," +
+				"ar." + Artists.ARTIST_SORT + "," +
+
+				"al." + Albums.NUMBER_OF_SONGS + "," +
+				"al." + Albums.YEAR + "," +
+				"al." + Albums.COMPILATION +
+
+				" FROM " + Albums.TABLE + " al " +
+				" LEFT JOIN " + Artists.TABLE + " ar " +
+				" ON al." + Albums.ARTIST_ID + " = ar." + Artists._ID
+		);
+	}
+
+	private static void createTrackView(SQLiteDatabase db)
+	{
+		db.execSQL("CREATE VIEW " + Tracks.VIEW +
+				" AS SELECT " +
+				"t." + Tracks._ID + "," +
+				"t." + Tracks.PATH + "," +
+				"t." + Tracks.TITLE + "," +
+				"t." + Tracks.TITLE_SORT + "," +
+
+				"al." + Albums._ID + " AS " + Tracks.ALBUM_ID + "," +
+				"al." + Albums.ALBUM + "," +
+				"al." + Albums.ALBUM_SORT + "," +
+				"al." + Albums.ARTIST_ID + " AS " + Tracks.ALBUMARTIST_ID + "," +
+				"al." + Albums.ARTIST + " AS " + Tracks.ALBUMARTIST + "," +
+				"al." + Albums.ARTIST_SORT + " AS " + Tracks.ALBUMARTIST_SORT + "," +
+
+				"ar." + Artists._ID + " AS " + Tracks.ARTIST_ID + "," +
+				"ar." + Tracks.ARTIST + "," +
+				"ar." + Tracks.ARTIST_SORT + "," +
+
+				"t." + Tracks.ARTWORK_HASH + "," +
+				"t." + Tracks.COMPOSER + "," +
+				"t." + Tracks.GENRE + "," +
+				"t." + Tracks.TRACK_NO + "," +
+				"t." + Tracks.DISC_NO + "," +
+				"t." + Tracks.DURATION + "," +
+				"t." + Tracks.YEAR + "," +
+				"t." + Tracks.COMPILATION + "," +
+				"t." + Tracks.FILE_LAST_MODIFIED + "," +
+				"t." + Tracks.FLAG +
+
+				" FROM " + Tracks.TABLE + " t " +
+				" LEFT JOIN " + Albums.VIEW + " al " +
+				" ON t." + Tracks.ALBUM_ID + " = al." + Albums._ID +
+				" LEFT JOIN " + Artists.TABLE + " ar " +
+				" ON t." + Tracks.ARTIST_ID + " = ar." + Artists._ID
+		);
+	}
 }
 	
 	
