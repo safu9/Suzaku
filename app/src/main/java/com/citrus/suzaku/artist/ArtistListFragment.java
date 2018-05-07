@@ -125,9 +125,9 @@ public class ArtistListFragment extends TrackGroupListFragment<Artist>
 
 			ViewHolder holder = new ViewHolder();
 
-			holder.artistTextView = (TextView)view.findViewById(R.id.title_view);
-			holder.numAlbumsTextView = (TextView)view.findViewById(R.id.albums_view);
-			holder.numSongsTextView = (TextView)view.findViewById(R.id.songs_view);
+			holder.artistTextView = view.findViewById(R.id.title_view);
+			holder.numAlbumsTextView = view.findViewById(R.id.albums_view);
+			holder.numSongsTextView = view.findViewById(R.id.songs_view);
 
 			view.setTag(holder);
 

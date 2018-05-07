@@ -104,11 +104,11 @@ public class PlaylistListFragment extends TrackGroupListFragment<Playlist>
 
 			ViewHolder holder = new ViewHolder();
 
-			holder.titleTextView = (TextView)view.findViewById(R.id.title_view);
-			holder.songsTextView = (TextView)view.findViewById(R.id.songs_view);
+			holder.titleTextView = view.findViewById(R.id.title_view);
+			holder.songsTextView = view.findViewById(R.id.songs_view);
 
 
-			holder.popupButton = (ImageButton)view.findViewById(R.id.popup_button);
+			holder.popupButton = view.findViewById(R.id.popup_button);
 			holder.popupButton.setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View v)

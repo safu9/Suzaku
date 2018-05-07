@@ -81,7 +81,7 @@ public class GenreListFragment extends TrackGroupListFragment<Genre>
 			View view = inflater.inflate(R.layout.listitem_genre, parent, false);
 
 			ViewHolder holder = new ViewHolder();
-			holder.genreTextView = (TextView)view.findViewById(R.id.genre_view);
+			holder.genreTextView = view.findViewById(R.id.genre_view);
 
 			view.setTag(holder);
 

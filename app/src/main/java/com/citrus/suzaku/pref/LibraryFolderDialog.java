@@ -41,8 +41,8 @@ public class LibraryFolderDialog extends PreferenceDialogFragmentCompat implemen
         LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.dialog_library_folder, null, false);
 
-        Button okButton = (Button)view.findViewById(R.id.ok_button);
-        Button cancelButton = (Button)view.findViewById(R.id.cancel_button);
+        Button okButton = view.findViewById(R.id.ok_button);
+        Button cancelButton = view.findViewById(R.id.cancel_button);
 
         okButton.setOnClickListener(this);
         cancelButton.setOnClickListener(this);
@@ -51,10 +51,10 @@ public class LibraryFolderDialog extends PreferenceDialogFragmentCompat implemen
         adapter.setDataList(paths);
 
         View footer = inflater.inflate(R.layout.listitem_text, null, false);
-        TextView textView = (TextView)footer.findViewById(R.id.title_view);
+        TextView textView = footer.findViewById(R.id.title_view);
         textView.setText(R.string.add_folder);
 
-        ListView listView = (ListView)view.findViewById(R.id.list);
+        ListView listView = view.findViewById(R.id.list);
         listView.addFooterView(footer);
         listView.setOnItemClickListener(this);
         listView.setAdapter(adapter);
@@ -143,8 +143,8 @@ public class LibraryFolderDialog extends PreferenceDialogFragmentCompat implemen
 
             ViewHolder holder = new ViewHolder();
 
-            holder.dirNameTextView = (TextView)view.findViewById(R.id.name_view);
-            holder.clearButton = (ImageButton)view.findViewById(R.id.clear_button);
+            holder.dirNameTextView = view.findViewById(R.id.name_view);
+            holder.clearButton = view.findViewById(R.id.clear_button);
 
             holder.clearButton.setOnClickListener(new View.OnClickListener()
             {

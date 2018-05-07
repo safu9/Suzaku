@@ -50,13 +50,13 @@ public class LibraryFolderSelectDialog extends DialogFragment implements Adapter
 
 		View view = inflater.inflate(R.layout.dialog_library_folder, null);
 
-		Button okButton = (Button)view.findViewById(R.id.ok_button);
-		Button cancelButton = (Button)view.findViewById(R.id.cancel_button);
+		Button okButton = view.findViewById(R.id.ok_button);
+		Button cancelButton = view.findViewById(R.id.cancel_button);
 
 		okButton.setOnClickListener(this);
 		cancelButton.setOnClickListener(this);
 
-		ListView listView = (ListView)view.findViewById(R.id.list);
+		ListView listView = view.findViewById(R.id.list);
 		listView.setOnItemClickListener(this);
 
 		adapter = new FileArrayAdapter();
@@ -220,8 +220,8 @@ public class LibraryFolderSelectDialog extends DialogFragment implements Adapter
 			View view = inflater.inflate(R.layout.dialog_listitem_dir, parent, false);
 
 			ViewHolder holder = new ViewHolder();
-			holder.iconView = (ImageView)view.findViewById(R.id.icon_view);
-			holder.dirNameView = (TextView)view.findViewById(R.id.name_view);
+			holder.iconView = view.findViewById(R.id.icon_view);
+			holder.dirNameView = view.findViewById(R.id.name_view);
 
 			view.setTag(holder);
 

@@ -64,7 +64,7 @@ public class DockFragment extends Fragment implements ServiceConnection
 
 		// UI
 
-		LinearLayout dock = (LinearLayout)view.findViewById(R.id.dock);
+		LinearLayout dock = view.findViewById(R.id.dock);
 		dock.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v){
@@ -74,15 +74,15 @@ public class DockFragment extends Fragment implements ServiceConnection
 			}
 		});
 
-		trackTextView = (TextView)view.findViewById(R.id.track_view);
-		albumTextView = (TextView)view.findViewById(R.id.album_view);
-		artistTextView = (TextView)view.findViewById(R.id.artist_view);
+		trackTextView = view.findViewById(R.id.track_view);
+		albumTextView = view.findViewById(R.id.album_view);
+		artistTextView = view.findViewById(R.id.artist_view);
 
-		artworkImageView = (ImageView)view.findViewById(R.id.artwork_view);
+		artworkImageView = view.findViewById(R.id.artwork_view);
 
-		playButton = (ImageButton)view.findViewById(R.id.play_button);
-		ImageButton prevButton = (ImageButton)view.findViewById(R.id.prev_button);
-		ImageButton nextButton = (ImageButton)view.findViewById(R.id.next_button);
+		playButton = view.findViewById(R.id.play_button);
+		ImageButton prevButton = view.findViewById(R.id.prev_button);
+		ImageButton nextButton = view.findViewById(R.id.next_button);
 
 		playButton.setImageResource(R.drawable.ic_play_white_32dp);
 		playButton.setOnClickListener(new ImageButton.OnClickListener(){

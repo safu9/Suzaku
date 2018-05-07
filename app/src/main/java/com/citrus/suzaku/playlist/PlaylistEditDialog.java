@@ -48,9 +48,9 @@ public class PlaylistEditDialog extends DialogFragment implements View.OnClickLi
 		LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View content = inflater.inflate(R.layout.dialog_create_playlist, null, false);
 
-		editText = (EditText)content.findViewById(R.id.title_edit);
-		Button okButton = (Button)content.findViewById(R.id.ok_button);
-		Button cancelButton = (Button)content.findViewById(R.id.cancel_button);
+		editText = content.findViewById(R.id.title_edit);
+		Button okButton = content.findViewById(R.id.ok_button);
+		Button cancelButton = content.findViewById(R.id.cancel_button);
 		
 		editText.setText(playlist.title);
 		okButton.setOnClickListener(this);

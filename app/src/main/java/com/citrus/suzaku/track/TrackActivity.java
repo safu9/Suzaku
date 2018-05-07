@@ -110,12 +110,12 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		View content = findViewById(android.R.id.content);
 		content.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_FULLSCREEN);
 */
-		titleTextView = (TextView)findViewById(R.id.track_view);
-		albumTextView = (TextView)findViewById(R.id.album_view);
-		artistTextView = (TextView)findViewById(R.id.artist_view);
-		artworkImageButton = (ImageButton)findViewById(R.id.artwork_view);
+		titleTextView = findViewById(R.id.track_view);
+		albumTextView = findViewById(R.id.album_view);
+		artistTextView = findViewById(R.id.artist_view);
+		artworkImageButton = findViewById(R.id.artwork_view);
 
-		ImageButton navBeforeButton = (ImageButton)findViewById(R.id.nav_before_button);
+		ImageButton navBeforeButton = findViewById(R.id.nav_before_button);
 		navBeforeButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -125,7 +125,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			}
 		});
 
-		popupButton = (ImageButton)findViewById(R.id.popup_button);
+		popupButton = findViewById(R.id.popup_button);
 		popupButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -138,7 +138,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			}
 		});
 
-		closeButton = (ImageButton)findViewById(R.id.close_button);
+		closeButton = findViewById(R.id.close_button);
 		closeButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -157,7 +157,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			}
 		});
 
-		durationBar = (SeekBar)findViewById(R.id.duration_bar);
+		durationBar = findViewById(R.id.duration_bar);
 		
 		durationBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
 			@Override
@@ -182,16 +182,16 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			}
 		});
 		
-		chronometer = (Chronometer)findViewById(R.id.chronometer);
+		chronometer = findViewById(R.id.chronometer);
 		chronometer.setOnChronometerTickListener(this);
 		
-		numberTextView = (TextView)findViewById(R.id.number_view);
+		numberTextView = findViewById(R.id.number_view);
 		
-		playButton = (ImageButton)findViewById(R.id.play_button);
-		ImageButton prevButton = (ImageButton)findViewById(R.id.prev_button);
-		ImageButton nextButton = (ImageButton)findViewById(R.id.next_button);
-		loopButton = (ImageButton)findViewById(R.id.loop_button);
-		shuffleButton = (ImageButton)findViewById(R.id.shuffle_button);
+		playButton = findViewById(R.id.play_button);
+		ImageButton prevButton = findViewById(R.id.prev_button);
+		ImageButton nextButton = findViewById(R.id.next_button);
+		loopButton = findViewById(R.id.loop_button);
+		shuffleButton = findViewById(R.id.shuffle_button);
 		
 		playButton.setImageResource(R.drawable.ic_pause_white_32dp);
 		playButton.setOnClickListener(new ImageButton.OnClickListener(){
@@ -245,9 +245,9 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 		panelView = findViewById(R.id.panel);
 		panelView.setVisibility(View.GONE);
 
-		lyricsScrollView = (ScrollView)findViewById(R.id.lyrics_scroll);
+		lyricsScrollView = findViewById(R.id.lyrics_scroll);
 
-		lyricsTextView = (TextView)findViewById(R.id.lyrics_view);
+		lyricsTextView = findViewById(R.id.lyrics_view);
 		lyricsTextView.setClickable(true);
 		lyricsTextView.setOnClickListener(new View.OnClickListener(){
 			@Override
@@ -257,7 +257,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			}
 		});
 
-		Button detailButton = (Button)findViewById(R.id.detail_button);
+		Button detailButton = findViewById(R.id.detail_button);
 		detailButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -274,7 +274,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			}
 		});
 
-		switchPanelButton = (Button)findViewById(R.id.switch_panel_button);
+		switchPanelButton = findViewById(R.id.switch_panel_button);
 		switchPanelButton.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -284,7 +284,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 			}
 		});
 
-		playlistView = (ListView)findViewById(R.id.playlist);
+		playlistView = findViewById(R.id.playlist);
 		playlistAdapter = new PlaylistTrackListAdapter();
 		playlistAdapter.setDataList(playlist.getPlaylist());
 		playlistView.setAdapter(playlistAdapter);
@@ -674,9 +674,9 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 
 			ViewHolder holder = new ViewHolder();
 
-			holder.trackTextView = (TextView)view.findViewById(R.id.title_view);
-			holder.artistTextView = (TextView)view.findViewById(R.id.artist_view);
-			holder.durationTextView = (TextView)view.findViewById(R.id.duration_view);
+			holder.trackTextView = view.findViewById(R.id.title_view);
+			holder.artistTextView = view.findViewById(R.id.artist_view);
+			holder.durationTextView = view.findViewById(R.id.duration_view);
 
 			view.setTag(holder);
 

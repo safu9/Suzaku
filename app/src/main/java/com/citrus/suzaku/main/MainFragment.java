@@ -48,8 +48,8 @@ public class MainFragment extends Fragment
 		
 		// Tab
 
-		mTabs = (TabLayout)view.findViewById(R.id.tabs);
-		mViewPager = (ViewPager)view.findViewById(R.id.pager);
+		mTabs = view.findViewById(R.id.tabs);
+		mViewPager = view.findViewById(R.id.pager);
 		
 		mPagerAdapter = new MyPagerAdapter(getChildFragmentManager());
 		mViewPager.setAdapter(mPagerAdapter);
@@ -61,7 +61,7 @@ public class MainFragment extends Fragment
 
 		for(int i = 0; i < mPagerAdapter.getCount(); i++){
 			View tab = inflater.inflate(R.layout.tab_item_main, null, false);
-			TextView titleView = (TextView)tab.findViewById(R.id.title_view);
+			TextView titleView = tab.findViewById(R.id.title_view);
 			titleView.setText(mPagerAdapter.getPageTitle(i));
 
 			mTabs.getTabAt(i).setCustomView(tab);

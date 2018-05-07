@@ -71,12 +71,12 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 		View content = findViewById(android.R.id.content);
 		content.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 */
-		toolbar = (Toolbar) findViewById(R.id.toolbar);
+		toolbar = findViewById(R.id.toolbar);
 		toolbar.setTitle(R.string.app_name);
 		setSupportActionBar(toolbar);
 
 		
-		mDrawer = (DrawerLayout)findViewById(R.id.drawerLayout);
+		mDrawer = findViewById(R.id.drawerLayout);
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer, R.string.open_drawer, R.string.close_drawer){
 			@Override
 			public void onDrawerOpened(View drawer){
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
 		
-		ListView drawerList = (ListView)findViewById(R.id.drawer_list);
+		ListView drawerList = findViewById(R.id.drawer_list);
 		String[] tabTitles = getResources().getStringArray(R.array.tabs);
 		drawerList.setAdapter(new ArrayAdapter<>(this, R.layout.listitem_text, R.id.title_view, tabTitles));
 		drawerList.setOnItemClickListener(this);

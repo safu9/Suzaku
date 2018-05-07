@@ -37,7 +37,7 @@ public class ProgressDialog extends DialogFragment
 		View view = inflater.inflate(R.layout.dialog_progress, null, false);
 
 //		mProgressBar = (ProgressBar)view.findViewById(R.id.progress);
-		mMessageView = (TextView)view.findViewById(R.id.message_view);
+		mMessageView = view.findViewById(R.id.message_view);
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(getArguments().getString("TITLE"));

@@ -60,10 +60,10 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 		adapter.setDataList(playlists);
 		
 		View header = inflater.inflate(R.layout.listitem_text, null, false);
-		TextView textView = (TextView)header.findViewById(R.id.title_view);
+		TextView textView = header.findViewById(R.id.title_view);
 		textView.setText(R.string.create_new_playlist);
 		
-		ListView listView = (ListView)content.findViewById(R.id.list);
+		ListView listView = content.findViewById(R.id.list);
 		listView.addHeaderView(header);
 		listView.setOnItemClickListener(this);
 		listView.setAdapter(adapter);
@@ -154,8 +154,8 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 
 			ViewHolder holder = new ViewHolder();
 
-			holder.titleTextView = (TextView)view.findViewById(R.id.title_view);
-			holder.songsTextView = (TextView)view.findViewById(R.id.songs_view);
+			holder.titleTextView = view.findViewById(R.id.title_view);
+			holder.songsTextView = view.findViewById(R.id.songs_view);
 
 			view.setTag(holder);
 

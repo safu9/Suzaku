@@ -54,10 +54,10 @@ public class AlbumFragment extends Fragment
 
 		((MainActivity)getActivity()).getSupportActionBar().setTitle(R.string.album);
 
-		TextView albumTextView = (TextView)view.findViewById(R.id.album_view);
-		TextView artistTextView = (TextView)view.findViewById(R.id.artist_view);
-		TextView songsTextView = (TextView)view.findViewById(R.id.songs_view);
-		artworkImageView = (ImageView)view.findViewById(R.id.artwork_view);
+		TextView albumTextView = view.findViewById(R.id.album_view);
+		TextView artistTextView = view.findViewById(R.id.artist_view);
+		TextView songsTextView = view.findViewById(R.id.songs_view);
+		artworkImageView = view.findViewById(R.id.artwork_view);
 
 		albumTextView.setText(albumItem.getAlbumString());
 		artistTextView.setText(albumItem.getArtistString());

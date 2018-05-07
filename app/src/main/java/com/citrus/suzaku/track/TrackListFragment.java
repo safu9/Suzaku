@@ -107,9 +107,9 @@ public class TrackListFragment extends BaseListFragment<Track>
 
 			ViewHolder holder = new ViewHolder();
 
-			holder.trackTextView = (TextView)view.findViewById(R.id.title_view);
-			holder.artistTextView = (TextView)view.findViewById(R.id.artist_view);
-			holder.durationTextView = (TextView)view.findViewById(R.id.duration_view);
+			holder.trackTextView = view.findViewById(R.id.title_view);
+			holder.artistTextView = view.findViewById(R.id.artist_view);
+			holder.durationTextView = view.findViewById(R.id.duration_view);
 
 		/*
 			holder.popupButton = (ImageButton)view.findViewById(R.id.popupButton);

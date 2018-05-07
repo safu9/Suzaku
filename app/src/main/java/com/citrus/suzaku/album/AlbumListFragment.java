@@ -91,10 +91,10 @@ public class AlbumListFragment extends TrackGroupListFragment<Album>
 
 			ViewHolder holder = new ViewHolder();
 
-			holder.albumTextView = (TextView)view.findViewById(R.id.title_view);
-			holder.artistTextView = (TextView)view.findViewById(R.id.artist_view);
-			holder.numSongsTextView = (TextView)view.findViewById(R.id.songs_view);
-			holder.artworkImageView = (ImageView)view.findViewById(R.id.artwork_view);
+			holder.albumTextView = view.findViewById(R.id.title_view);
+			holder.artistTextView = view.findViewById(R.id.artist_view);
+			holder.numSongsTextView = view.findViewById(R.id.songs_view);
+			holder.artworkImageView = view.findViewById(R.id.artwork_view);
 
 			view.setTag(holder);
 

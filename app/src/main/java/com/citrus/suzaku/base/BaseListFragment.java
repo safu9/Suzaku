@@ -65,8 +65,8 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 		super.onActivityCreated(savedInstanceState);
 		
 		View view = getView();
-		mListView = (ListView)view.findViewById(android.R.id.list);
-		mEmptyView = (TextView)view.findViewById(android.R.id.empty);
+		mListView = view.findViewById(android.R.id.list);
+		mEmptyView = view.findViewById(android.R.id.empty);
 
 //		listView.setMultiChoiceModeListener(this);
 

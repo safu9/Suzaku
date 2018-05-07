@@ -64,9 +64,9 @@ public class PlaylistFragment extends Fragment
 
 		((MainActivity)getActivity()).getSupportActionBar().setTitle(R.string.playlist);
 
-		titleTextView = (TextView)view.findViewById(R.id.title_view);
-		songsTextView = (TextView)view.findViewById(R.id.songs_view);
-		artworkImageView = (ImageView)view.findViewById(R.id.artwork_view);
+		titleTextView = view.findViewById(R.id.title_view);
+		songsTextView = view.findViewById(R.id.songs_view);
+		artworkImageView = view.findViewById(R.id.artwork_view);
 		
 		updateView();
 

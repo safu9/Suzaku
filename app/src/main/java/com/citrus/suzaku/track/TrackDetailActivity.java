@@ -119,14 +119,14 @@ public class TrackDetailActivity extends AppCompatActivity
 
 		// UI
 
-		mToolbar = (Toolbar) findViewById(R.id.toolbar);
+		mToolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(mToolbar);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Tab
 
-		mTabs = (TabLayout)findViewById(R.id.tabs);
-		mViewPager = (ViewPager)findViewById(R.id.pager);
+		mTabs = findViewById(R.id.tabs);
+		mViewPager = findViewById(R.id.pager);
 		
 		// Data
 
@@ -166,7 +166,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		for(int i = 0; i < mPagerAdapter.getCount(); i++){
 			View tab = inflater.inflate(R.layout.tab_item_main, null, false);
-			TextView titleView = (TextView)tab.findViewById(R.id.title_view);
+			TextView titleView = tab.findViewById(R.id.title_view);
 
 			titleView.setText(mPagerAdapter.getPageTitle(i));
 
@@ -979,11 +979,11 @@ public class TrackDetailActivity extends AppCompatActivity
 			View view = inflater.inflate(R.layout.fragment_track_detail_info, container, false);
 			
 			for(int i = 0; i < ITEM_NUM; i++){
-				mEditTexts[i] = (EditText)view.findViewById(IDS[i]);
+				mEditTexts[i] = view.findViewById(IDS[i]);
 				mEditTexts[i].addTextChangedListener(new MyTextWatcher(i));
 			}
 
-			compilationCheckBox = (CheckBox)view.findViewById(R.id.compilation_check);
+			compilationCheckBox = view.findViewById(R.id.compilation_check);
 			compilationCheckBox.setOnClickListener(new View.OnClickListener()
 			{
 				@Override
@@ -996,7 +996,7 @@ public class TrackDetailActivity extends AppCompatActivity
 
 			boolean isMultiple = getArguments().getBoolean("MULTIPLE");
 			if(isMultiple){														// 複数曲モードではタイトル非表示
-				TextView titleLabel = (TextView)view.findViewById(R.id.title_label);
+				TextView titleLabel = view.findViewById(R.id.title_label);
 				titleLabel.setVisibility(View.GONE);
 				mEditTexts[0].setVisibility(View.GONE);
 			}
@@ -1137,9 +1137,9 @@ public class TrackDetailActivity extends AppCompatActivity
 			
 			View view = inflater.inflate(R.layout.fragment_track_detail_artwork, container, false);
 
-			artworkImageView = (ImageView)view.findViewById(R.id.artwork_view);
+			artworkImageView = view.findViewById(R.id.artwork_view);
 
-			Button galleryButton = (Button)view.findViewById(R.id.gallery_button);
+			Button galleryButton = view.findViewById(R.id.gallery_button);
 			galleryButton.setOnClickListener(new View.OnClickListener()
 			{
 				@Override
@@ -1162,7 +1162,7 @@ public class TrackDetailActivity extends AppCompatActivity
 				}
 			});
 
-			deleteButton = (Button)view.findViewById(R.id.delete_button);
+			deleteButton = view.findViewById(R.id.delete_button);
 			deleteButton.setOnClickListener(new View.OnClickListener()
 			{
 				@Override
@@ -1174,7 +1174,7 @@ public class TrackDetailActivity extends AppCompatActivity
 				}
 			});
 
-			undoButton = (Button)view.findViewById(R.id.undo_button);
+			undoButton = view.findViewById(R.id.undo_button);
 			undoButton.setOnClickListener(new View.OnClickListener()
 			{
 				@Override
@@ -1276,7 +1276,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
 			View view = inflater.inflate(R.layout.fragment_track_detail_lyrics, container, false);
-			lyricsEditText = (EditText)view.findViewById(R.id.lyrics_edit);
+			lyricsEditText = view.findViewById(R.id.lyrics_edit);
 			lyricsEditText.addTextChangedListener(new MyTextWatcher());
 			
 			updateView();
@@ -1370,17 +1370,17 @@ public class TrackDetailActivity extends AppCompatActivity
 			View view = inflater.inflate(R.layout.fragment_track_detail_sort, container, false);
 
 			for(int i = 0; i < ITEM_NUM; i++){
-				mEditTexts[i] = (EditText)view.findViewById(IDS[i]);
+				mEditTexts[i] = view.findViewById(IDS[i]);
 				mEditTexts[i].addTextChangedListener(new MyTextWatcher(i));
 			}
 
 			boolean isMultiple = getArguments().getBoolean("MULTIPLE");
 			if(isMultiple){														// 複数曲モードではタイトル非表示
-				TextView titleLabel = (TextView)view.findViewById(R.id.title_label);
+				TextView titleLabel = view.findViewById(R.id.title_label);
 				titleLabel.setVisibility(View.GONE);
 				mEditTexts[0].setVisibility(View.GONE);
 
-				TextView titleSortLabel = (TextView)view.findViewById(R.id.title_sort_label);
+				TextView titleSortLabel = view.findViewById(R.id.title_sort_label);
 				titleSortLabel.setVisibility(View.GONE);
 				mEditTexts[1].setVisibility(View.GONE);
 			}
@@ -1471,12 +1471,12 @@ public class TrackDetailActivity extends AppCompatActivity
 
 			View view = inflater.inflate(R.layout.fragment_track_detail_file, container, false);
 
-			pathTextView = (TextView)view.findViewById(R.id.path_view);
+			pathTextView = view.findViewById(R.id.path_view);
 
-			lengthTextView = (TextView)view.findViewById(R.id.length_view);
-			bitrateTextView = (TextView)view.findViewById(R.id.bitrate_view);
-			sampleRateTextView = (TextView)view.findViewById(R.id.sample_rate_view);
-			channelsTextView = (TextView)view.findViewById(R.id.channels_view);
+			lengthTextView = view.findViewById(R.id.length_view);
+			bitrateTextView = view.findViewById(R.id.bitrate_view);
+			sampleRateTextView = view.findViewById(R.id.sample_rate_view);
+			channelsTextView = view.findViewById(R.id.channels_view);
 
 			updateView();
 

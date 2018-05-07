@@ -75,17 +75,17 @@ public class ArtistFragment extends Fragment
 		
 		((MainActivity)getActivity()).getSupportActionBar().setTitle(R.string.artist);
 		
-		titleTextView = (TextView)view.findViewById(R.id.artist_view);
-		subTextView1 = (TextView)view.findViewById(R.id.albums_view);
-		subTextView2 = (TextView)view.findViewById(R.id.songs_view);
-		artworkImageView = (ImageView)view.findViewById(R.id.artwork_view);
+		titleTextView = view.findViewById(R.id.artist_view);
+		subTextView1 = view.findViewById(R.id.albums_view);
+		subTextView2 = view.findViewById(R.id.songs_view);
+		artworkImageView = view.findViewById(R.id.artwork_view);
 
 		updateView();
 		
 		// Tab
 
-		mTabs = (TabLayout)view.findViewById(R.id.tabs);
-		mViewPager = (ViewPager)view.findViewById(R.id.pager);
+		mTabs = view.findViewById(R.id.tabs);
+		mViewPager = view.findViewById(R.id.pager);
 		
 		mPagerAdapter = new ArtistPagerAdapter(getChildFragmentManager());
 		mViewPager.setAdapter(mPagerAdapter);
@@ -99,7 +99,7 @@ public class ArtistFragment extends Fragment
 			Album item = albums.get(i);
 
 			View tab = inflater.inflate(R.layout.tab_item_album, null, false);
-			ImageView imageView = (ImageView)tab.findViewById(R.id.artwork_view);
+			ImageView imageView = tab.findViewById(R.id.artwork_view);
 
 			if(i == 0){
 				imageView.setImageResource(R.drawable.img_all);
