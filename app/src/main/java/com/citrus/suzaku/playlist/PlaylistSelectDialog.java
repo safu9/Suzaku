@@ -127,7 +127,7 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 	// Adapter
 	private static class PlaylistListAdapter extends BaseListAdapter<Playlist>
 	{
-		private LayoutInflater inflater;
+		private final LayoutInflater inflater;
 
 
 		public PlaylistListAdapter()

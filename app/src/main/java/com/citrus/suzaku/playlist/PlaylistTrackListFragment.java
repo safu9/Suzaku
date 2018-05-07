@@ -3,6 +3,7 @@ package com.citrus.suzaku.playlist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
@@ -50,7 +51,7 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		playlist = (Playlist)getArguments().getSerializable(PLAYLIST);
 		return super.onCreateView(inflater, container, savedInstanceState);
@@ -133,7 +134,7 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 	// Adapter
 	private class PlaylistTrackListAdapter extends BaseListAdapter<PlaylistTrack> // implements PopupMenu.OnMenuItemClickListener
 	{
-		private LayoutInflater inflater;
+		private final LayoutInflater inflater;
 
 	//	private int menuPosition;
 

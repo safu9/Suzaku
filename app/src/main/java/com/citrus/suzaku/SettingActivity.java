@@ -132,9 +132,11 @@ public class SettingActivity extends AppCompatActivity
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences pref, String key)
 		{
+		/*
 			if(key.equals(PreferenceUtils.LANGUAGE)){
-			//	PreferenceUtils.updateLocale();
+				PreferenceUtils.updateLocale();
 			}
+		*/
 		}
 	}
 	

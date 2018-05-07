@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -58,7 +59,7 @@ public class DockFragment extends Fragment implements ServiceConnection
 
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		view = inflater.inflate(R.layout.fragment_dock, container, false);
 
@@ -268,7 +269,7 @@ public class DockFragment extends Fragment implements ServiceConnection
 	
 	private static class MyHandler extends Handler
 	{
-		private WeakReference<DockFragment> mFragmentRef;
+		private final WeakReference<DockFragment> mFragmentRef;
 
 		public MyHandler(DockFragment fragment)
 		{

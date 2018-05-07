@@ -95,7 +95,7 @@ public class ArtistListFragment extends TrackGroupListFragment<Artist>
 	// Adapter
 	private class ArtistListAdapter extends BaseListAdapter<Artist>
 	{
-		private LayoutInflater inflater;
+		private final LayoutInflater inflater;
 
 
 		public ArtistListAdapter()

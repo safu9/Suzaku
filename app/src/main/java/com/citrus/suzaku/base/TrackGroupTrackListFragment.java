@@ -2,6 +2,7 @@ package com.citrus.suzaku.base;
 
 import android.content.*;
 import android.os.*;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.*;
 import android.widget.*;
@@ -36,7 +37,7 @@ public class TrackGroupTrackListFragment<T extends TrackGroup> extends TrackList
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		trackGroup = (TrackGroup)getArguments().getSerializable(TRACK_GROUP);
 		return super.onCreateView(inflater, container, savedInstanceState);

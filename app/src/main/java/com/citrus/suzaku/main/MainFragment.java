@@ -2,6 +2,7 @@ package com.citrus.suzaku.main;
 
 import android.content.*;
 import android.os.*;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.*;
 import android.support.v4.content.ContextCompat;
@@ -32,7 +33,7 @@ public class MainFragment extends Fragment
 	private int mPosition = 0;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View view = inflater.inflate(R.layout.fragment_main, container, false);
 		

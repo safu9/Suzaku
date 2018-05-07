@@ -731,7 +731,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 	
 	private static class MyHandler extends Handler
 	{
-		private WeakReference<PlayerService> mServiceRef;
+		private final WeakReference<PlayerService> mServiceRef;
 
 		public MyHandler(PlayerService service)
 		{

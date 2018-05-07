@@ -2,6 +2,7 @@ package com.citrus.suzaku.playlist;
 
 import android.content.*;
 import android.os.*;
+import android.support.annotation.NonNull;
 import android.support.v4.app.*;
 import android.support.v4.content.ContextCompat;
 import android.view.*;
@@ -49,7 +50,7 @@ public class PlaylistFragment extends Fragment
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View view = inflater.inflate(R.layout.fragment_playlist, container, false);
 

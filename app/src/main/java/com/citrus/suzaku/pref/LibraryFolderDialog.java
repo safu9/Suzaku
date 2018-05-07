@@ -116,7 +116,7 @@ public class LibraryFolderDialog extends PreferenceDialogFragmentCompat implemen
     // Adapter
     private class FolderListAdapter extends BaseListAdapter<String>
     {
-        private LayoutInflater inflater;
+        private final LayoutInflater inflater;
 
 
         public FolderListAdapter()

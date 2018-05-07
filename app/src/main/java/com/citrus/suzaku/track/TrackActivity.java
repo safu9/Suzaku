@@ -626,7 +626,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 
 	private static class MyHandler extends Handler
 	{
-		private WeakReference<TrackActivity> mActivityRef;
+		private final WeakReference<TrackActivity> mActivityRef;
 
 		public MyHandler(TrackActivity activity)
 		{
@@ -647,7 +647,7 @@ public class TrackActivity extends Activity implements OnChronometerTickListener
 	// Adapter
 	private class PlaylistTrackListAdapter extends BaseListAdapter<Track>
 	{
-		private LayoutInflater inflater;
+		private final LayoutInflater inflater;
 
 		public PlaylistTrackListAdapter()
 		{

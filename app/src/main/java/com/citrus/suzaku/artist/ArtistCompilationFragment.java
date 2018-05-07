@@ -1,6 +1,7 @@
 package com.citrus.suzaku.artist;
 
 import android.os.*;
+import android.support.annotation.NonNull;
 import android.support.v4.app.*;
 import android.view.*;
 
@@ -33,7 +34,7 @@ public class ArtistCompilationFragment extends Fragment
 	
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View view = inflater.inflate(R.layout.fragment_base, container, false);
 

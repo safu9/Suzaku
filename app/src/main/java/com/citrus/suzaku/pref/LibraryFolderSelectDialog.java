@@ -162,8 +162,7 @@ public class LibraryFolderSelectDialog extends DialogFragment implements Adapter
 				}
 			});
 
-			list = new ArrayList<>();
-			list.addAll(Arrays.asList(fileList));
+			list = new ArrayList<>(Arrays.asList(fileList));
 			Collections.sort(list);
 
 			list.add(0, new File(".."));
@@ -188,7 +187,7 @@ public class LibraryFolderSelectDialog extends DialogFragment implements Adapter
 
 	private static class FileArrayAdapter extends BaseListAdapter<File>
 	{
-		private LayoutInflater inflater;
+		private final LayoutInflater inflater;
 
 
 		public FileArrayAdapter()

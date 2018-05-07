@@ -56,7 +56,7 @@ public class AlbumListFragment extends TrackGroupListFragment<Album>
 	// Adapter
 	private class AlbumListAdapter extends BaseListAdapter<Album>
 	{
-		private LayoutInflater inflater;
+		private final LayoutInflater inflater;
 
 		public AlbumListAdapter()
 		{

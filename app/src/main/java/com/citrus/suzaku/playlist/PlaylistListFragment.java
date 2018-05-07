@@ -72,7 +72,7 @@ public class PlaylistListFragment extends TrackGroupListFragment<Playlist>
 	// Adapter
 	private class PlaylistListAdapter extends BaseListAdapter<Playlist> implements PopupMenu.OnMenuItemClickListener
 	{
-		private LayoutInflater inflater;
+		private final LayoutInflater inflater;
 
 		private int menuPosition;
 

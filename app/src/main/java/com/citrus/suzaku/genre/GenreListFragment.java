@@ -55,7 +55,7 @@ public class GenreListFragment extends TrackGroupListFragment<Genre>
 	// Adapter
 	private class GenreListAdapter extends BaseListAdapter<Genre>
 	{
-		private LayoutInflater inflater;
+		private final LayoutInflater inflater;
 
 
 		public GenreListAdapter()

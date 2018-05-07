@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -495,6 +496,7 @@ public class TrackDetailActivity extends AppCompatActivity
 
 	private class ReadTagLoaderCallbacks implements LoaderManager.LoaderCallbacks<Bundle>
 	{
+		@NonNull
 		@Override
 		public Loader<Bundle> onCreateLoader(int id, Bundle args)
 		{
@@ -512,7 +514,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		}
 
 		@Override
-		public void onLoadFinished(Loader<Bundle> loader, Bundle result)
+		public void onLoadFinished(@NonNull Loader<Bundle> loader, Bundle result)
 		{
 			// Using FragmentTransaction
 			Message msg = new Message();
@@ -535,7 +537,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		}
 
 		@Override
-		public void onLoaderReset(Loader<Bundle> loader)
+		public void onLoaderReset(@NonNull Loader<Bundle> loader)
 		{
 		}
 	}
@@ -760,6 +762,7 @@ public class TrackDetailActivity extends AppCompatActivity
 
 	private class SaveTagLoaderCallbacks implements LoaderManager.LoaderCallbacks<Bundle>
 	{
+		@NonNull
 		@Override
 		public Loader<Bundle> onCreateLoader(int id, Bundle args)
 		{
@@ -777,7 +780,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		}
 
 		@Override
-		public void onLoadFinished(Loader<Bundle> loader, Bundle result)
+		public void onLoadFinished(@NonNull Loader<Bundle> loader, Bundle result)
 		{
 			getSupportLoaderManager().destroyLoader(SAVE_TAG_LOADER_ID);
 
@@ -806,7 +809,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		}
 
 		@Override
-		public void onLoaderReset(Loader<Bundle> loader)
+		public void onLoaderReset(@NonNull Loader<Bundle> loader)
 		{
 		}
 	}
@@ -814,7 +817,7 @@ public class TrackDetailActivity extends AppCompatActivity
 	// Handler for ProgressDialog
 	private static class DialogHandler extends Handler
 	{
-		private WeakReference<FragmentActivity> mActivityRef;
+		private final WeakReference<FragmentActivity> mActivityRef;
 
 		public DialogHandler(FragmentActivity activity)
 		{
@@ -974,7 +977,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		}
 		
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
 			View view = inflater.inflate(R.layout.fragment_track_detail_info, container, false);
 			
@@ -1131,7 +1134,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		}
 		
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
 			mTrack = (Track)getArguments().getSerializable("TRACK");
 			
@@ -1273,7 +1276,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		}
 		
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
 			View view = inflater.inflate(R.layout.fragment_track_detail_lyrics, container, false);
 			lyricsEditText = view.findViewById(R.id.lyrics_edit);
@@ -1365,7 +1368,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
 			View view = inflater.inflate(R.layout.fragment_track_detail_sort, container, false);
 
@@ -1465,7 +1468,7 @@ public class TrackDetailActivity extends AppCompatActivity
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
 			mTrack = (Track)getArguments().getSerializable("TRACK");
 

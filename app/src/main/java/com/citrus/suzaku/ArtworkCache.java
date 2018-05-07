@@ -290,8 +290,8 @@ public class ArtworkCache
 		// AsyncTask : ImageView に画像を設定
 		private static class ImageGetTask extends AsyncTask<Void, Void, Bitmap>
 		{
-			private Track track;
-			private ImageView image;
+			private final Track track;
+			private final ImageView image;
 		
 			public ImageGetTask(Track track, ImageView image)
 			{
@@ -474,9 +474,9 @@ public class ArtworkCache
 		// AsyncTask : ImageView に画像を設定
 		public static class ImageGetTask extends AsyncTask<Void, Void, Bitmap>
 		{
-			private Track track;
-			private ImageView image;
-			private boolean saveCache;
+			private final Track track;
+			private final ImageView image;
+			private final boolean saveCache;
 
 			public ImageGetTask(Track track, ImageView image, boolean saveCache)
 			{

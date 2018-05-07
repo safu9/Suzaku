@@ -74,7 +74,7 @@ public class TrackListFragment extends BaseListFragment<Track>
 	// Adapter
 	private class TrackListAdapter extends BaseListAdapter<Track> // implements PopupMenu.OnMenuItemClickListener
 	{
-		private LayoutInflater inflater;
+		private final LayoutInflater inflater;
 
 	//	private int menuPosition;
 

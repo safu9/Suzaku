@@ -49,9 +49,7 @@ public class LibraryFolderPreference extends DialogPreference
 
     public List<String> getStringListValue()
     {
-        List<String> clone = new ArrayList<>();
-        clone.addAll(paths);
-        return clone;
+        return new ArrayList<>(paths);      // clone
     }
 
 }
