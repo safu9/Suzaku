@@ -546,8 +546,6 @@ public class MusicDBService extends IntentService
 			playlist.id = cursor.getLong(0);
 			cursor.close();
 
-			MusicDBHelper.createPlaylistTrackTable(db, playlist.id);
-
 			db.setTransactionSuccessful();
 		}finally{
 			db.endTransaction();
@@ -588,8 +586,8 @@ public class MusicDBService extends IntentService
 
 	private void updateNumSongsInPlaylist(SQLiteDatabase db, long playlistId)
 	{
-		String table = PlaylistTracks.TABLE + String.valueOf(playlistId);
-		Cursor cursor = db.rawQuery("SELECT COUNT(" + PlaylistTracks._ID + ") FROM " + table + ";" , null);
+		String[] selectionArgs = {String.valueOf(playlistId)};
+		Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + PlaylistTracks.TABLE + " WHERE " + PlaylistTracks.PLAYLIST_ID + "=?;" , selectionArgs);
 		cursor.moveToFirst();
 		int songs = cursor.getInt(0);
 		cursor.close();
@@ -597,7 +595,6 @@ public class MusicDBService extends IntentService
 		ContentValues values = new ContentValues(1);
 		values.put(Playlists.NUMBER_OF_SONGS, songs);
 
-		String[] selectionArgs = { String.valueOf(playlistId) };
 		db.update(Playlists.TABLE, values, Playlists._ID + " = ?", selectionArgs);
 	}
 
@@ -617,9 +614,10 @@ public class MusicDBService extends IntentService
 				PlaylistTrack playlistTrack = new PlaylistTrack(null);
 				playlistTrack.setTrackInfo(track);
 				playlistTrack.trackId = track.id;
+				playlistTrack.playlistId = playlist.id;
 				playlistTrack.playlistTrackNo = i;
 
-				mdb.insertPlaylistTrack(playlist.id, playlistTrack);
+				mdb.insertPlaylistTrack(playlistTrack);
 
 				i++;
 			}
@@ -641,14 +639,15 @@ public class MusicDBService extends IntentService
 		db.beginTransactionNonExclusive();
 		try{
 			String stmt =
-				"DELETE FROM " + PlaylistTracks.TABLE + String.valueOf(playlist.id) +
-				" WHERE " + PlaylistTracks.TRACK_ID + " = ?;";
+				"DELETE FROM " + PlaylistTracks.TABLE +
+				" WHERE " + PlaylistTracks.TRACK_ID + " = ? AND " + PlaylistTracks.PLAYLIST_ID + " = ?;";
 
 			SQLiteStatement deleteStmt = db.compileStatement(stmt);
 
 			try{
 				for(Long id : trackIds){
 					deleteStmt.bindLong(1, id);
+					deleteStmt.bindLong(2, playlist.id);
 					deleteStmt.executeUpdateDelete();
 				}
 			}finally{
@@ -666,7 +665,7 @@ public class MusicDBService extends IntentService
 					values.put(PlaylistTracks.PLAYLIST_TRACK_NO, i);
 
 					String[] selectionArgs = { String.valueOf(ptrack.id) };
-					db.update(PlaylistTracks.TABLE + String.valueOf(playlist.id), values, PlaylistTracks._ID + " = ?", selectionArgs);
+					db.update(PlaylistTracks.TABLE, values, PlaylistTracks._ID + " = ?", selectionArgs);
 				}
 			}
 			

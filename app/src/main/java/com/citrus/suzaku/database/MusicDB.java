@@ -28,7 +28,7 @@ public class MusicDB
 	public static class Tracks implements BaseColumns
 	{
 		public static final String TABLE = "tracks";
-		public static final String VIEW = "tracks_view";
+		public static final String VIEW = "tracksView";
 
 		public static final String PATH = "path";
 		public static final String TITLE = "title";
@@ -61,7 +61,7 @@ public class MusicDB
 	public static class Albums implements BaseColumns
 	{
 		public static final String TABLE = "albums";
-		public static final String VIEW = "albums_view";
+		public static final String VIEW = "albumsView";
 
 		public static final String ALBUM = "album";
 		public static final String ALBUM_SORT = "albumSort";
@@ -102,9 +102,11 @@ public class MusicDB
 	
 	public static class PlaylistTracks extends Tracks implements BaseColumns
 	{
-		public static final String TABLE = "playlistTracks_";				// playlistTracks_#(No.)
+		public static final String TABLE = "playlistTracks";
+		public static final String VIEW = "playlistTracksView";
 
 		public static final String TRACK_ID = "trackId";
+		public static final String PLAYLIST_ID = "playlistId";
 		public static final String PLAYLIST_TRACK_NO = "playlistTrackNo";
 	}
 	
@@ -207,7 +209,7 @@ public class MusicDB
 			}
 		}
 
-		ContentValues values = getTrackContentValues(track);
+		ContentValues values = getTrackContentValues(track, false);
 		return db.insertWithOnConflict(Tracks.TABLE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 	}
 	
@@ -410,7 +412,7 @@ public class MusicDB
 	//! UNUSED
 	public void insertGenre(Genre genre)
 	{
-		ContentValues values = getGenreContentValues(genre);
+		ContentValues values = getGenreContentValues(genre, false);
 		db.insertWithOnConflict(Genres.TABLE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 	}
 	
@@ -457,16 +459,13 @@ public class MusicDB
 	
 	public void insertPlaylist(Playlist playlist)
 	{
-		ContentValues values = getPlaylistContentValues(playlist);
-		values.remove(Playlists._ID);
-		
+		ContentValues values = getPlaylistContentValues(playlist, false);
 		db.insert(Playlists.TABLE, null, values);
 	}
 	
 	public void updatePlaylist(Playlist playlist)
 	{
-		ContentValues values = getPlaylistContentValues(playlist);
-		values.remove(Playlists._ID);
+		ContentValues values = getPlaylistContentValues(playlist, false);
 		
 		String[] whereArgs = { String.valueOf(playlist.id) };
 		db.update(Playlists.TABLE, values, Playlists._ID + " = ?", whereArgs);
@@ -476,8 +475,7 @@ public class MusicDB
 	{
 		String[] selectionArgs = { String.valueOf(playlistId) };
 		db.delete(Playlists.TABLE, Playlists._ID + " = ?", selectionArgs);
-
-		db.execSQL("DROP TABLE IF EXISTS " +  PlaylistTracks.TABLE + String.valueOf(playlistId) + ";");
+		db.delete(PlaylistTracks.TABLE, PlaylistTracks.PLAYLIST_ID + " = ?", selectionArgs);
 	}
 
 
@@ -486,7 +484,8 @@ public class MusicDB
 
 	public List<PlaylistTrack> getPlaylistTracks(long playlistId)
 	{
-		Cursor cursor = db.query(PlaylistTracks.TABLE + String.valueOf(playlistId), null, null, null,null, null, PlaylistTracks.PLAYLIST_TRACK_NO);
+		String[] selectionArgs = { String.valueOf(playlistId) };
+		Cursor cursor = db.query(PlaylistTracks.VIEW, null, PlaylistTracks.PLAYLIST_ID + " = ?", selectionArgs,null, null, PlaylistTracks.PLAYLIST_TRACK_NO);
 
 		List<PlaylistTrack> tracks = new ArrayList<>();
 
@@ -499,22 +498,22 @@ public class MusicDB
 		return tracks;
 	}
 	
-	public void insertPlaylistTrack(long playlistId, PlaylistTrack track)
+	public void insertPlaylistTrack(PlaylistTrack track)
 	{
-		ContentValues values = getPlaylistTrackContentValues(track);
-		values.remove(PlaylistTracks._ID);
-		
-		db.insert(PlaylistTracks.TABLE + String.valueOf(playlistId), null, values);
+		ContentValues values = getPlaylistTrackContentValues(track, false);
+		db.insert(PlaylistTracks.TABLE, null, values);
 	}
 
 
 	// Utils
 
-	private ContentValues getTrackContentValues(Track t)
+	private ContentValues getTrackContentValues(Track t, boolean hasId)
 	{
 		ContentValues values = new ContentValues(21);
 
-		values.put(Tracks._ID, t.id);
+		if(hasId){
+			values.put(Tracks._ID, t.id);
+		}
 		values.put(Tracks.PATH, t.path);
 		values.put(Tracks.TITLE, t.title);
 		values.put(Tracks.TITLE_SORT, t.titleSort);
@@ -566,52 +565,40 @@ public class MusicDB
 		return values;
 	}
 
-	private ContentValues getGenreContentValues(Genre g)
+	private ContentValues getGenreContentValues(Genre g, boolean hasId)
 	{
 		ContentValues values = new ContentValues(2);
 
-		values.put(Genres._ID, g.id);
+		if(hasId){
+			values.put(Genres._ID, g.id);
+		}
 		values.put(Genres.GENRE, g.genre);
 
 		return values;
 	}
 
-	private ContentValues getPlaylistContentValues(Playlist p)
+	private ContentValues getPlaylistContentValues(Playlist p, boolean hasId)
 	{
 		ContentValues values = new ContentValues(3);
 
-		values.put(Playlists._ID, p.id);
+		if(hasId){
+			values.put(Playlists._ID, p.id);
+		}
 		values.put(Playlists.TITLE, p.title);
 		values.put(Playlists.NUMBER_OF_SONGS, p.numSongs);
 
 		return values;
 	}
 
-	private ContentValues getPlaylistTrackContentValues(PlaylistTrack t)
+	private ContentValues getPlaylistTrackContentValues(PlaylistTrack t, boolean hasId)
 	{
 		ContentValues values = new ContentValues(20);
 
-		values.put(PlaylistTracks._ID, t.id);
-		values.put(PlaylistTracks.PATH, t.path);
-		values.put(PlaylistTracks.TITLE, t.title);
-		values.put(PlaylistTracks.TITLE_SORT, t.titleSort);
-		values.put(PlaylistTracks.ALBUM, t.album);
-		values.put(PlaylistTracks.ALBUM_ID, t.albumId);
-		values.put(PlaylistTracks.ALBUMARTIST, t.albumArtist);
-		values.put(PlaylistTracks.ALBUMARTIST_ID, t.albumArtistId);
-		values.put(PlaylistTracks.ARTWORK_HASH, t.artworkHash);
-		values.put(PlaylistTracks.ARTIST, t.artist);
-		values.put(PlaylistTracks.ARTIST_ID, t.artistId);
-		values.put(PlaylistTracks.COMPOSER, t.composer);
-		values.put(PlaylistTracks.GENRE, t.genre);
-		values.put(PlaylistTracks.TRACK_NO, t.trackNo);
-		values.put(PlaylistTracks.DISC_NO, t.discNo);
-		values.put(PlaylistTracks.DURATION, t.duration);
-		values.put(PlaylistTracks.YEAR, t.year);
-		values.put(PlaylistTracks.COMPILATION, t.compilation);
-		values.put(PlaylistTracks.FILE_LAST_MODIFIED, t.fileLastModified);
-
+		if(hasId){
+			values.put(PlaylistTracks._ID, t.id);
+		}
 		values.put(PlaylistTracks.TRACK_ID, t.trackId);
+		values.put(PlaylistTracks.PLAYLIST_ID, t.playlistId);
 		values.put(PlaylistTracks.PLAYLIST_TRACK_NO, t.playlistTrackNo);
 
 		return values;

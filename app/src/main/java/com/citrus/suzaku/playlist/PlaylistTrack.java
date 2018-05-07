@@ -13,6 +13,7 @@ public class PlaylistTrack extends Track implements Serializable, Cloneable
 	private static final long serialVersionUID = 6L;
 
 	public long trackId;
+	public long playlistId;
 	public int playlistTrackNo;
 	
 	
@@ -24,6 +25,7 @@ public class PlaylistTrack extends Track implements Serializable, Cloneable
 			return;
 		
 		trackId = cursor.getLong(cursor.getColumnIndex(PlaylistTracks.TRACK_ID));
+		playlistId = cursor.getLong(cursor.getColumnIndex(PlaylistTracks.PLAYLIST_ID));
 		playlistTrackNo = cursor.getInt(cursor.getColumnIndex(PlaylistTracks.PLAYLIST_TRACK_NO));
 	}
 	
@@ -36,6 +38,7 @@ public class PlaylistTrack extends Track implements Serializable, Cloneable
 		album = track.album;
 		albumId = track.albumId;
 		albumArtist = track.albumArtist;
+		albumArtistId = track.albumArtistId;
 		artworkHash = track.artworkHash;
 		artist = track.artist;
 		artistId = track.artistId;

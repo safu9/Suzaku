@@ -18,7 +18,7 @@ import com.citrus.suzaku.database.MusicDB.Tracks;
 public class MusicDBHelper extends SQLiteOpenHelper
 {
 	private static final String DATABASE_NAME = "music.db";
-	private static final int DATABASE_VERSION = 6;
+	private static final int DATABASE_VERSION = 7;
 
 	// Singleton ...
 
@@ -65,9 +65,11 @@ public class MusicDBHelper extends SQLiteOpenHelper
 		createArtistTable(db);
 		createGenreTable(db);
 		createPlaylistTable(db);
+		createPlaylistTrackTable(db);
 
 		createAlbumView(db);
 		createTrackView(db);
+		createPlaylistTrackView(db);
 	}
 
 	// 開くときにアップグレード
@@ -145,32 +147,12 @@ public class MusicDBHelper extends SQLiteOpenHelper
 	}
 	
 	
-	public static void createPlaylistTrackTable(SQLiteDatabase db, long playlistId)
+	public static void createPlaylistTrackTable(SQLiteDatabase db)
 	{
-		db.execSQL("CREATE TABLE IF NOT EXISTS " + PlaylistTracks.TABLE + String.valueOf(playlistId) + " (" + 
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + PlaylistTracks.TABLE + " (" +
 				   PlaylistTracks._ID + " INTEGER PRIMARY KEY," +
 				   PlaylistTracks.TRACK_ID + " INTEGER," +
-				   PlaylistTracks.PATH + " TEXT NOT NULL," +
-				   PlaylistTracks.TITLE + " TEXT NOT NULL," +
-				   PlaylistTracks.TITLE_SORT + " TEXT," +
-				   PlaylistTracks.ARTIST + " TEXT," +
-				   PlaylistTracks.ARTIST_ID + " INTEGER," +
-				   PlaylistTracks.ARTIST_SORT + " TEXT," +
-				   PlaylistTracks.ALBUM + " TEXT," +
-				   PlaylistTracks.ALBUM_ID + " INTEGER," +
-				   PlaylistTracks.ALBUM_SORT + " TEXT," +
-				   PlaylistTracks.ALBUMARTIST_ID + " INTEGER," +
-				   PlaylistTracks.ALBUMARTIST + " TEXT," +
-				   PlaylistTracks.ALBUMARTIST_SORT + " TEXT," +
-				   PlaylistTracks.ARTWORK_HASH + " TEXT," +
-				   PlaylistTracks.COMPOSER + " TEXT," +
-				   PlaylistTracks.GENRE + " TEXT," +
-				   PlaylistTracks.TRACK_NO + " INTEGER," +
-				   PlaylistTracks.DISC_NO + " INTEGER," +
-				   PlaylistTracks.DURATION + " INTEGER," +
-				   PlaylistTracks.YEAR + " INTEGER," +
-				   PlaylistTracks.COMPILATION + " INTEGER," +
-				   PlaylistTracks.FILE_LAST_MODIFIED + " INTEGER NOT NULL DEFAULT 0," +
+				   PlaylistTracks.PLAYLIST_ID + " INTEGER," +
 				   PlaylistTracks.PLAYLIST_TRACK_NO + " INTEGER);");
 	}
 
@@ -233,6 +215,44 @@ public class MusicDBHelper extends SQLiteOpenHelper
 				" ON t." + Tracks.ALBUM_ID + " = al." + Albums._ID +
 				" LEFT JOIN " + Artists.TABLE + " ar " +
 				" ON t." + Tracks.ARTIST_ID + " = ar." + Artists._ID
+		);
+	}
+
+	public static void createPlaylistTrackView(SQLiteDatabase db)
+	{
+		db.execSQL("CREATE VIEW " + PlaylistTracks.VIEW +
+			" AS SELECT " +
+			"p." + PlaylistTracks._ID + "," +
+			"p." + PlaylistTracks.PLAYLIST_ID + "," +
+			"p." + PlaylistTracks.PLAYLIST_TRACK_NO + "," +
+
+			"t." + Tracks._ID + " AS " + PlaylistTracks.TRACK_ID +"," +
+			"t." + Tracks.PATH + "," +
+			"t." + Tracks.TITLE + "," +
+			"t." + Tracks.TITLE_SORT + "," +
+			"t." + Tracks.ALBUM_ID + "," +
+			"t." + Tracks.ALBUM + "," +
+			"t." + Tracks.ALBUM_SORT + "," +
+			"t." + Tracks.ALBUMARTIST_ID + "," +
+			"t." + Tracks.ALBUMARTIST + "," +
+			"t." + Tracks.ALBUMARTIST_SORT + "," +
+			"t." + Tracks.ARTIST_ID + "," +
+			"t." + Tracks.ARTIST + "," +
+			"t." + Tracks.ARTIST_SORT + "," +
+			"t." + Tracks.ARTWORK_HASH + "," +
+			"t." + Tracks.COMPOSER + "," +
+			"t." + Tracks.GENRE + "," +
+			"t." + Tracks.TRACK_NO + "," +
+			"t." + Tracks.DISC_NO + "," +
+			"t." + Tracks.DURATION + "," +
+			"t." + Tracks.YEAR + "," +
+			"t." + Tracks.COMPILATION + "," +
+			"t." + Tracks.FILE_LAST_MODIFIED + "," +
+			"t." + Tracks.FLAG +
+
+			" FROM " + PlaylistTracks.TABLE + " p " +
+			" LEFT JOIN " + Tracks.VIEW + " t " +
+			" ON p." + PlaylistTracks.TRACK_ID + " = t." + Tracks._ID
 		);
 	}
 }
