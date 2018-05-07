@@ -200,7 +200,7 @@ public abstract class BaseListFragment<T> extends Fragment implements ActionMode
 			case R.id.menu_add_to_playlist:
 				PlaylistSelectDialog dialog = PlaylistSelectDialog.newInstance(getCheckedTrackIds());
 				dialog.setTargetFragment(this, 0);
-				dialog.show(getChildFragmentManager(), "PlaylistSelectDialog");
+				dialog.show(getFragmentManager(), "PlaylistSelectDialog");
 				
 				resetChoiceMode();
 				break;

@@ -77,7 +77,7 @@ public class LibraryFolderDialog extends PreferenceDialogFragmentCompat implemen
         if(paths == null || position == paths.size()){					// Footer
             LibraryFolderSelectDialog dialog = new LibraryFolderSelectDialog();
             dialog.setTargetFragment(this, 0);
-            dialog.show(getChildFragmentManager(), "LibraryFolderSelectDialog");
+            dialog.show(getFragmentManager(), "LibraryFolderSelectDialog");
         }
     }
 

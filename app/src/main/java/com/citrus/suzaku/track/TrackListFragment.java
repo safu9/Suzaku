@@ -143,7 +143,7 @@ public class TrackListFragment extends BaseListFragment<Track>
 					
 					PlaylistSelectDialog dialog = PlaylistSelectDialog.newInstance(tracks);
 					dialog.setTargetFragment(TrackListFragment.this, 0);
-					dialog.show(getChildFragmentManager(), "PlaylistSelectDialog");
+					dialog.show(getFragmentManager(), "PlaylistSelectDialog");
 					return true;
 
 				case R.id.menu_add_to_queue:

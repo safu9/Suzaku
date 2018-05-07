@@ -137,7 +137,7 @@ public class PlaylistListFragment extends TrackGroupListFragment<Playlist>
 					List<Long> trackIds = getItem(menuPosition).getTrackIds();
 					PlaylistSelectDialog selectDialog = PlaylistSelectDialog.newInstance(trackIds);
 					selectDialog.setTargetFragment(PlaylistListFragment.this, 0);
-					selectDialog.show(getChildFragmentManager(), "PlaylistSelectDialog");
+					selectDialog.show(getFragmentManager(), "PlaylistSelectDialog");
 					return true;
 
 				case R.id.menu_add_to_queue:
@@ -146,7 +146,7 @@ public class PlaylistListFragment extends TrackGroupListFragment<Playlist>
 				case R.id.menu_edit:
 					PlaylistEditDialog editDialog = PlaylistEditDialog.newInstance(getItem(menuPosition));
 					editDialog.setTargetFragment(PlaylistListFragment.this, 0);
-					editDialog.show(getChildFragmentManager(), "PlaylistSelectDialog");
+					editDialog.show(getFragmentManager(), "PlaylistSelectDialog");
 					return true;
 
 				case R.id.menu_delete:

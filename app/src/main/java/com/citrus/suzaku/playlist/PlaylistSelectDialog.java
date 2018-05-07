@@ -95,7 +95,7 @@ public class PlaylistSelectDialog extends DialogFragment implements ListView.OnI
 		if(position == 0){					// Header
 			PlaylistCreateDialog dialog = new PlaylistCreateDialog();
 			dialog.setTargetFragment(this, 0);
-			dialog.show(getChildFragmentManager(), "PlaylistCreateDialog");
+			dialog.show(getFragmentManager(), "PlaylistCreateDialog");
 
 			return;
 		}
