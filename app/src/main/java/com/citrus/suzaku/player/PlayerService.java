@@ -24,6 +24,7 @@ import java.lang.ref.WeakReference;
 public class PlayerService extends Service implements AudioManager.OnAudioFocusChangeListener
 {
 	private static final int NOTIFICATION_ID = 1;
+	private static final String CHANNEL_ID = "suzaku";
 	
 	// From Activity, RemoteViews & RemoteControl
 	public static final String ACTION_PLAY = "Citrus.suzaku.action.ACTION_PLAY";
@@ -84,6 +85,8 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		
 		playlist = new PlaylistManager();
 		playlist.load();
+
+		createNotificationChannel();
 	}
 	
 	@Override
@@ -588,6 +591,21 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 			e.printStackTrace();
 		}
 	}
+
+	private void createNotificationChannel()
+	{
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			CharSequence name = getString(R.string.channel_name);
+			String description = getString(R.string.channel_description);
+
+			NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+			channel.setDescription(description);
+			channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+
+			NotificationManager manager = getSystemService(NotificationManager.class);
+			manager.createNotificationChannel(channel);
+		}
+	}
 	
 	// 通知
 	private void updateNotification()
@@ -634,14 +652,7 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		intent = new Intent(ACTION_STOP);
 		PendingIntent stopIntent = PendingIntent.getService(this, R.id.close_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		ntfViews.setOnClickPendingIntent(R.id.close_button, stopIntent);
-		
-/*		// Recreate MainActivity!!! (without saving instantState)
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-		stackBuilder.addParentStack(TrackActivity.class);
-		stackBuilder.addNextIntent(new Intent(this, TrackActivity.class));
-		PendingIntent contentIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-*/
-		// API LV 11
+
 		Intent[] intents = new Intent[2];
 		intents[0] = new Intent(this, MainActivity.class);
 		intents[0].setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -653,12 +664,13 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		.setContent(ntfViews)
 		.setContentIntent(contentIntent)
 		.setSmallIcon((isPlaying) ? R.drawable.ic_play_white_32dp : R.drawable.ic_pause_white_32dp)
-		.setDefaults(Notification.FLAG_FOREGROUND_SERVICE);
+		.setDefaults(Notification.FLAG_FOREGROUND_SERVICE)
+		.setChannelId(CHANNEL_ID);
 
-		if(Build.VERSION.SDK_INT >= 16){							// JellyBean(4.2)
-			ntfBuilder.setPriority(Notification.PRIORITY_HIGH);
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+			ntfBuilder.setPriority(Notification.PRIORITY_DEFAULT);
 		}
-		
+
 		startForeground(NOTIFICATION_ID, ntfBuilder.build());
 	}
 	

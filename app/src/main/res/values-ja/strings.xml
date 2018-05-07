@@ -148,4 +148,9 @@
 	<string name="auto_scan">自動スキャン</string>
 	<string name="select_folder">フォルダを選択</string>
 
+	<!-- Notification -->
+
+	<string name="channel_name">Suzaku</string>
+	<string name="channel_description">再生中の曲の表示</string>
+
 </resources>
