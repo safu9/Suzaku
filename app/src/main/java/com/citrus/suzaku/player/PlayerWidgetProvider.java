@@ -16,7 +16,7 @@ import com.citrus.suzaku.track.TrackActivity;
 
 public class PlayerWidgetProvider extends AppWidgetProvider
 {
-	public static final String ACTION_UPDATE = "Citrus.suzaku.action.ACTION_UPDATE_WIDGET";
+	public static final String ACTION_UPDATE = "com.citrus.suzaku.action.ACTION_UPDATE_WIDGET";
 	
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)

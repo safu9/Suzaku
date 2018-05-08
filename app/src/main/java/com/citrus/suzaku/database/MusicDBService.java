@@ -43,13 +43,13 @@ import java.util.List;
 public class MusicDBService extends IntentService
 {
 	// Actions From App
-	public static final String ACTION_UPDATE_DATABASE = "Citrus.suzaku.action.ACTION_UPDATE_DATABASE";
-	public static final String ACTION_UPDATE_TRACKS = "Citrus.suzaku.action.ACTION_UPDATE_TRACKS";
-	public static final String ACTION_CREATE_PLAYLIST = "Citrus.suzaku.action.ACTION_CREATE_PLAYLIST";
-	public static final String ACTION_EDIT_PLAYLIST = "Citrus.suzaku.action.ACTION_EDIT_PLAYLIST";
-	public static final String ACTION_ADD_TO_PLAYLIST = "Citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST";
-	public static final String ACTION_DELETE_PLAYLISTTRACKS = "Citrus.suzaku.action.ACTION_DELETE_PLAYLISTTRACKS";
-	public static final String ACTION_DELETE_PLAYLIST = "Citrus.suzaku.action.ACTION_DELETE_PLAYLIST";
+	public static final String ACTION_UPDATE_DATABASE = "com.citrus.suzaku.action.ACTION_UPDATE_DATABASE";
+	public static final String ACTION_UPDATE_TRACKS = "com.citrus.suzaku.action.ACTION_UPDATE_TRACKS";
+	public static final String ACTION_CREATE_PLAYLIST = "com.citrus.suzaku.action.ACTION_CREATE_PLAYLIST";
+	public static final String ACTION_EDIT_PLAYLIST = "com.citrus.suzaku.action.ACTION_EDIT_PLAYLIST";
+	public static final String ACTION_ADD_TO_PLAYLIST = "com.citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST";
+	public static final String ACTION_DELETE_PLAYLISTTRACKS = "com.citrus.suzaku.action.ACTION_DELETE_PLAYLISTTRACKS";
+	public static final String ACTION_DELETE_PLAYLIST = "com.citrus.suzaku.action.ACTION_DELETE_PLAYLIST";
 
 	// Intent Extra Key
 	public static final String INTENT_KEY_PATHS = "PATHS";

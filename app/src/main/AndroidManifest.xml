@@ -61,11 +61,11 @@
             android:exported="false">
 
             <intent-filter >
-                <action android:name="Citrus.suzaku.action.ACTION_PLAY" />
-                <action android:name="Citrus.suzaku.action.ACTION_PLAY_PAUSE" />
-                <action android:name="Citrus.suzaku.action.ACTION_NEXT" />
-                <action android:name="Citrus.suzaku.action.ACTION_PREV" />
-                <action android:name="Citrus.suzaku.action.ACTION_STOP" />
+                <action android:name="com.citrus.suzaku.action.ACTION_PLAY" />
+                <action android:name="com.citrus.suzaku.action.ACTION_PLAY_PAUSE" />
+                <action android:name="com.citrus.suzaku.action.ACTION_NEXT" />
+                <action android:name="com.citrus.suzaku.action.ACTION_PREV" />
+                <action android:name="com.citrus.suzaku.action.ACTION_STOP" />
             </intent-filter>
         </service>
 
@@ -75,13 +75,13 @@
             android:exported="false">
 
             <intent-filter >
-                <action android:name="Citrus.suzaku.action.ACTION_UPDATE_DATABASE" />
-                <action android:name="Citrus.suzaku.action.ACTION_UPDATE_TRACKS"/>
-                <action android:name="Citrus.suzaku.action.ACTION_CREATE_PLAYLIST" />
-                <action android:name="Citrus.suzaku.action.ACTION_EDIT_PLAYLIST" />
-                <action android:name="Citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST" />
-                <action android:name="Citrus.suzaku.action.ACTION_DELETE_PLAYLISTTRACKS" />
-                <action android:name="Citrus.suzaku.action.ACTION_DELETE_PLAYLIST" />
+                <action android:name="com.citrus.suzaku.action.ACTION_UPDATE_DATABASE" />
+                <action android:name="com.citrus.suzaku.action.ACTION_UPDATE_TRACKS"/>
+                <action android:name="com.citrus.suzaku.action.ACTION_CREATE_PLAYLIST" />
+                <action android:name="com.citrus.suzaku.action.ACTION_EDIT_PLAYLIST" />
+                <action android:name="com.citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST" />
+                <action android:name="com.citrus.suzaku.action.ACTION_DELETE_PLAYLISTTRACKS" />
+                <action android:name="com.citrus.suzaku.action.ACTION_DELETE_PLAYLIST" />
             </intent-filter>
         </service>
 
@@ -100,7 +100,7 @@
             <intent-filter >
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 
-                <action android:name="Citrus.suzaku.action.ACTION_UPDATE_WIDGET" />
+                <action android:name="com.citrus.suzaku.action.ACTION_UPDATE_WIDGET" />
             </intent-filter>
 
             <meta-data

@@ -27,12 +27,12 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 	private static final String CHANNEL_ID = "suzaku";
 	
 	// From Activity, RemoteViews & RemoteControl
-	public static final String ACTION_PLAY = "Citrus.suzaku.action.ACTION_PLAY";
-	public static final String ACTION_ENQUEUE = "Citrus.suzaku.action.ACTION_ENQUEUE";
-	public static final String ACTION_PLAY_PAUSE = "Citrus.suzaku.action.ACTION_PLAY_PAUSE";
-	public static final String ACTION_NEXT = "Citrus.suzaku.action.ACTION_NEXT";
-	public static final String ACTION_PREV = "Citrus.suzaku.action.ACTION_PREV";
-	public static final String ACTION_STOP = "Citrus.suzaku.action.ACTION_STOP";
+	public static final String ACTION_PLAY = "com.citrus.suzaku.action.ACTION_PLAY";
+	public static final String ACTION_ENQUEUE = "com.citrus.suzaku.action.ACTION_ENQUEUE";
+	public static final String ACTION_PLAY_PAUSE = "com.citrus.suzaku.action.ACTION_PLAY_PAUSE";
+	public static final String ACTION_NEXT = "com.citrus.suzaku.action.ACTION_NEXT";
+	public static final String ACTION_PREV = "com.citrus.suzaku.action.ACTION_PREV";
+	public static final String ACTION_STOP = "com.citrus.suzaku.action.ACTION_STOP";
 	
 	public static final int MSG_REQUEST_INFO = 1;
 	public static final int MSG_PLAY_PAUSE = 2;
