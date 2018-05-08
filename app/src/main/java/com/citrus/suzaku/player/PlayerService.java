@@ -72,7 +72,9 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 
 	private AudioManager audioManager;
 	private RemoteControlClient remoteControlClient;
-	
+
+	private PowerManager.WakeLock wakeLock;
+
 	private int startId;
 
 	
@@ -155,6 +157,9 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 	@Override
 	public void onDestroy()
 	{
+		if(!isStopped){
+			stopSong();
+		}
 	}
 
 	@Override
@@ -299,6 +304,8 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 			return false;
 		}
 
+		aquireWakeLock();
+
 		return true;
 	}
 
@@ -351,8 +358,6 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 			}
 		});
 */
-
-		player.setWakeMode(App.getContext(), PowerManager.PARTIAL_WAKE_LOCK);
 	}
 	
 	private void nextSong()
@@ -445,9 +450,11 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		if(isPlaying){
 			player.pause();
 			remoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
+			releaseWakeLock();
 			
 			isPlaying = false;
 		}else{
+			aquireWakeLock();
 			player.start();
 			remoteControlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
 			
@@ -475,6 +482,8 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 			player.release();
 			player = null;
 		}
+
+		releaseWakeLock();
 		
 		if(!isStopped){
 			stopForeground(true);
@@ -523,6 +532,23 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 			updateRemoteControl();
 		}else{
 			stopSelf(startId);
+		}
+	}
+
+	private void aquireWakeLock()
+	{
+		if(wakeLock == null){
+			PowerManager powerManager = (PowerManager)getSystemService(POWER_SERVICE);
+			wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, PlayerService.class.toString());
+			wakeLock.acquire();
+		}
+	}
+
+	private void releaseWakeLock()
+	{
+		if(wakeLock != null){
+			wakeLock.release();
+			wakeLock = null;
 		}
 	}
 	
