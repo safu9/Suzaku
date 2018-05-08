@@ -737,7 +737,8 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 	
 	private void updateWidget()
 	{
-		Intent intent = new Intent(PlayerWidgetProvider.ACTION_UPDATE);
+		Intent intent = new Intent(App.getContext(), PlayerWidgetProvider.class);
+		intent.setAction(PlayerWidgetProvider.ACTION_UPDATE);
 		intent.putExtra(KEY_TRACK, playlist.getCurrentTrack());
 		intent.putExtra(KEY_PLAYING, isPlaying);
 		sendBroadcast(intent);
