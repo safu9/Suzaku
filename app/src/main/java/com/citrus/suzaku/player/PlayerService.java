@@ -1,23 +1,40 @@
 package com.citrus.suzaku.player;
 
-import android.app.*;
-import android.content.*;
-import android.graphics.*;
-import android.media.*;
-import android.os.*;
-import android.support.v4.app.*;
-import android.util.*;
-import android.widget.*;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
+import android.media.RemoteControlClient;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.PowerManager;
+import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
+import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.citrus.suzaku.App;
 import com.citrus.suzaku.ArtworkCache;
-import com.citrus.suzaku.main.MainActivity;
 import com.citrus.suzaku.R;
+import com.citrus.suzaku.base.TrackGroup;
+import com.citrus.suzaku.main.MainActivity;
 import com.citrus.suzaku.track.Track;
 import com.citrus.suzaku.track.TrackActivity;
-import com.citrus.suzaku.base.TrackGroup;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 
@@ -660,23 +677,28 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		}else{
 			ntfViews.setImageViewResource(R.id.artwork_view, R.drawable.img_blank_big);
 		}
-		
+
+		Context context = App.getContext();
 		Intent intent;
 		
-		intent = new Intent(ACTION_PREV);
-		PendingIntent prevIntent = PendingIntent.getService(this, R.id.prev_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		intent = new Intent(context, PlayerService.class);
+		intent.setAction(ACTION_PREV);
+		PendingIntent prevIntent = getForegrounServiceCompat(this, R.id.prev_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		ntfViews.setOnClickPendingIntent(R.id.prev_button, prevIntent);
 		
-		intent = new Intent(ACTION_PLAY_PAUSE);
-		PendingIntent playIntent = PendingIntent.getService(this, R.id.play_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		intent = new Intent(context, PlayerService.class);
+		intent.setAction(ACTION_PLAY_PAUSE);
+		PendingIntent playIntent = getForegrounServiceCompat(this, R.id.play_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		ntfViews.setOnClickPendingIntent(R.id.play_button, playIntent);
 		
-		intent = new Intent(ACTION_NEXT);
-		PendingIntent nextIntent = PendingIntent.getService(this, R.id.next_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		intent = new Intent(context, PlayerService.class);
+		intent.setAction(ACTION_NEXT);
+		PendingIntent nextIntent = getForegrounServiceCompat(this, R.id.next_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		ntfViews.setOnClickPendingIntent(R.id.next_button, nextIntent);
 		
-		intent = new Intent(ACTION_STOP);
-		PendingIntent stopIntent = PendingIntent.getService(this, R.id.close_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		intent = new Intent(context, PlayerService.class);
+		intent.setAction(ACTION_STOP);
+		PendingIntent stopIntent = getForegrounServiceCompat(this, R.id.close_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		ntfViews.setOnClickPendingIntent(R.id.close_button, stopIntent);
 
 		Intent[] intents = new Intent[2];
@@ -698,6 +720,15 @@ public class PlayerService extends Service implements AudioManager.OnAudioFocusC
 		}
 
 		startForeground(NOTIFICATION_ID, ntfBuilder.build());
+	}
+
+	private static PendingIntent getForegrounServiceCompat(Context context, int requestCode, Intent intent, int flags)
+	{
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+			return PendingIntent.getForegroundService(context, requestCode, intent, flags);
+		}else{
+			return PendingIntent.getService(context, requestCode, intent, flags);
+		}
 	}
 	
 	// ロック画面での表示

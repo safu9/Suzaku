@@ -4,6 +4,7 @@ import android.app.*;
 import android.appwidget.*;
 import android.content.*;
 import android.graphics.*;
+import android.os.Build;
 import android.widget.*;
 
 import com.citrus.suzaku.App;
@@ -51,16 +52,19 @@ public class PlayerWidgetProvider extends AppWidgetProvider
 
 		Intent intent;
 
-		intent = new Intent(PlayerService.ACTION_PREV);
-		PendingIntent prevIntent = PendingIntent.getService(context, R.id.prev_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		intent = new Intent(context, PlayerService.class);
+		intent.setAction(PlayerService.ACTION_PREV);
+		PendingIntent prevIntent = getForegrounServiceCompat(context, R.id.prev_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		views.setOnClickPendingIntent(R.id.prev_button, prevIntent);
 
-		intent = new Intent(PlayerService.ACTION_PLAY_PAUSE);
-		PendingIntent playIntent = PendingIntent.getService(context, R.id.play_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		intent = new Intent(context, PlayerService.class);
+		intent.setAction(PlayerService.ACTION_PLAY_PAUSE);
+		PendingIntent playIntent = getForegrounServiceCompat(context, R.id.play_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		views.setOnClickPendingIntent(R.id.play_button, playIntent);
 
-		intent = new Intent(PlayerService.ACTION_NEXT);
-		PendingIntent nextIntent = PendingIntent.getService(context, R.id.next_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		intent = new Intent(context, PlayerService.class);
+		intent.setAction(PlayerService.ACTION_NEXT);
+		PendingIntent nextIntent = getForegrounServiceCompat(context, R.id.next_button, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		views.setOnClickPendingIntent(R.id.next_button, nextIntent);
 		
 		// API LV 11
@@ -99,6 +103,15 @@ public class PlayerWidgetProvider extends AppWidgetProvider
 		}
 
 		return views;
+	}
+
+	private static PendingIntent getForegrounServiceCompat(Context context, int requestCode, Intent intent, int flags)
+	{
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+			return PendingIntent.getForegroundService(context, requestCode, intent, flags);
+		}else{
+			return PendingIntent.getService(context, requestCode, intent, flags);
+		}
 	}
 
 	@Override
