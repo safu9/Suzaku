@@ -47,15 +47,18 @@ public class MusicDBService extends IntentService
 	public static final String ACTION_UPDATE_TRACKS = "com.citrus.suzaku.action.ACTION_UPDATE_TRACKS";
 	public static final String ACTION_CREATE_PLAYLIST = "com.citrus.suzaku.action.ACTION_CREATE_PLAYLIST";
 	public static final String ACTION_EDIT_PLAYLIST = "com.citrus.suzaku.action.ACTION_EDIT_PLAYLIST";
-	public static final String ACTION_ADD_TO_PLAYLIST = "com.citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST";
-	public static final String ACTION_DELETE_PLAYLISTTRACKS = "com.citrus.suzaku.action.ACTION_DELETE_PLAYLISTTRACKS";
 	public static final String ACTION_DELETE_PLAYLIST = "com.citrus.suzaku.action.ACTION_DELETE_PLAYLIST";
+	public static final String ACTION_ADD_TO_PLAYLIST = "com.citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST";
+	public static final String ACTION_UPDATE_PLAYLISTTRACKS = "com.citrus.suzaku.action.ACTION_UPDATE_PLAYLISTTRACKS";
+	public static final String ACTION_DELETE_PLAYLISTTRACKS = "com.citrus.suzaku.action.ACTION_DELETE_PLAYLISTTRACKS";
 
 	// Intent Extra Key
 	public static final String INTENT_KEY_PATHS = "PATHS";
 	public static final String INTENT_KEY_PLAYLIST = "PLAYLIST";
 	public static final String INTENT_KEY_PLAYLIST_ID = "PLAYLIST_ID";
 	public static final String INTENT_KEY_TRACK_IDS = "TRACK_IDS";
+	public static final String INTENT_KEY_PLAYLISTTRACK = "PLAYLISTTRACK";
+	public static final String INTENT_KEY_PLAYLISTTRACK_IDS = "PLAYLISTTRACK_IDS";
 	
 	
 /*	public MusicDBService(String name)
@@ -106,6 +109,13 @@ public class MusicDBService extends IntentService
 				postEvent(new PlaylistChangedEvent());
 				break;
 			}
+			case ACTION_DELETE_PLAYLIST:
+				long playlistId = intent.getLongExtra(INTENT_KEY_PLAYLIST_ID, -1);
+				deletePlaylist(playlistId);
+
+				postEvent(new PlaylistChangedEvent());
+				break;
+
 			case ACTION_ADD_TO_PLAYLIST:{
 				Playlist playlist = (Playlist) intent.getSerializableExtra(INTENT_KEY_PLAYLIST);
 				List<Long> trackIds = (List<Long>) intent.getSerializableExtra(INTENT_KEY_TRACK_IDS);
@@ -114,20 +124,22 @@ public class MusicDBService extends IntentService
 				postEvent(new PlaylistChangedEvent());
 				break;
 			}
-			case ACTION_DELETE_PLAYLISTTRACKS: {
+			case ACTION_UPDATE_PLAYLISTTRACKS: {
 				Playlist playlist = (Playlist) intent.getSerializableExtra(INTENT_KEY_PLAYLIST);
-				List<Long> trackIds = (List<Long>) intent.getSerializableExtra(INTENT_KEY_TRACK_IDS);
-				deletePlaylistTracks(playlist, trackIds);
+				List<PlaylistTrack> ptracks = (List<PlaylistTrack>) intent.getSerializableExtra(INTENT_KEY_PLAYLISTTRACK);
+				updatePlaylistTracks(playlist, ptracks);
 
 				postEvent(new PlaylistChangedEvent());
 				break;
 			}
-			case ACTION_DELETE_PLAYLIST:
-				long playlistId = intent.getLongExtra(INTENT_KEY_PLAYLIST_ID, -1);
-				deletePlaylist(playlistId);
-			
+			case ACTION_DELETE_PLAYLISTTRACKS: {
+				Playlist playlist = (Playlist) intent.getSerializableExtra(INTENT_KEY_PLAYLIST);
+				List<Long> ptrackIds = (List<Long>) intent.getSerializableExtra(INTENT_KEY_PLAYLISTTRACK_IDS);
+				deletePlaylistTracks(playlist, ptrackIds);
+
 				postEvent(new PlaylistChangedEvent());
 				break;
+			}
 		}
 	}
 	
@@ -632,20 +644,65 @@ public class MusicDBService extends IntentService
 		showToast(R.string.msg_added_to_playlist);
 	}
 
+	// ACTION_UPDATE_PLAYLISTTRACKS
+	private void updatePlaylistTracks(Playlist playlist, List<PlaylistTrack> ptracks){
+
+		SQLiteDatabase db = MusicDBHelper.getInstanceForWriting().getWritableDatabase();
+		db.beginTransactionNonExclusive();
+		try{
+			String stmt =
+				"UPDATE " + PlaylistTracks.TABLE + " SET " +
+					PlaylistTracks.PLAYLIST_TRACK_NO + " = ?" +
+					" WHERE " + PlaylistTracks._ID + " = ? AND " + PlaylistTracks.PLAYLIST_ID + " = ?;";
+
+			SQLiteStatement updateStmt = db.compileStatement(stmt);
+
+			stmt =
+				"DELETE FROM " + PlaylistTracks.TABLE +
+					" WHERE " + PlaylistTracks._ID + " = ? AND " + PlaylistTracks.PLAYLIST_ID + " = ?;";
+
+			SQLiteStatement deleteStmt = db.compileStatement(stmt);
+
+			try{
+				for(PlaylistTrack ptrack : ptracks){
+					if(ptrack.playlistTrackNo >= 0){		// 更新
+						updateStmt.bindLong(1, ptrack.playlistTrackNo);
+						updateStmt.bindLong(2, ptrack.id);
+						updateStmt.bindLong(3, playlist.id);
+						updateStmt.executeUpdateDelete();
+					}else{									// 削除
+						deleteStmt.bindLong(1, ptrack.id);
+						deleteStmt.bindLong(2, playlist.id);
+						deleteStmt.executeUpdateDelete();
+					}
+				}
+			}finally{
+				updateStmt.close();
+				deleteStmt.close();
+			}
+
+			updateNumSongsInPlaylist(db, playlist.id);
+
+			db.setTransactionSuccessful();
+		}finally{
+			db.endTransaction();
+		}
+	}
+
 	// ACTION_DELETE_PLAYLISTTRACKS
-	private void deletePlaylistTracks(Playlist playlist, List<Long> trackIds)
+	private void deletePlaylistTracks(Playlist playlist, List<Long> ptrackIds)
 	{
 		SQLiteDatabase db = MusicDBHelper.getInstanceForWriting().getWritableDatabase();
 		db.beginTransactionNonExclusive();
 		try{
 			String stmt =
 				"DELETE FROM " + PlaylistTracks.TABLE +
-				" WHERE " + PlaylistTracks.TRACK_ID + " = ? AND " + PlaylistTracks.PLAYLIST_ID + " = ?;";
+				" WHERE " + PlaylistTracks._ID + " = ? AND " + PlaylistTracks.PLAYLIST_ID + " = ?;";
 
 			SQLiteStatement deleteStmt = db.compileStatement(stmt);
 
 			try{
-				for(Long id : trackIds){
+				for(Long id : ptrackIds){
 					deleteStmt.bindLong(1, id);
 					deleteStmt.bindLong(2, playlist.id);
 					deleteStmt.executeUpdateDelete();

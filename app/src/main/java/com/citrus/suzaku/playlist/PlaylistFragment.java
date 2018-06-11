@@ -1,41 +1,52 @@
 package com.citrus.suzaku.playlist;
 
-import android.content.*;
-import android.os.*;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.*;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.view.*;
-import android.widget.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.citrus.suzaku.ArtworkCache;
-import com.citrus.suzaku.main.MainActivity;
-import com.citrus.suzaku.pref.PreferenceUtils;
 import com.citrus.suzaku.R;
-import com.citrus.suzaku.track.Track;
-import com.citrus.suzaku.track.TrackActivity;
 import com.citrus.suzaku.database.MusicDB;
 import com.citrus.suzaku.database.MusicDBService;
+import com.citrus.suzaku.main.MainActivity;
 import com.citrus.suzaku.player.PlayerService;
 import com.citrus.suzaku.player.PlaylistManager;
+import com.citrus.suzaku.pref.PreferenceUtils;
+import com.citrus.suzaku.track.Track;
+import com.citrus.suzaku.track.TrackActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.*;
+import java.util.List;
 
 // Attached to MainActivity
 public class PlaylistFragment extends Fragment
 {
 	private static final String FRAGMENT_TAG = "PlaylistTrackListFragment";
 	private static final int LOADER_ID = 1001;
+
+	private static final String EDIT_FRAGMENT_TAG = "PlaylistTrackListEditFragment";
 	
 	private Playlist playlistItem;
 	
 	private TextView titleTextView;
 	private TextView songsTextView;
 	private ImageView artworkImageView;
+
+	private boolean isEditMode = false;
 	
 	
 	public static PlaylistFragment newInstance(Playlist playlist)
@@ -79,6 +90,16 @@ public class PlaylistFragment extends Fragment
 			.replace(R.id.list, PlaylistTrackListFragment.newInstance(LOADER_ID, playlistItem), FRAGMENT_TAG)
 			.commit();
 		}
+
+		getChildFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener(){
+			@Override
+			public void onBackStackChanged()
+			{
+				int count = getChildFragmentManager().getBackStackEntryCount();
+				isEditMode = (count != 0);
+				getActivity().invalidateOptionsMenu();
+			}
+		});
 		
 		return view;
 	}
@@ -104,8 +125,15 @@ public class PlaylistFragment extends Fragment
 		super.onCreateOptionsMenu(menu,inflater);
 
 		inflater.inflate(R.menu.menu_fragment, menu);
+		inflater.inflate(R.menu.menu_fragment_playlist, menu);
 	}
-	
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu)
+	{
+		menu.findItem(R.id.menu_edit).setEnabled(!isEditMode);
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -125,6 +153,14 @@ public class PlaylistFragment extends Fragment
 					startActivity(new Intent(getActivity(), TrackActivity.class));
 				}
 
+				return true;
+
+			case R.id.menu_edit:
+				getChildFragmentManager()
+					.beginTransaction()
+					.add(R.id.list, PlaylistTrackListEditFragment.newInstance(playlistItem), EDIT_FRAGMENT_TAG)
+					.addToBackStack(EDIT_FRAGMENT_TAG)
+					.commit();
 				return true;
 
 			default:

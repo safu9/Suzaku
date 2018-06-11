@@ -79,9 +79,10 @@
                 <action android:name="com.citrus.suzaku.action.ACTION_UPDATE_TRACKS"/>
                 <action android:name="com.citrus.suzaku.action.ACTION_CREATE_PLAYLIST" />
                 <action android:name="com.citrus.suzaku.action.ACTION_EDIT_PLAYLIST" />
-                <action android:name="com.citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST" />
-                <action android:name="com.citrus.suzaku.action.ACTION_DELETE_PLAYLISTTRACKS" />
                 <action android:name="com.citrus.suzaku.action.ACTION_DELETE_PLAYLIST" />
+                <action android:name="com.citrus.suzaku.action.ACTION_ADD_TO_PLAYLIST" />
+                <action android:name="com.citrus.suzaku.action.ACTION_UPDATE_PLAYLISTTRACKS" />
+                <action android:name="com.citrus.suzaku.action.ACTION_DELETE_PLAYLISTTRACKS" />
             </intent-filter>
         </service>
 

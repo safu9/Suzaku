@@ -2,13 +2,24 @@
 	style="@style/myListItem"
 	android:layout_width="match_parent"
 	android:gravity="center_vertical"
-	android:orientation="vertical">
+	android:orientation="vertical"
+	android:background="@color/white">
+
+	<ImageView
+		android:id="@+id/handle_view"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:src="@drawable/ic_drag_handle_white_24"
+		android:tint="@color/gray"
+		android:paddingLeft="@dimen/spacing_small"
+		android:paddingRight="@dimen/spacing_small"/>
 
 	<TextView
 		style="@style/myListText"
 		android:id="@+id/title_view"
 		android:layout_height="@dimen/view_tiny"
-		android:layout_width="match_parent"/>
+		android:layout_width="match_parent"
+		android:layout_toRightOf="@id/handle_view"/>
 
 	<TextView
 		style="@style/myListDetailText"
@@ -16,6 +27,7 @@
 		android:layout_height="@dimen/view_tiny"
 		android:layout_width="match_parent"
 		android:layout_below="@id/title_view"
+		android:layout_toRightOf="@id/handle_view"
 		android:layout_toLeftOf="@+id/duration_view"/>
 
 	<TextView

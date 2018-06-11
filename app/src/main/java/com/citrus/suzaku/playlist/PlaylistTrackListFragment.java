@@ -35,7 +35,7 @@ import java.util.List;
 public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 {
 	private static final String PLAYLIST = "PLAYLIST";
-	
+
 	private Playlist playlist;
 
 	public static PlaylistTrackListFragment newInstance(int loaderId, Playlist playlist)
@@ -93,7 +93,7 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 			case R.id.menu_delete:
 				Intent intent = new Intent(MusicDBService.ACTION_DELETE_PLAYLISTTRACKS);
 				intent.putExtra(MusicDBService.INTENT_KEY_PLAYLIST, playlist);
-				intent.putExtra(MusicDBService.INTENT_KEY_TRACK_IDS, (Serializable)getCheckedTrackIds());
+				intent.putExtra(MusicDBService.INTENT_KEY_PLAYLISTTRACK_IDS, (Serializable)getCheckedPlaylistTrackIds());
 				intent.setPackage(App.PACKAGE);
 				getActivity().startService(intent);
 				
@@ -116,6 +116,17 @@ public class PlaylistTrackListFragment extends BaseListFragment<PlaylistTrack>
 		}
 
 		return trackIds;
+	}
+
+	protected List<Long> getCheckedPlaylistTrackIds()
+	{
+		List<PlaylistTrack> ptracks = getCheckedItems();
+		List<Long> ptrackIds = new ArrayList<>();
+		for(PlaylistTrack ptrack : ptracks){
+			ptrackIds.add(ptrack.id);
+		}
+
+		return ptrackIds;
 	}
 
 	@Override
