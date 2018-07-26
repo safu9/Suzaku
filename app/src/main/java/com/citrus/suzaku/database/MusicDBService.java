@@ -214,18 +214,18 @@ public class MusicDBService extends IntentService
 	private void deleteTracksOutOfLibrary(SQLiteDatabase db, ArrayList<String> rootPaths)
 	{
 		String[] whereArgs = rootPaths.toArray(new String[rootPaths.size()]);
-		String where = "";
+		StringBuilder where = new StringBuilder();
 		for(int i = 0; i < rootPaths.size(); i++){
 			if(i != 0){
-				where += "AND ";
+				where.append("AND ");
 			}
-			where += Tracks.PATH + " NOT LIKE ? || '/%' ";
+			where.append(Tracks.PATH + " NOT LIKE ? || '/%' ");
 		}
 
 		db.beginTransactionNonExclusive();
 		try{
 			MusicDB mdb = new MusicDB(db);
-			mdb.deleteTracks(where, whereArgs);
+			mdb.deleteTracks(where.toString(), whereArgs);
 			db.setTransactionSuccessful();
 		}finally{
 			db.endTransaction();
