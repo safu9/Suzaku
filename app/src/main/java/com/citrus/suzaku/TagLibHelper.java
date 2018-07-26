@@ -89,7 +89,7 @@ public class TagLibHelper
     public native void setComment(String comment);
     public native void setGroup(String group);
     public native void setTrackNumber(int trackNum);
-    public native void setDiscNumber(int discNum);
+    public native void setDiscNumber(int discNum, int discCount);
     public native void setCompilation(boolean compilation);
 
     public native void setArtwork(byte[] artwork, String mime);
