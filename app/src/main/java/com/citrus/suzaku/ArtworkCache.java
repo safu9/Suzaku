@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -271,7 +272,10 @@ public class ArtworkCache
 			if(bmp != null){
 				image.setImageBitmap(bmp);
 			}else{
-				new ImageGetTask(album.getTracks().get(0), image).executeOnExecutor(ImageGetTask.MY_THREAD_POOL_EXECUTOR);
+				List<Track> tracks = album.getTracks();
+				if (tracks.size() > 1) {
+					new ImageGetTask(tracks.get(0), image).executeOnExecutor(ImageGetTask.MY_THREAD_POOL_EXECUTOR);
+				}
 			}
 		}
 
@@ -440,7 +444,10 @@ public class ArtworkCache
 			if(bmp != null){
 				image.setImageBitmap(bmp);
 			}else{
-				new ImageGetTask(album.getTracks().get(0), image, false).execute();
+				List<Track> tracks = album.getTracks();
+				if (tracks.size() > 1) {
+					new ImageGetTask(tracks.get(0), image, false).execute();
+				}
 			}
 		}
 
